@@ -1,36 +1,54 @@
 <template>
-    
-    <g :x="x" :y="y" :transform="'translate(' + x + ',' + y +')'" ref="grid">
+    <g ref="grid" >
+      <g :x="collumnWidth * (index - 1)" y="0" :key="index" v-for="index in (collumnsLeft+collumnsRight)">
+        <rect :x="collumnWidth * (index - 1)" :y="(barHeight / beats) * (rect - 1)" :width="collumnWidth" :height="(barHeight / beats)" fill="#fff" :key="rect" v-for="rect in ((bars) * beats)"/>
+      </g>
+      <!--horizontal lines-->
+      <line :x1="collumnWidth * (collumnsLeft - 0.5)" :y1="(barHeight / beats) * (line - 1)" :x2="collumnWidth * (collumnsLeft +  0.5)" :y2="(barHeight / beats) * (line - 1)" :key="line" v-for="line in ((bars) * beats)" stroke-width="2" stroke="black"/>
+      <line :x1="collumnWidth * (collumnsLeft - 2)" :y1="barHeight * (line - 1)" :x2="collumnWidth * (collumnsLeft + 2)" :y2="barHeight * (line - 1)" :key="line" v-for="line in (bars + 2)" stroke-width="2" stroke="black"/>
+      <line :x1="collumnWidth * (collumnsLeft - 2)" :y1="barHeight * bars + 5" :x2="collumnWidth * (collumnsLeft + 2)" :y2="barHeight * bars + 5" stroke-width="2" stroke="black"/>
 
+      <!--vertical lines-->
+      <line :x1="collumnWidth * (collumnsLeft - 2)" y1="0" :x2="collumnWidth * (collumnsLeft - 2)" :y2="fullHeight" stroke-width="2" stroke="black"/>
+      <line :x1="collumnWidth * (collumnsLeft)" y1="0" :x2="collumnWidth * (collumnsLeft)" :y2="fullHeight" stroke-width="3" stroke="black"/>
+      <line :x1="collumnWidth * (collumnsLeft + 2)" y1="0" :x2="collumnWidth * (collumnsLeft + 2)" :y2="fullHeight" stroke-width="2" stroke="black"/>
     </g>
 </template>
 
 <script>
+import interact from "interactjs";
+
 /**
  * The generic laban sign component.
  * @displayName Grid
  */
 export default {
   name: "Grid",
+  inject: ["barHeight", "collumnWidth", "canvasMargin","borderWidth"],
   props: {
-    x: Number,
-    y: Number,
-    sex: Number
+    collumnsLeft: Number,
+    collumnsRight: Number,
+    bars: Number,
+    beats: Number,
   },
   data() {
     return {
-      signType: "Generic",
-      name: ""
     };
   },
   mounted () {
-    //TODO: REPLACE IMPLICIT CALLING FOR MYSIGN AND DRAGGABLE WITH REFS
-    this.name= Math.round(Math.random() * 100);
-  },
-  methods: {
+    interact(this.$refs.grid).on("tap", this.click);
     
   },
+  methods: {
+    click () {
+      this.$emit("unselect");
+    },
+    randomColor () {
+      return "#" + Math.floor(Math.random()*16777215).toString(16);
+    }
+  },
   computed: {
+    fullHeight () {return this.barHeight * (2 + 1)}, 
   }
 };
 </script>
@@ -38,43 +56,4 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style>
 
-.dragging {
-  touch-action: none;
-  overscroll-behavior: none;
-  user-select: none;
-
-}
-
-  .dragging > rect {
-    opacity: 0.5;
-    stroke-width: 4;
-    stroke:#5e9fc7;
-    z-index: 100;
-  }
-
-.draggable {
-  fill: white;
-  stroke-width: 2;
-  stroke:rgb(0,0,0);
-
-  touch-action: none;
-}
-
-  .draggable.active {
-    stroke-width: 3;
-    stroke:#5e9fc7;
-  }
-
-.shadow {
-  fill: #a42a42;
-  stroke-width: 2;
-  stroke: rgb(0,0,0);
-  
-}
-
-.resize-handle {
-  stroke: #5e9fc7; 
-  stroke-width: 3;
-  fill: white;
-}
 </style>

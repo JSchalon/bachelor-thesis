@@ -1,22 +1,27 @@
 <template>
     <g :x="x" :y="y" :transform="'translate(' + x + ',' + y +')'" ref="GenericSign" :signID="id">
       
-      <rect x="0" y="0" width="60" :height="height" class="draggable actual-sign" :signID="id" :class="{active: isSelected}">
+      <rect x="0" y="0" :width="signWidth" :height="height" class="draggable actual-sign" :signID="id" :class="{active: isSelected}" :stroke-width="isSelected ? borderWidth + 1: borderWidth">
         
       </rect>
-      <text x="0" y="20" class="text" fill="black">{{name}}</text>
-      <circle cx="30" cy="0" r="7" class="resize-handle handle-first" :display="isSelected ? 'block' : 'none'" :signID="id"/>
-      <circle cx="30" :cy="height" r="7" class="resize-handle handle-second" :display="isSelected ? 'block' : 'none'" :signID="id"/>
+      <text x="10" y="20" class="text" fill="black">{{name}}</text>
+      <ResizeHandle :isFirst="true" :isActive="isSelected" :signHeight="height" :signID="id"/>
+      <ResizeHandle :isFirst="false" :isActive="isSelected" :signHeight="height" :signID="id"/>
     </g>
 </template>
 
 <script>
+import ResizeHandle from "../ResizeHandle.vue"
+
 /**
  * The generic laban sign component.
  * @displayName Generic Sign
  */
 export default {
   name: "GenericSign",
+  components: {
+    ResizeHandle
+  },
   props: {
     id: Number,
     isSelected: Boolean,
@@ -24,6 +29,7 @@ export default {
     x: Number,
     y: Number,
   },
+  inject: ["signWidth","borderWidth"],
   data() {
     return {
       signType: "Generic",
@@ -31,7 +37,6 @@ export default {
     };
   },
   mounted () {
-    //TODO: REPLACE IMPLICIT CALLING FOR MYSIGN AND DRAGGABLE WITH REFS
     this.name= Math.round(Math.random() * 100);
     let sign = this.$refs.GenericSign;
     
@@ -45,8 +50,7 @@ export default {
 };
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
-<style>
+<style scoped>
 
 .dragging {
   touch-action: none;
@@ -57,34 +61,18 @@ export default {
 
   .dragging > rect {
     opacity: 0.5;
-    stroke-width: 4;
     stroke:#5e9fc7;
     z-index: 100;
   }
 
 .draggable {
   fill: white;
-  stroke-width: 2;
   stroke:rgb(0,0,0);
 
   touch-action: none;
 }
 
   .draggable.active {
-    stroke-width: 3;
     stroke:#5e9fc7;
   }
-
-.shadow {
-  fill: #a42a42;
-  stroke-width: 2;
-  stroke: rgb(0,0,0);
-  
-}
-
-.resize-handle {
-  stroke: #5e9fc7; 
-  stroke-width: 3;
-  fill: white;
-}
 </style>

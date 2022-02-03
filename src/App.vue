@@ -1,30 +1,30 @@
 <template>
   <div id="app">
     <Header/>
-    <SignLibrary/>
-    <div id="interactionBox">
-      <InteractionMenu/>
-      <Score/>
-    </div>
-    
+    <router-view/>
   </div>
 </template>
 
 <script>
 //TODO: MAKE A COMPONENT WITH INTERACTIONBOX AND SIGNLIBRARY SO OTHER VIEWS MIGHT BE ADDED 
 import Header from "./components/Header";
-import InteractionMenu from "./components/InteractionMenu";
-import SignLibrary from "./components/SignLibrary";
-import Score from "./components/Score";
 
 export default {
   name: "App",
   components: {
     Header,
-    InteractionMenu,
-    SignLibrary,
-    Score
-  }
+  },
+  provide: {
+    //set global dimensions used by the score canvas, its subcomponents and the signs
+    //change these here
+    signWidth: 50,
+    barHeight: 200,
+    collumnWidth: 80,
+
+    canvasMargin: 15,
+    handleDiam: 7,
+    borderWidth: 2,
+  },
 };
 </script>
 
@@ -32,9 +32,5 @@ export default {
 body {
   margin: 0;
 
-}
-#interactionBox {
-  width: 84%;
-  float: right;
 }
 </style>

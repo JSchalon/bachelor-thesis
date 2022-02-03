@@ -1,14 +1,12 @@
 <template>
     <div id="canvasContainer">
       <svg preserveAspectRatio="xMinYMax meet" ref="canvas" id="canvas" :width="canvasDimensions.x" :height="canvasDimensions.y" fill="white">
-        <rect x="0" y="0" :width="collumnWidth" :height="canvasDimensions.y" fill="red"/>
-        <rect :x="collumnWidth * 1" y="0" :width="collumnWidth" :height="canvasDimensions.y" fill="black"/>
-        <rect :x="collumnWidth * 2" y="0" :width="collumnWidth" :height="canvasDimensions.y" fill="green"/>
-        <rect :x="collumnWidth * 3" y="0" :width="collumnWidth" :height="canvasDimensions.y" fill="blue"/>
-        <rect :x="collumnWidth * 4" y="0" :width="collumnWidth" :height="canvasDimensions.y" fill="yellow"/>
-        <rect :x="collumnWidth * 5" y="0" :width="collumnWidth" :height="canvasDimensions.y" fill="pink"/>
-        <Grid :x="gridPosition.x" :y="gridPosition.y"/>
-        <component :is="item.signType" @requestListeners="initListeners" :id="index" :isSelected="item.isSelected" :height="item.height" :x="item.x" :y="item.y" :key="index" v-for="(item, index) in signs"/>
+        <rect x="0" y="0" :width="canvasDimensions.x" :height="canvasDimensions.y" ref="canvasBG" />
+        <g :transform="'translate(' + canvasMargin + ', ' + canvasMargin +')'" ref="bounding">
+          <rect x="0" y="0" :width="canvasDimensions.x - canvasMargin * 2" :height="canvasDimensions.y - canvasMargin * 2" />
+          <Grid @unselect="selectSign(-1)" :beats="beats" :bars="bars" :collumnsLeft="collumnsLeft" :collumnsRight="collumnsRight" />
+          <component :is="item.signType" @requestListeners="initListeners" :id="index" :isSelected="item.isSelected" :height="item.height" :x="item.x" :y="item.y" :key="index" v-for="(item, index) in signs"/>
+        </g>
       </svg>
     </div>
 </template>
@@ -19,37 +17,39 @@ import Grid from "./Grid.vue"
 import interact from "interactjs";
 
 export default {
-    name: 'Score',
-    components: {
+  name: 'Score',
+  components: {
     GenericSign,
     Grid
   },
+  inject: ["signWidth", "barHeight", "collumnWidth", "handleDiam", "canvasMargin", "borderWidth"],
   data() {
     return {
-      gloMinSignHeight: 100,
-      gloSignWidth: 60,
-      gloHandleDiam: 7,
-      gloBorderWidth: 2,
-      margin: 15,
-      barHeight: 200,
-      collumnWidth: 90,
-      collumnsLeft: 3,
-      collumnsRight: 3,
-      bars: 2,
-      beats: 2,
-      signs: [{isSelected: false, signType: "GenericSign", height: 100, x: 15, y: 0},{isSelected: false, signType: "GenericSign", height: 100, x:105, y: 100}],
+      signs: [{isSelected: false, signType: "GenericSign", height: 100, x: 15, y: 0},{isSelected: false, signType: "GenericSign", height: 100, x:95, y: 100}],
     };
   },
   computed: {
-    canvasDimensions () {
-      return {x: this.collumnWidth * (this.collumnsLeft + this.collumnsRight), y: this.barHeight * (this.bars + 1) };
+    collumnsLeft () {
+      return this.$store.state["collumnsLeft"];
     },
-    gridPosition () {
-      return {x: 100, y: 100};
-    }
+    collumnsRight () {
+      return this.$store.state["collumnsRight"];
+    },
+    bars () {
+      return this.$store.state["bars"];
+    },
+    beats () {
+      return this.$store.state["beatsPerBar"];
+    },
+    minHeight () {
+      return this.barHeight / this.beats;
+    },
+    canvasDimensions () {
+      return {x: this.collumnWidth * (this.collumnsLeft + this.collumnsRight) + 2 * this.canvasMargin, y: this.barHeight * (this.bars + 1) + 2 * this.canvasMargin};
+    },
   },
   mounted () {
-
+    //this.$store.dispatch("getCurrentVillagerFromAPI", this.$route.params.id);
   },
   methods: {
     selectSign(id) {
@@ -61,7 +61,7 @@ export default {
       }
     },
     placeOnTop (elem) {
-      this.$refs.canvas.appendChild(elem);
+      this.$refs.bounding.appendChild(elem);
     },
     addSign (type, height, x, y) {
       const newSign = {isSelected: false, signType: type, height: height, x: x, y: y};
@@ -111,7 +111,6 @@ export default {
           right: false,
           bottom: ".handle-second",  
           top: ".handle-first", 
-          
         },
         listeners: {
           move: this.resizeMove,
@@ -119,10 +118,10 @@ export default {
         modifiers: [
           // minimum size
           interact.modifiers.restrictSize({
-            min: { width: 0, height: this.gloMinSignHeight + this.gloHandleDiam * 2 }
+            min: { width: 0, height: this.minHeight + this.handleDiam * 2 }
           }),
-          interact.modifiers.restrict({
-            restriction: 'parent',
+          interact.modifiers.restrictEdges({
+            outer: "parent",
           })
         ],
 
@@ -161,7 +160,7 @@ export default {
       let y = (parseFloat(target.getAttribute("data-y")) || 0);
 
       // update the element height (-14 for the handles)
-      this.signs[targetID].height = event.rect.height - 14;
+      this.signs[targetID].height = event.rect.height - this.handleDiam * 2;
 
       // keep the same position when resizing from the top
       y += event.deltaRect.top;
@@ -216,6 +215,7 @@ export default {
      * @arg event the drag-move event
      */
     dragMove: function(event) {
+      this.selectSign(-1);
       let target = event.target;
       const targetID = target.getAttribute("signID");
       let shadow = this.$refs.canvas.querySelector("#shadow");
@@ -227,7 +227,7 @@ export default {
       //TODO: GET/SET BLOCKSIZE AUTOMATICALLY FROM SETTINGS 
       const blocksizeX = this.collumnWidth;
       const blocksizeY = this.barHeight / this.beats;
-      const collumnOffset = (this.collumnWidth - this.gloSignWidth) / 2;
+      const collumnOffset = (this.collumnWidth - this.signWidth) / 2;
       let actualx = Math.round(x / blocksizeX) * blocksizeX + collumnOffset;
       let actualy = Math.round(y / blocksizeY) * blocksizeY;
 
@@ -264,7 +264,7 @@ export default {
       //get the blocksize TODO: GET FROM GLOBAL VAR?
       const blocksizeX = this.collumnWidth;
       const blocksizeY = this.barHeight / this.beats;
-      const collumnOffset = (this.collumnWidth - this.gloSignWidth) / 2;
+      const collumnOffset = (this.collumnWidth - this.signWidth) / 2;
       let screenX = Math.round(x / blocksizeX) * blocksizeX + collumnOffset;
       let screenY = Math.round(y / blocksizeY) * blocksizeY;
 
@@ -294,17 +294,23 @@ export default {
 }
 </script>
 
-<style scoped>
+<style>
 #canvasContainer {
   width: 100%;
   height: 87vh;
   background-color: #e4e4e4;
-  overflow-x: scroll;
+  overflow: auto;
 }
 
 svg {
   margin: auto auto;
   display: block;
+  box-shadow: 0 1px 6px 3px rgba(0, 0, 0, 0.15);
 }
-
+.shadow {
+  fill: #a42a42;
+  stroke-width: 2;
+  stroke: rgb(0,0,0);
+  
+}
 </style>
