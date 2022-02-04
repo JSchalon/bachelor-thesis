@@ -20,8 +20,9 @@ export default {
     signWidth: 50,
     barHeight: 200,
     collumnWidth: 80,
-
-    canvasMargin: 15,
+    addRemoveHeight: 40,
+    addRemoveWidth: 10,
+    canvasMargin: 30,
     handleDiam: 7,
     borderWidth: 2,
   },

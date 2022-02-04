@@ -39,7 +39,6 @@ export default {
   mounted () {
     this.name= Math.round(Math.random() * 100);
     let sign = this.$refs.GenericSign;
-    
     this.$emit("requestListeners", sign);
   },
   methods: {

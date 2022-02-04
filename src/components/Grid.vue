@@ -30,6 +30,7 @@ export default {
     collumnsRight: Number,
     bars: Number,
     beats: Number,
+    fullHeight: Number,
   },
   data() {
     return {
@@ -37,7 +38,6 @@ export default {
   },
   mounted () {
     interact(this.$refs.grid).on("tap", this.click);
-    
   },
   methods: {
     click () {
@@ -47,9 +47,6 @@ export default {
       return "#" + Math.floor(Math.random()*16777215).toString(16);
     }
   },
-  computed: {
-    fullHeight () {return this.barHeight * (2 + 1)}, 
-  }
 };
 </script>
 

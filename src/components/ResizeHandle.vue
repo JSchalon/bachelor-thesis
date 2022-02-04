@@ -5,7 +5,7 @@
 <script>
 /**
  * The resize handle component.
- * @displayName Generic Sign
+ * @displayName Resize Handle
  */
 export default {
   name: "ResizeHandle",

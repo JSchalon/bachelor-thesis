@@ -2,11 +2,14 @@
     <div id="canvasContainer">
       <svg preserveAspectRatio="xMinYMax meet" ref="canvas" id="canvas" :width="canvasDimensions.x" :height="canvasDimensions.y" fill="white">
         <rect x="0" y="0" :width="canvasDimensions.x" :height="canvasDimensions.y" ref="canvasBG" />
-        <g :transform="'translate(' + canvasMargin + ', ' + canvasMargin +')'" ref="bounding">
-          <rect x="0" y="0" :width="canvasDimensions.x - canvasMargin * 2" :height="canvasDimensions.y - canvasMargin * 2" />
-          <Grid @unselect="selectSign(-1)" :beats="beats" :bars="bars" :collumnsLeft="collumnsLeft" :collumnsRight="collumnsRight" />
+        <g :transform="'translate(' + canvasMarginTopLeft + ', ' + canvasMarginTopLeft +')'" ref="bounding">
+          <rect x="0" y="0" :width="canvasDimNoPad.x" :height="canvasDimNoPad.y" />
+          <Grid @unselect="selectSign(-1)" :beats="beats" :bars="bars" :collumnsLeft="collumnsLeft" :collumnsRight="collumnsRight" :fullHeight="canvasDimNoPad.y" />
           <component :is="item.signType" @requestListeners="initListeners" :id="index" :isSelected="item.isSelected" :height="item.height" :x="item.x" :y="item.y" :key="index" v-for="(item, index) in signs"/>
         </g>
+        <AddRemoveKnob :place="'left'" :canvasDim="canvasDimensions" @addCollumn="addCollumn"/>
+        <AddRemoveKnob :place="'right'" :canvasDim="canvasDimensions" @addCollumn="addCollumn"/>
+        <AddRemoveKnob :place="'top'" :canvasDim="canvasDimensions" @addBar="addBar"/>
       </svg>
     </div>
 </template>
@@ -14,15 +17,17 @@
 <script>
 import GenericSign from "./Base Signs/GenericSign.vue"
 import Grid from "./Grid.vue"
+import AddRemoveKnob from "./AddRemoveKnob.vue"
 import interact from "interactjs";
 
 export default {
   name: 'Score',
   components: {
     GenericSign,
-    Grid
+    Grid,
+    AddRemoveKnob
   },
-  inject: ["signWidth", "barHeight", "collumnWidth", "handleDiam", "canvasMargin", "borderWidth"],
+  inject: ["signWidth", "barHeight", "collumnWidth", "handleDiam", "canvasMargin", "borderWidth", "addRemoveHeight", "addRemoveWidth"],
   data() {
     return {
       signs: [{isSelected: false, signType: "GenericSign", height: 100, x: 15, y: 0},{isSelected: false, signType: "GenericSign", height: 100, x:95, y: 100}],
@@ -45,13 +50,30 @@ export default {
       return this.barHeight / this.beats;
     },
     canvasDimensions () {
-      return {x: this.collumnWidth * (this.collumnsLeft + this.collumnsRight) + 2 * this.canvasMargin, y: this.barHeight * (this.bars + 1) + 2 * this.canvasMargin};
+      return {x: this.collumnWidth * (this.collumnsLeft + this.collumnsRight) + 2 * ( 2 * this.canvasMargin + this.addRemoveHeight), y: this.barHeight * (this.bars + 1) + 2 * (this.canvasMargin + this.addRemoveHeight)};
     },
+    canvasDimNoPad () {
+      return {x: this.collumnWidth * (this.collumnsLeft + this.collumnsRight), y: this.barHeight * (this.bars + 1)};
+    },
+    canvasMarginTopLeft () {
+      return 2 * this.canvasMargin + this.addRemoveHeight;
+    }
   },
   mounted () {
-    //this.$store.dispatch("getCurrentVillagerFromAPI", this.$route.params.id);
   },
   methods: {
+    addCollumn(side) {
+      this.$store.dispatch('addCollumn',side);
+    },
+    removeCollumn(side) {
+      this.$store.dispatch('removeCollumn',side);
+    },
+    addBar() {
+      this.$store.dispatch('addBar');
+    },
+    removeBar() {
+      this.$store.dispatch('removeBarBar');
+    },
     selectSign(id) {
       for (let elem of this.signs) {
         elem.isSelected = false;

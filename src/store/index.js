@@ -8,29 +8,35 @@ export default createStore({
     beatsPerBar: 4,
   },
   mutations: {
-    setCurVillager(state, data) {
-      
-      let newCurVillager;
-      newCurVillager = {
-        vName: data.name["name-EUde"],
-        personality: data.personality,
-        gender: data.gender,
-        birthday: data.birthday,
-        image_uri: data.image_uri,
-        catchPhrase: data["catch-phrase"],
-      };
-      state["curVillager"] = newCurVillager;
+    setCollumns (state, data) {
+      if (data.side == "left") {
+        state["collumnsLeft"] = state["collumnsLeft"] + data.number;
+      } 
+      if (data.side == "right") {
+        state["collumnsRight"] = state["collumnsRight"] + data.number;
+      }
+    },
+    setBars (state, number) {
+      state["bars"] = state["bars"] + number;
     }
   },
   actions: {
-    getCurrentVillagerFromAPI (context, id) {
-      fetch(`http://acnhapi.com/v1/villagers/${id}`)
-      .then(response=>response.json())
-      .then(data=>{
-        context.commit('setCurVillager', data);
-      })
+    addCollumn (context, side) {
+      let data = {side: side, number: 1};
+      context.commit('setCollumns', data);
     },
-
+    removeCollumn (context, side) {
+      let data = {side: side, number: -1};
+      context.commit('setCollumns', data);
+    },
+    addBar (context) {
+      let number = 1;
+      context.commit('setBars', number);
+    },
+    removeBar (context) {
+      let number = -1;
+      context.commit('setBars', number);
+    },
   },
   modules: {
   }
