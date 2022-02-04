@@ -11,6 +11,11 @@ Git Repo zur Bachelorarbeit zur Entwicklung eines webbasierten Interaktionsedito
 
 ## Versions
 
+### Version 0.0.2
+- Added visual grid
+- Added global variables and constants
+- Added the ability to add collumns and bars
+
 ### Version 0.0.1
 - Created vue project
 - Set up basic component and router structure
