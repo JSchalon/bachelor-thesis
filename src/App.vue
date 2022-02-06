@@ -19,13 +19,20 @@ export default {
     //change these here
     signWidth: 50,
     barHeight: 200,
+    startBarOffset: 5,
     collumnWidth: 80,
     addRemoveHeight: 40,
     addRemoveWidth: 10,
     canvasMargin: 30,
     handleDiam: 7,
     borderWidth: 2,
+    contextMenuWidth: 200,
   },
+  mounted () {
+  },
+  methods: {
+  
+  }
 };
 </script>
 

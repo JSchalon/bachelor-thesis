@@ -2,8 +2,8 @@ import { createStore } from 'vuex'
 
 export default createStore({
   state: {
-    collumnsLeft: 3,
-    collumnsRight: 3,
+    collumnsLeft: 2,
+    collumnsRight: 2,
     bars: 2,
     beatsPerBar: 4,
   },

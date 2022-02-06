@@ -1,12 +1,12 @@
 <template>
-    <g :x="x" :y="y" :transform="'translate(' + x + ',' + y +')'" ref="GenericSign" :signID="id">
+    <g :x="x" :y="y" :data-y="y" :transform="'translate(' + x + ',' + y +')'" ref="GenericSign" :signID="id">
       
       <rect x="0" y="0" :width="signWidth" :height="height" class="draggable actual-sign" :signID="id" :class="{active: isSelected}" :stroke-width="isSelected ? borderWidth + 1: borderWidth">
         
       </rect>
       <text x="10" y="20" class="text" fill="black">{{name}}</text>
-      <ResizeHandle :isFirst="true" :isActive="isSelected" :signHeight="height" :signID="id"/>
-      <ResizeHandle :isFirst="false" :isActive="isSelected" :signHeight="height" :signID="id"/>
+      <ResizeHandle :isFirst="true" :isActive="isSelected && canResize" :signHeight="height" :signID="id"/>
+      <ResizeHandle :isFirst="false" :isActive="isSelected && canResize" :signHeight="height" :signID="id"/>
     </g>
 </template>
 
@@ -15,12 +15,14 @@ import ResizeHandle from "../ResizeHandle.vue"
 
 /**
  * The generic laban sign component.
+ * Signs that can be resized must be wrapped in a group containing the sign, as well as two resize handles
+ * Signs must have the "requestlisteners" emit on mounted so that dragging them and clicking on them is possible
  * @displayName Generic Sign
  */
 export default {
   name: "GenericSign",
   components: {
-    ResizeHandle
+    ResizeHandle,
   },
   props: {
     id: Number,
@@ -28,6 +30,7 @@ export default {
     height: Number,
     x: Number,
     y: Number,
+    canResize: Boolean
   },
   inject: ["signWidth","borderWidth"],
   data() {
