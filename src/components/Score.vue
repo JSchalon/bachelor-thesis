@@ -549,7 +549,6 @@ export default {
      * @arg event the resize-end event
      */
     resizeEnd (event) {
-      //TODO: set bar/beat after 
       let target = event.target;
       const targetID = target.getAttribute("signID");
       let shadow = this.$refs.canvas.querySelector("#shadow");
@@ -592,7 +591,6 @@ export default {
           }
         }
       }
-      console.log("beat: " + this.signs[targetID].signData.beat + " bar: " + this.signs[targetID].signData.bar + " collumn: " + this.signs[targetID].signData.col);
 
       shadow.remove();
       target.classList.remove("dragging");
@@ -712,6 +710,40 @@ export default {
       this.signs[targetID].x = screenX;
       this.signs[targetID].y = screenY;
       target.setAttribute("data-y", screenY);
+
+      let beatsMoved = ((this.signs[targetID].y + this.signs[targetID].height) - (parseFloat(target.getAttribute("start-y")) + parseFloat(target.getAttribute("start-h")))) / -blocksizeY;
+      if (beatsMoved != 0) {
+        let beatsOverall = this.signs[targetID].signData.beat + beatsMoved;
+        if (beatsOverall >= 0) {
+          if (beatsMoved % 1 != 0) {
+            console.log(Math.floor(beatsMoved - 1));
+            beatsMoved = Math.floor(beatsMoved + 2);
+            beatsOverall = this.signs[targetID].signData.beat + beatsMoved;
+          } 
+          if (beatsOverall < this.beats) {
+            this.signs[targetID].signData.beat = beatsOverall;
+          } else {
+            let barsMoved =  (beatsOverall - beatsOverall % this.beats) / this.beats;
+            this.signs[targetID].signData.beat = beatsOverall % this.beats;
+            this.signs[targetID].signData.bar = this.signs[targetID].signData.bar + barsMoved;
+          }
+        } else {
+          if (beatsMoved % 1 != 0) {
+            console.log(Math.floor(beatsMoved - 1));
+            beatsMoved = Math.floor(beatsMoved - 1);
+            beatsOverall = this.signs[targetID].signData.beat + beatsMoved;
+          } 
+          if (beatsOverall > -this.beats) {
+            this.signs[targetID].signData.beat = beatsOverall + this.beats;
+            this.signs[targetID].signData.bar = this.signs[targetID].signData.bar - 1;
+          } else {
+            let barsMoved = (beatsOverall - ((beatsOverall % this.beats) + this.beats) % this.beats) / this.beats;
+            this.signs[targetID].signData.bar = this.signs[targetID].signData.bar + barsMoved; 
+            this.signs[targetID].signData.beat = ((beatsOverall % this.beats) + this.beats) % this.beats;
+          }
+        }
+      }
+      console.log("beat: " + this.signs[targetID].signData.beat + " bar: " + this.signs[targetID].signData.bar + " collumn: " + this.signs[targetID].signData.col);
 
       this.$refs.canvas.querySelector("#shadow").remove();
     },
