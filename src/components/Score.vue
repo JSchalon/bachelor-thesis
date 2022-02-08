@@ -2,125 +2,302 @@
     <div id="canvasContainer">
       <div>
         <svg preserveAspectRatio="xMinYMax meet" ref="canvas" id="canvas" :width="canvasDimensions.x" :height="canvasDimensions.y" fill="white">
-          <rect x="0" y="0" :width="canvasDimensions.x" :height="canvasDimensions.y" ref="canvasBG" />
-          <g :transform="'translate(' + canvasMarginTopLeft + ', ' + canvasMarginTopLeft +')'" ref="bounding">
-            <rect x="0" y="0" :width="canvasDimNoPad.x" :height="canvasDimNoPad.y" />
-            <Grid @unselect="selectSign(-1)" :beats="beats" :bars="bars" :collumnsLeft="collumnsLeft" :collumnsRight="collumnsRight" :fullHeight="canvasDimNoPad.y" />
-            <component :is="item.signType" @requestListeners="initListeners" :id="index" :isSelected="item.isSelected" :canResize="item.canResize" :height="item.height" :x="item.x" :y="item.y" :key="index" v-for="(item, index) in signs"/>
-          </g>
+          <rect x="0" y="0" :width="canvasDimensions.x" :height="canvasDimensions.y" ref="canvasBG" @click="selectSign(-1)"/>
           <AddRemoveKnob :place="'left'" :canvasDim="canvasDimensions" @addCollumn="addCollumn"/>
           <AddRemoveKnob :place="'right'" :canvasDim="canvasDimensions" @addCollumn="addCollumn"/>
           <AddRemoveKnob :place="'top'" :canvasDim="canvasDimensions" @addBar="addBar"/>
-          <GenericSignContext :signData="{}"/>
+          <g :transform="'translate(' + canvasMarginTopLeft + ', ' + canvasMarginTopLeft +')'" ref="bounding">
+            <rect x="0" y="0" :width="canvasDimNoPad.x" :height="canvasDimNoPad.y" />
+            <Grid @unselect="selectSign(-1)" :beats="beats" :bars="bars" :collumnsLeft="collumnsLeft" :collumnsRight="collumnsRight" :fullHeight="canvasDimNoPad.y" />
+            <component
+              :is="item.signType"
+              @requestListeners="initListeners"
+              :id="index"
+              :isSelected="item.isSelected"
+              :canResize="item.canResize"
+              :height="item.height" :x="item.x"
+              :y="item.y"
+              :borderColor="item.signData.borderColor"
+              :color="item.signData.color"
+              :key="index"
+              v-for="(item, index) in signs"/>
+            <GenericSignContext :signData="signs[contextSign].signData" :signIndex="contextSign" :isActive="contextActive" :x="contextPos.x" :y="contextPos.y" @updateSignData="updateSignData" @delete="removeSign" id="context-menu"/>
+          </g>
+          
+          
         </svg>
       </div>
     </div>
 </template>
 
 <script>
+import interact from "interactjs";
+
 import GenericSign from "./Base Signs/GenericSign.vue"
 import Grid from "./Grid.vue"
 import AddRemoveKnob from "./AddRemoveKnob.vue"
-import interact from "interactjs";
+import GenericSignContext from "./Context Menus/GenericSignContext.vue"
+
 
 //TODO: make space below grid for pre-signs
-//TODO: sort methods for better visibility
-//TODO: comment all functions
-//TODO: MAKE SHADOW STUFF SEPERATE FUNCTIONS
+//TODO: MAKE SHADOW ELEM SEPERATE FUNCTIONS
+//TODO: properly fix the context menu "signdata undefined" problem
+//TODO: increase standard whitespace to accomodate sign category window
 
 export default {
   name: 'Score',
   components: {
     GenericSign,
     Grid,
-    AddRemoveKnob
+    AddRemoveKnob,
+    GenericSignContext
   },
-  inject: ["signWidth", "barHeight", "collumnWidth", "handleDiam", "canvasMargin", "borderWidth", "addRemoveHeight", "startBarOffset"],
+  inject: ["signWidth", "barHeight", "collumnWidth", "handleDiam", "canvasMargin", "borderWidth", "addRemoveHeight", "startBarOffset", "contextMenuWidth"],
   data() {
     return {
       signs: [
-        {isSelected: false, signType: "GenericSign", height: 100, side: "left", x: 100, y: 100, col: 2, bar: 2, beat: 1, canResize: true},
-        {isSelected: false, signType: "GenericSign", height: 50, side: "left", x: 15, y: 0, col: 1, bar: 2, beat: 4, canResize: true}
+        {isSelected: false, purpose: "dummy sign", signData: {borderColor: "black", color: "white"}},
+        {isSelected: false, signType: "GenericSign", height: 100, side: "left", x: 95, y: 100, col: -2, bar: 2, beat: 0, canResize: true, signData: {borderColor: "black", color: "white"}},
+        {isSelected: false, signType: "GenericSign", height: 50, side: "left", x: 15, y: 0, col: -3, bar: 2, beat: 3, canResize: true, signData: {borderColor: "black", color: "white"}},
+        {isSelected: false, signType: "GenericSign", height: 100, side: "left", x: 95, y: 0, col: -2, bar: 2, beat: 2, canResize: true, signData: {borderColor: "black", color: "white"}},
       ],
+      contextActive: false,
+      contextPos: {x: 0, y: 0},
+      selectedSigns: [],
+      contextSign: 0,
     };
   },
   computed: {
+    /**
+     * Gets the amount of collumns on the left side from the vuex state
+     */
     collumnsLeft () {
       return this.$store.state["collumnsLeft"];
     },
+    /**
+     * Gets the amount of collumns on the left side from the vuex state
+     */
     collumnsRight () {
       return this.$store.state["collumnsRight"];
     },
+    /**
+     * Gets the amount of bars from the vuex state
+     */
     bars () {
       return this.$store.state["bars"];
     },
+    /**
+     * Gets the amount of beats per bar from the vuex state
+     */
     beats () {
       return this.$store.state["beatsPerBar"];
     },
+    /**
+     * Calculates the minimum height of a sign based on the height of a beat
+     */
     minHeight () {
       return this.barHeight / this.beats;
     },
+    /**
+     * Calculates the full canvas dimensions including margins
+     */
     canvasDimensions () {
       return {x: this.collumnWidth * (this.collumnsLeft + this.collumnsRight) + 2 * ( 2 * this.canvasMargin + this.addRemoveHeight), y: this.barHeight * (this.bars + 0.5) + 2 * (this.canvasMargin + this.addRemoveHeight) + this.startBarOffset};
     },
+    /**
+     * Calculates the full canvas dimensions without the margins
+     */
     canvasDimNoPad () {
       return {x: this.collumnWidth * (this.collumnsLeft + this.collumnsRight), y: this.barHeight * (this.bars + 0.5) + this.startBarOffset};
     },
+    /**
+     * Calculates the margin of the actual score from the top
+     */
     canvasMarginTopLeft () {
       return 2 * this.canvasMargin + this.addRemoveHeight;
     }
   },
   mounted () {
-    window.addEventListener('keydown', this.logKey);
+    window.addEventListener('keydown', this.keyEvent);
   },
   methods: {
-    logKey(event) {
-      //delete sign
-      if (event.key == "x" || event.key == "Delete") {
+    /**
+     * Method for adding a collumn on the chosen side in the vuex state
+     * @arg side the side to add a collumn to  
+     */
+    addCollumn(side) {
+      this.contextActive = false;
+      if (side == "left") {
         for (let elem of this.signs) {
-          if (elem.isSelected == true) {
-            this.removeSign (elem.id);
-          }
+          elem.x = elem.x + this.collumnWidth;
+          elem.col = elem.col + 1;
         }
       }
-      //move sign with arrow keys... //TODO: MAKE SEPERATE FUNCTIONS FOR CHANGING BEAT/BAR AND HEIGHT
+      this.$store.dispatch('addCollumn',side);
+    },
+    /**
+     * Method for removing a collumn on the chosen side in the vuex state
+     * @arg side the side to remove a collumn from  
+     */
+    removeCollumn(side) {
+      //TODO: delete signs inside the deleted collumn
+      this.contextActive = false;
+      if (side == "left") {
+        for (let elem of this.signs) {
+          elem.x = elem.x - this.collumnWidth;
+        }
+      }
+      this.$store.dispatch('removeCollumn',side);
+    },
+
+    /**
+     * Method for adding a bar in the vuex state
+     */
+    addBar() {
+      //TODO: add an index so that signs in the bars after this index get moved up one bar
+      this.contextActive = false;
+      for (let elem of this.signs) {
+        elem.y = elem.y + this.barHeight;
+      }
+      this.$store.dispatch('addBar');
+    },
+    /**
+     * Method for removing a bar in the vuex state
+     */
+    removeBar() {
+      //TODO: add an index so that signs in the removed bar get deleted
+      this.contextActive = false;
+      this.$store.dispatch('removeBarBar');
+    },
+
+    /**
+     * Method for adding a sign to the score
+     * @arg type the sign type
+     * @arg height the height of the sign
+     * @arg x the x position of the sign
+     * @arg y the y position of the sign
+     */
+    addSign (type, height, x, y) {
+      //TODO: fully implement with sign data etc.
+      const newSign = {isSelected: false, signType: type, height: height, x: x, y: y};
+      this.signs.push(newSign);
+    },
+    /**
+     * Method for removing a sign from the score
+     * @arg elem the element to remove
+     */
+    removeSign (id = this.selectedSigns[0]) {
+        this.selectSign(-1);
+        this.contextActive = false;
+        this.signs.splice(id, 1);
+        this.contextSign = 0;
+    },
+
+    /**
+     * Method for updating the data of a sign in the signs object
+     * @arg data the new sign data and the index of that sign in the signs object 
+     */
+    updateSignData(data) {
+      console.log(data)
+      this.signs[data.index].signData = data.data;
+    },
+
+    /**
+     * Method for selecting a sign via the attribute in the signs object
+     * @arg id the index of the sign in the signs object 
+     */
+    selectSign(id) {
+      //TODO: add multi select support via shift or ctrl, or holding on mobile
+      for (let elem of this.signs) {
+        elem.isSelected = false;
+      }
+      if (id >= 0) {
+        this.signs[id].isSelected = true;
+        this.selectedSigns.push(id);
+      } else {
+        this.contextActive = false;
+        this.selectedSigns = [];
+      }
+    },
+
+    /**
+     * Method for placing an element on top of the canvas (placing it as the last element on the canvas svg)
+     * @arg elem the element node to place on top 
+     */
+    placeSignOnTop (elem) {
+      this.$refs.bounding.appendChild(elem);
+    },
+
+
+
+    /**
+     * Method for checking the key of a keydown event and using its functions
+     * @arg event the keydown event 
+     */
+    keyEvent(event) {
+      //delete sign on x or del
+      if (event.key == "x" || event.key == "Delete") {
+        for (let elem of this.selectedSigns) {
+            this.removeSign (elem);
+        }
+      }
+      //move sign with arrow keys key.id are 37 to 40
+      //TODO: MAKE SEPERATE FUNCTION FOR CHANGING BEAT/BAR AND HEIGHT
+      //TODO: Check if possible to do via interact snapping instead to simplify
       if (event.which >= 37 && event.which <= 40) {
         let move = this.getArrowKeyAction (event.which);
         for (let elem of this.signs) {
           if (elem.isSelected == true) {
+            //if the key id is odd -> left / right arrow key, move the sign(s) to the next collumn
             if (event.which % 2 == 1) {
-              if (elem.col + move.collumn >= 1 && elem.col + move.collumn <= this.collumnsLeft + this.collumnsRight) {
+              if (elem.col + move.collumn  >= -this.collumnsLeft && elem.col + move.collumn < this.collumnsRight) {
                 elem.col = elem.col + move.collumn;
+                if (elem.col < 0) {
+                  elem.side = "left";
+                } else {
+                  elem.side = "right";
+                }
                 elem.x = elem.x + move.collumn * this.collumnWidth;
               }
+            //if the key id is even -> up / down arrow key, move the sign up or down one beat if possible 
             } else {
+              //arrow up, only move the element if it isn't already at the top of the last bar
               if (move.beat == 1 && elem.y - this.minHeight >= 0) {
-                if (elem.beat + move.beat <= this.beats) {
+                //if the element is not already on the highest beat in a bar
+                if (elem.beat + move.beat <= this.beats - 1) {
+                  // if elem is in starting position (bar = 0) -> move up to bar = 1 
                   if (elem.bar == 0) {
-                    elem.beat = 1;
+                    elem.beat = 0;
                     elem.bar = 1;
                     elem.y = elem.y - this.minHeight * 2 - this.startBarOffset;
+                  //else just move it up one beat
                   } else {
                     elem.beat = elem.beat + move.beat;
                     elem.y = elem.y - this.minHeight;
                   }
+                //if the element is on the highest beat in a bar -> go to next bar and set beat = 0
                 } else {
                   elem.beat = 1;
                   elem.bar = elem.bar + 1;
                   elem.y = elem.y - this.minHeight;
                 }
+              //arrow down
               } else if (move.beat == -1) {
-                if (elem.beat + move.beat >= 1) {
+                // standard case if the new beat is still >= 0
+                if (elem.beat + move.beat >= 0) {
                   elem.beat = elem.beat + move.beat;
                   elem.y = elem.y + this.minHeight;
+                // if the new beat would be the top beat of the bar before the current bar
                 } else {
+                  //if moving the element one beat down would put it in the starting pos, put it there and set the height accordingly
                   if (elem.bar == 1) {
-                    elem.beat = 1;
+                    elem.beat = 0;
                     elem.y = elem.y + elem.height + this.startBarOffset;
                     elem.height = this.minHeight * 2;
                     elem.bar = elem.bar -1;
+                  //if there are more bars below, move the element one bar down and set the beat to the max amount
                   } else if (elem.bar > 1) {
-                    elem.beat = this.beats;
+                    elem.beat = this.beats - 1;
                     elem.y = elem.y + this.minHeight;
                     elem.bar = elem.bar -1;
                   }
@@ -140,6 +317,11 @@ export default {
         console.log("redo");
       }
     },
+
+    /**
+     * Method for checking which arrow key is pressed and adjusting the action of the key event on the keylog function above
+     * @arg keyNr the id of the keydown event  
+     */
     getArrowKeyAction (keyNr) {
       let beat = 0;
       let collumn = 0;
@@ -154,63 +336,34 @@ export default {
       }
       return {beat: beat, collumn: collumn};
     },
-    addCollumn(side) {
-      if (side == "left") {
-        for (let elem of this.signs) {
-          elem.x = elem.x + this.collumnWidth;
-          elem.col = elem.col + 1;
-        }
-      }
-      this.$store.dispatch('addCollumn',side);
-    },
-    removeCollumn(side) {
-      if (side == "left") {
-        for (let elem of this.signs) {
-          elem.x = elem.x - this.collumnWidth;
-        }
-      }
-      this.$store.dispatch('removeCollumn',side);
-    },
-    addBar() {
-      for (let elem of this.signs) {
-        elem.y = elem.y + this.barHeight;
-      }
-      this.$store.dispatch('addBar');
-    },
-    removeBar() {
-      this.$store.dispatch('removeBarBar');
-    },
-    selectSign(id) {
-      for (let elem of this.signs) {
-        elem.isSelected = false;
-      }
-      if (id >= 0) {
-        this.signs[id].isSelected = true;
-      }
-    },
-    placeSignOnTop (elem) {
-      this.$refs.bounding.appendChild(elem);
-    },
-    addSign (type, height, x, y) {
-      const newSign = {isSelected: false, signType: type, height: height, x: x, y: y};
-      this.signs.push(newSign);
-    },
-    removeSign (id) {
-      this.signs.splice(id,1);
-    },
+
+
+
+    /**
+     * Method for initializing event listeners on a sign
+     * @arg elem the grouping element of the sign
+     */
     initListeners (elem) {
       this.initSignInteraction(elem);
-      this.initClick(elem);
-      elem.addEventListener("contextmenu", this.bob, false);
+      this.initSignClick(elem);
+      elem.addEventListener("contextmenu", this.openContextMenu, false);
       ["touchstart", "touchmove", "touchend"].forEach((et) => elem.addEventListener(et, this.ignoreTouch));
     },
+
     /**
      * Method for calling the custom sign context menu
      * @arg event the context menu call event
      */
-    bob (event) {
-      console.log("You've tried to open " + this.name);
-      /* TODO: ADD CUSTOM MENU CALLER */
+    openContextMenu (event) {
+      let target = event.target;
+      const targetID = target.getAttribute("signID");
+      this.contextSign = targetID;
+      this.contextActive = true;
+      this.selectSign(targetID);
+      this.contextPos.x = this.signs[targetID].x + this.signWidth;
+      this.contextPos.y = this.signs[targetID].y;
+      this.placeSignOnTop(this.$refs.canvas.querySelector("#context-menu"));
+
       event.preventDefault();
     },
 
@@ -259,27 +412,42 @@ export default {
       })
     },
 
+    
+
     /**
      * Inititalizes the clicking event listener
      * @arg selector the clickable element
      */
-    initClick: function(selector) {
-      //TODO: rename to indicate the funcion is for the clicking on signs
-      interact(selector).on("tap", this.click);
+    initSignClick: function(selector) {
+      interact(selector).on("tap", this.clickSign);
+      interact(selector).on("doubletap", this.doubleClickSign);
     },
 
     /**
      * The click event listener, fires a selection request to the score component
      * @arg event the click event
      */
-    click (event) {
-      //TODO: rename to indicate the funcion is for the clicking on signs
+    clickSign (event) {
       if (event.button == 0) {
-        
         this.placeSignOnTop(event.target.parentElement);
         this.selectSign(event.target.getAttribute("signID"));
       }
     },
+
+    /**
+     * The double click event listener, opens the context menu of a sign
+     * @arg event the double click event
+     */
+    doubleClickSign (event) {
+      this.openContextMenu(event)
+    },
+
+
+
+    /**
+     * The resize start event listener, creats the shadow element for resizing
+     * @arg event the resize-start event
+     */
     resizeStart (event) {
       let target = event.target;
 
@@ -305,12 +473,15 @@ export default {
       //insert shadow before sign
       target.parentElement.insertBefore(shadow, target);
     },
+
     /**
      * The resize move event listener, resizes the event target
      * @arg event the resize-move event
      */
     resizeMove (event) {
-      //TODO: MAKE RESIZE IN STARTING POSITION IMPOSSIBLE -> data-y?
+      //TODO: MAKE RESIZE INTO STARTING POSITION IMPOSSIBLE -> data-y
+      //TODO: IF CONTEXT IS ACTIVE: CHANGE POSITION OF CONTEXT
+      //TODO: IF RESIZING FROM TOP AND LOWER BORDER IS AT STARTING POS -> CHECK IF HEIGHT IS STILL >= minHeight AND ALSO STOP RESIZE
       //get the saved x and y data
       let target = event.target;
       const targetID = target.getAttribute("signID");
@@ -346,6 +517,7 @@ export default {
       //translate group
       this.signs[targetID].y = this.signs[targetID].y + event.deltaRect.top;
     },
+
     /**
      * The resize end listener, sets the actual height/position after a resize
      * @arg event the resize-end event
@@ -376,7 +548,9 @@ export default {
       
       this.$refs.canvas.querySelector("#shadow").remove();
       target.classList.remove("dragging");
-     },
+    },
+
+
 
     /**
      * The drag-start event listener, sets up the shadow element for the dragging
@@ -419,6 +593,7 @@ export default {
      * @arg event the drag-move event
      */
     dragMove: function(event) {
+      //TODO: get height form bounding box?
       this.selectSign(-1);
       let target = event.target;
       const targetID = target.getAttribute("signID");
@@ -455,6 +630,7 @@ export default {
      */
     dragEnd: function(event) {
       //TODO: change beat/bar/collumn after drag
+      //TODO: if context was active before start -> re-render after ?
       let target = event.target;
 
       const targetID = target.getAttribute("signID");
@@ -488,6 +664,9 @@ export default {
 
       this.$refs.canvas.querySelector("#shadow").remove();
     },
+
+
+
     /**
      * InteractJS workaround: touch events immediately end resize and drag events -> cancel them before that happens and implement scrolling elsewhere
      * @arg event the drag-move event
@@ -518,6 +697,11 @@ svg {
   display: block;
   box-shadow: 0 1px 6px 3px rgba(0, 0, 0, 0.15);
 }
+
+svg text {
+  user-select: none;
+}
+
 .shadow {
   fill: #a42a42;
   stroke-width: 2;

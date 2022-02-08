@@ -1,10 +1,18 @@
 <template>
     <g :x="x" :y="y" :data-y="y" :transform="'translate(' + x + ',' + y +')'" ref="GenericSign" :signID="id">
-      
-      <rect x="0" y="0" :width="signWidth" :height="height" class="draggable actual-sign" :signID="id" :class="{active: isSelected}" :stroke-width="isSelected ? borderWidth + 1: borderWidth">
-        
+      <rect
+        x="0"
+        y="0"
+        class="draggable actual-sign"
+        :width="signWidth"
+        :height="height"
+        :stroke="borderColor"
+        :fill="color"
+        :signID="id"
+        :class="{active: isSelected}"
+        :stroke-width="isSelected ? borderWidth + 1: borderWidth">
       </rect>
-      <text x="10" y="20" class="text" fill="black">{{name}}</text>
+      <text x="10" y="20" class="text no-select" fill="black" :signID="id">{{name}}</text>
       <ResizeHandle :isFirst="true" :isActive="isSelected && canResize" :signHeight="height" :signID="id"/>
       <ResizeHandle :isFirst="false" :isActive="isSelected && canResize" :signHeight="height" :signID="id"/>
     </g>
@@ -15,8 +23,9 @@ import ResizeHandle from "../ResizeHandle.vue"
 
 /**
  * The generic laban sign component.
- * Signs that can be resized must be wrapped in a group containing the sign, as well as two resize handles
- * Signs must have the "requestlisteners" emit on mounted so that dragging them and clicking on them is possible
+ * - Signs that can be resized must be wrapped in a group containing the sign, as well as two resize handles
+ * - All sign categories must have a corresponding "SignName" + "Context.vue" component that is loaded by the score, that implements the context menu for that category 
+ * @emits requestListeners at mount, so that the score can implement dragging, resizing, clicking and double clicking
  * @displayName Generic Sign
  */
 export default {
@@ -24,13 +33,16 @@ export default {
   components: {
     ResizeHandle,
   },
+  emits: ["requestListeners"],
   props: {
     id: Number,
     isSelected: Boolean,
     height: Number,
     x: Number,
     y: Number,
-    canResize: Boolean
+    canResize: Boolean,
+    color: String,
+    borderColor: String,
   },
   inject: ["signWidth","borderWidth"],
   data() {
@@ -40,8 +52,10 @@ export default {
     };
   },
   mounted () {
+    //give it a random number to differentiate between signs
     this.name= Math.round(Math.random() * 100);
     let sign = this.$refs.GenericSign;
+    //request event listeners on the outer group
     this.$emit("requestListeners", sign);
   },
   methods: {
@@ -68,9 +82,6 @@ export default {
   }
 
 .draggable {
-  fill: white;
-  stroke:rgb(0,0,0);
-
   touch-action: none;
 }
 

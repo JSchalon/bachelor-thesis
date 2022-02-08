@@ -5,8 +5,12 @@
 </template>
 
 <script>
+/**
+ * The sign library component
+ * @displayName Sign Library
+ */
 export default {
-    name: 'Header',
+    name: 'SignLibrary',
 }
 </script>
 

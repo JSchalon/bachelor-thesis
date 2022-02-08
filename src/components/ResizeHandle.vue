@@ -1,10 +1,18 @@
 <template>
-  <circle :cx="signWidth / 2" :cy="isFirst ? 0 : signHeight" :r="handleDiam" class="resize-handle" :class="isFirst ? 'handle-first' : 'handle-second'" :display="isActive ? 'block' : 'none'" :stroke-width="borderWidth + 1" />
+  <circle 
+    :cx="signWidth / 2" 
+    :cy="isFirst ? 0 : signHeight" 
+    :r="handleDiam"
+    class="resize-handle" 
+    :class="isFirst ? 'handle-first' : 'handle-second'"
+    :display="isActive ? 'block' : 'none'" 
+    :stroke-width="borderWidth + 1" 
+  />
 </template>
 
 <script>
 /**
- * The resize handle component.
+ * The resize handle component used to resize a sign
  * @displayName Resize Handle
  */
 export default {

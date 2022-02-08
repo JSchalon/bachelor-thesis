@@ -6,9 +6,14 @@
 </template>
 
 <script>
-//TODO: MAKE A COMPONENT WITH INTERACTIONBOX AND SIGNLIBRARY SO OTHER VIEWS MIGHT BE ADDED 
 import Header from "./components/Header";
 
+/**
+ * The app component
+ * Loads a view and the header
+ * Also sets global constants -> maybe refactor later?
+ * @displayName App
+ */
 export default {
   name: "App",
   components: {
@@ -23,10 +28,11 @@ export default {
     collumnWidth: 80,
     addRemoveHeight: 40,
     addRemoveWidth: 10,
-    canvasMargin: 30,
+    canvasMargin: 50,
     handleDiam: 7,
     borderWidth: 2,
-    contextMenuWidth: 200,
+    contextMenuWidth: 250,
+    contextItemHeight: 50,
   },
   mounted () {
   },
@@ -40,5 +46,8 @@ export default {
 body {
   margin: 0;
 
+}
+text {
+  font-family: Arial;
 }
 </style>

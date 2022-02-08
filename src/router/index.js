@@ -4,7 +4,7 @@ import Main from '../views/Main.vue'
 const routes = [
   {
     path: '/',
-    name: 'Interaktion Editor',
+    name: 'Interaction Editor',
     component: Main
   }
 ]

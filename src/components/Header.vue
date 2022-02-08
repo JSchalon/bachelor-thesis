@@ -5,6 +5,10 @@
 </template>
 
 <script>
+/**
+ * The Header component
+ * @displayName Main Header
+ */
 export default {
     name: 'Header',
 }

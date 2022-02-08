@@ -5,8 +5,12 @@
 </template>
 
 <script>
+/**
+ * The Interaction menu component
+ * @displayName Interaction Menu
+ */
 export default {
-    name: 'Header',
+    name: 'InteractionMenu',
 }
 </script>
 

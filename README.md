@@ -11,6 +11,12 @@ Git Repo zur Bachelorarbeit zur Entwicklung eines webbasierten Interaktionsedito
 
 ## Versions
 
+### Version 0.0.3
+- Implemented most of the components for context menus and added a context menu to the generic sign
+- Added deletion via "x" and "del" keys
+- Added moving of signs via arrow keys
+- Fixed some issues with previous versions
+
 ### Version 0.0.2
 - Added visual grid
 - Added global variables and constants

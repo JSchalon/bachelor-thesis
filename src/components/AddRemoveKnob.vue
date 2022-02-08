@@ -17,8 +17,11 @@
 </template>
 
 <script>
+//TODO: change from v-if to changing the transform.x and .y based off of the place prop
 /**
- * The collumn and .
+ * The add / remove knob for adding and maybe removing a collumn or bar
+ * @emits addCollumn if it is placed left/right
+ * @emits addBar if it is placed on top
  * @displayName AddRemove Knob
  */
 export default {
@@ -30,12 +33,21 @@ export default {
   emits: ["addCollumn", "addBar"],
   inject: ["addRemoveHeight", "addRemoveWidth", "canvasMargin"],
   computed: {
+    /**
+     * Calculates the half height of the addRemove Knob
+     */
     halfHeight () {
       return this.addRemoveHeight / 2;
     },
+    /**
+     * Calculates the half width of the addRemove Knob
+     */
     halfWidth () {
       return this.addRemoveWidth / 2;
     },
+    /**
+     * Calculates the y position based on the canvas height prop and the halfheight method, for the placement of the collumn knobs
+     */
     positionY () {
       return this.canvasDim.y / 2 - this.halfHeight;
     },

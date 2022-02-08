@@ -29,7 +29,9 @@
 
 <script>
 import interact from "interactjs";
-
+//TODO: simplify the line generation
+//TODO: change the collumn and bar naming according to the scheme
+//TODO: test snaping via the beat rects
 /**
  * The visual grid component
  * @displayName Grid
@@ -52,19 +54,39 @@ export default {
     interact(this.$refs.grid).on("tap", this.click);
   },
   methods: {
+    /**
+     * When the grid is clicked -> unselect all signs
+     */
     click () {
       this.$emit("unselect");
     },
+    /**
+     * Calculates the bar of a grid rect based on its' index
+     * @arg nr the index 
+     */
     getBar(nr) {
       return Math.floor(((this.beats * this.bars - nr) / this.beats) % this.bars);
     },
+    /**
+     * Calculates the beat of a grid rect based on its' index
+     * @arg nr the index 
+     */
     getBeat(nr) {
       return (this.totalBeats - nr) % this.beats;
     },
+    /**
+     * Highlights all rects in the specified collumn
+     * @arg collumn the the collumn 
+     */
     highlightCol (collumn) {
       let elem = this.$refs.grid.querySelector("#grid-collumn" + collumn);
       elem.setAttribute("fill", "red");
     },
+    /**
+     * Highlights all width the specified beat and or bar
+     * @arg bar the bar to highlight, optional
+     * @arg beat the bar to highlight, optional
+     */
     highlight (bar = -1, beat = -1) {
       let highl = "";
       if (bar >= 0) {
@@ -85,6 +107,9 @@ export default {
     }
   },
   computed: {
+    /**
+     * Calculates the total amount of beats in the score
+     */
     totalBeats() {
       return this.beats * this.bars;
     }

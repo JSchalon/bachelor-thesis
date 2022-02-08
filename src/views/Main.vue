@@ -13,6 +13,11 @@ import InteractionMenu from "../components/InteractionMenu";
 import SignLibrary from "../components/SignLibrary";
 import Score from "../components/Score";
 
+/**
+ * The main editor view
+ * additional views can be added in the same folder, and need to be registered to the router
+ * @displayName Main View
+ */
 export default {
   name: 'Main',
   components: {
