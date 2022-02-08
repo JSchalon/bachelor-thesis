@@ -6,15 +6,15 @@
           <AddRemoveKnob :place="'left'" :canvasDim="canvasDimensions" @addCollumn="addCollumn"/>
           <AddRemoveKnob :place="'right'" :canvasDim="canvasDimensions" @addCollumn="addCollumn"/>
           <AddRemoveKnob :place="'top'" :canvasDim="canvasDimensions" @addBar="addBar"/>
-          <g :transform="'translate(' + canvasMarginTopLeft + ', ' + canvasMarginTopLeft +')'" ref="bounding">
+          <g :transform="'translate(' + canvasMarginLeft + ', ' + canvasMarginTop +')'" ref="bounding">
             <rect x="0" y="0" :width="canvasDimNoPad.x" :height="canvasDimNoPad.y" />
             <Grid @unselect="selectSign(-1)" :beats="beats" :bars="bars" :collumnsLeft="collumnsLeft" :collumnsRight="collumnsRight" :fullHeight="canvasDimNoPad.y" />
             <component
-              :is="item.signType"
+              :is="item.signData.signType"
               @requestListeners="initListeners"
               :id="index"
               :isSelected="item.isSelected"
-              :canResize="item.canResize"
+              :canResize="item.signData.canResize"
               :height="item.height" :x="item.x"
               :y="item.y"
               :borderColor="item.signData.borderColor"
@@ -39,10 +39,9 @@ import AddRemoveKnob from "./AddRemoveKnob.vue"
 import GenericSignContext from "./Context Menus/GenericSignContext.vue"
 
 
-//TODO: make space below grid for pre-signs
 //TODO: MAKE SHADOW ELEM SEPERATE FUNCTIONS
 //TODO: properly fix the context menu "signdata undefined" problem
-//TODO: increase standard whitespace to accomodate sign category window
+//TODO: display signCategoryCOntainer to the left side if the side of the element is on the right
 
 export default {
   name: 'Score',
@@ -52,14 +51,14 @@ export default {
     AddRemoveKnob,
     GenericSignContext
   },
-  inject: ["signWidth", "barHeight", "collumnWidth", "handleDiam", "canvasMargin", "borderWidth", "addRemoveHeight", "startBarOffset", "contextMenuWidth"],
+  inject: ["signWidth", "barHeight", "collumnWidth", "handleDiam", "innerCanvasMargin", "outerCanvasMargin", "borderWidth", "addRemoveHeight", "startBarOffset", "contextMenuWidth"],
   data() {
     return {
       signs: [
         {isSelected: false, purpose: "dummy sign", signData: {borderColor: "black", color: "white"}},
-        {isSelected: false, signType: "GenericSign", height: 100, side: "left", x: 95, y: 100, col: -2, bar: 2, beat: 0, canResize: true, signData: {borderColor: "black", color: "white"}},
-        {isSelected: false, signType: "GenericSign", height: 50, side: "left", x: 15, y: 0, col: -3, bar: 2, beat: 3, canResize: true, signData: {borderColor: "black", color: "white"}},
-        {isSelected: false, signType: "GenericSign", height: 100, side: "left", x: 95, y: 0, col: -2, bar: 2, beat: 2, canResize: true, signData: {borderColor: "black", color: "white"}},
+        {isSelected: false, height: 100, x: 95, y: 100, signData: {signType: "GenericSign", borderColor: "black", color: "white", side: "left", col: -2, bar: 2, beat: 0, canResize: true, }},
+        {isSelected: false, height: 50, x: 15, y: 0, signData: {signType: "GenericSign", borderColor: "black", color: "white", side: "left", col: -3, bar: 2, beat: 3, canResize: true, }},
+        {isSelected: false, height: 100, x: 95, y: 0, signData: {signType: "GenericSign", borderColor: "black", color: "white", side: "left", col: -2, bar: 2, beat: 2, canResize: true, }},
       ],
       contextActive: false,
       contextPos: {x: 0, y: 0},
@@ -102,19 +101,28 @@ export default {
      * Calculates the full canvas dimensions including margins
      */
     canvasDimensions () {
-      return {x: this.collumnWidth * (this.collumnsLeft + this.collumnsRight) + 2 * ( 2 * this.canvasMargin + this.addRemoveHeight), y: this.barHeight * (this.bars + 0.5) + 2 * (this.canvasMargin + this.addRemoveHeight) + this.startBarOffset};
+      return {
+        x: this.collumnWidth * (this.collumnsLeft + this.collumnsRight) + 2 * this.canvasMarginLeft, 
+        y: this.barHeight * (this.bars + 0.5) + this.minHeight + this.innerCanvasMargin + this.outerCanvasMargin / 2 + 2 * (this.addRemoveHeight) + this.startBarOffset
+      };
     },
     /**
      * Calculates the full canvas dimensions without the margins
      */
     canvasDimNoPad () {
-      return {x: this.collumnWidth * (this.collumnsLeft + this.collumnsRight), y: this.barHeight * (this.bars + 0.5) + this.startBarOffset};
+      return {x: this.collumnWidth * (this.collumnsLeft + this.collumnsRight), y: this.barHeight * (this.bars + 0.5) + this.minHeight + this.startBarOffset};
     },
     /**
      * Calculates the margin of the actual score from the top
      */
-    canvasMarginTopLeft () {
-      return 2 * this.canvasMargin + this.addRemoveHeight;
+    canvasMarginTop () {
+      return this.innerCanvasMargin + this.outerCanvasMargin / 2 + this.addRemoveHeight;
+    },
+    /**
+     * Calculates the margin of the actual score from the left
+     */
+    canvasMarginLeft () {
+      return this.innerCanvasMargin + this.outerCanvasMargin + this.addRemoveHeight;
     }
   },
   mounted () {
@@ -130,7 +138,7 @@ export default {
       if (side == "left") {
         for (let elem of this.signs) {
           elem.x = elem.x + this.collumnWidth;
-          elem.col = elem.col + 1;
+          elem.signData.col = elem.signData.col + 1;
         }
       }
       this.$store.dispatch('addCollumn',side);
@@ -166,9 +174,12 @@ export default {
      */
     removeBar() {
       //TODO: add an index so that signs in the removed bar get deleted
+      //TODO: move signs in a bar lower than this one bar up 
       this.contextActive = false;
       this.$store.dispatch('removeBarBar');
     },
+
+
 
     /**
      * Method for adding a sign to the score
@@ -178,13 +189,13 @@ export default {
      * @arg y the y position of the sign
      */
     addSign (type, height, x, y) {
-      //TODO: fully implement with sign data etc.
+      //TODO: fully implement with sign data etc. (requires actual sign implementation)
       const newSign = {isSelected: false, signType: type, height: height, x: x, y: y};
       this.signs.push(newSign);
     },
     /**
      * Method for removing a sign from the score
-     * @arg elem the element to remove
+     * @arg id the id of the sign to remove
      */
     removeSign (id = this.selectedSigns[0]) {
         this.selectSign(-1);
@@ -194,11 +205,64 @@ export default {
     },
 
     /**
+     * Method for removing a sign from the score
+     * @arg elem the signto move
+     * @arg beats the amount of beats to move
+     */
+    moveSign(elem, beats = 0) {
+      let id = this.signs.indexOf(elem);
+      let signBars = this.signs[id].signData.bar;
+      let signBeats = this.signs[id].signData.beat;
+      if (beats != 0) {
+        //only move the sign if it isn't already at the top of the last bar
+        if (beats > 0 && this.signs[id].y - this.minHeight >= 0) {
+          //if the sign is not already on the highest beat in a bar
+          if (signBeats + beats <= this.beats - 1) {
+            // if the sign is in starting position (bar = 0) -> move up to bar = 1 
+            if (signBars == 0) {
+              this.signs[id].signData.beat = 0;
+              this.signs[id].signData.bar = 1;
+              this.signs[id].y = this.signs[id].y - this.minHeight * 2 - this.startBarOffset;
+            //else just move it up one beat
+            } else {
+              this.signs[id].signData.beat = this.signs[id].signData.beat + beats;
+              this.signs[id].y = this.signs[id].y - this.minHeight;
+            }
+          //if the sign is on the highest beat in a bar -> go to next bar and set beat = 0
+          } else {
+            this.signs[id].signData.beat = 0;
+            this.signs[id].signData.bar = this.signs[id].signData.bar + 1;
+            this.signs[id].y = this.signs[id].y - this.minHeight;
+          }
+        } else if (beats < 0) {
+          // standard case if the new beat is still >= 0
+          if (signBeats + beats >= 0) {
+            this.signs[id].signData.beat = this.signs[id].signData.beat + beats;
+            this.signs[id].y = this.signs[id].y + this.minHeight;
+          // if the new beat would be the top beat of the bar before the current bar
+          } else {
+            //if moving the sign one beat down would put it in the starting pos, put it there and set the height accordingly
+            if (signBars == 1) {
+              this.signs[id].signData.beat = 0;
+              this.signs[id].y = this.signs[id].y + this.signs[id].height + this.startBarOffset;
+              this.signs[id].height = this.minHeight * 2;
+              this.signs[id].signData.bar = this.signs[id].signData.bar -1;
+            //if there are more bars below, move the sign one bar down and set the beat to the max amount
+            } else if (signBars > 1) {
+              this.signs[id].signData.beat = this.beats - 1;
+              this.signs[id].y = this.signs[id].y + this.minHeight;
+              this.signs[id].signData.bar = this.signs[id].signData.bar -1;
+            }
+          }
+        }
+      }
+    },
+
+    /**
      * Method for updating the data of a sign in the signs object
      * @arg data the new sign data and the index of that sign in the signs object 
      */
     updateSignData(data) {
-      console.log(data)
       this.signs[data.index].signData = data.data;
     },
 
@@ -206,10 +270,12 @@ export default {
      * Method for selecting a sign via the attribute in the signs object
      * @arg id the index of the sign in the signs object 
      */
-    selectSign(id) {
+    selectSign(id, selectMultiple = false) {
       //TODO: add multi select support via shift or ctrl, or holding on mobile
-      for (let elem of this.signs) {
-        elem.isSelected = false;
+      if (!selectMultiple) {
+        for (let elem of this.signs) {
+          elem.isSelected = false;
+        }
       }
       if (id >= 0) {
         this.signs[id].isSelected = true;
@@ -242,68 +308,25 @@ export default {
         }
       }
       //move sign with arrow keys key.id are 37 to 40
-      //TODO: MAKE SEPERATE FUNCTION FOR CHANGING BEAT/BAR AND HEIGHT
-      //TODO: Check if possible to do via interact snapping instead to simplify
       if (event.which >= 37 && event.which <= 40) {
         let move = this.getArrowKeyAction (event.which);
         for (let elem of this.signs) {
           if (elem.isSelected == true) {
             //if the key id is odd -> left / right arrow key, move the sign(s) to the next collumn
             if (event.which % 2 == 1) {
-              if (elem.col + move.collumn  >= -this.collumnsLeft && elem.col + move.collumn < this.collumnsRight) {
-                elem.col = elem.col + move.collumn;
+              if (elem.signData.col + move.collumn  >= -this.collumnsLeft && elem.signData.col + move.collumn < this.collumnsRight) {
+                elem.signData.col = elem.signData.col + move.collumn;
                 if (elem.col < 0) {
-                  elem.side = "left";
+                  elem.signData.side = "left";
                 } else {
-                  elem.side = "right";
+                  elem.signData.side = "right";
                 }
                 elem.x = elem.x + move.collumn * this.collumnWidth;
               }
             //if the key id is even -> up / down arrow key, move the sign up or down one beat if possible 
             } else {
-              //arrow up, only move the element if it isn't already at the top of the last bar
-              if (move.beat == 1 && elem.y - this.minHeight >= 0) {
-                //if the element is not already on the highest beat in a bar
-                if (elem.beat + move.beat <= this.beats - 1) {
-                  // if elem is in starting position (bar = 0) -> move up to bar = 1 
-                  if (elem.bar == 0) {
-                    elem.beat = 0;
-                    elem.bar = 1;
-                    elem.y = elem.y - this.minHeight * 2 - this.startBarOffset;
-                  //else just move it up one beat
-                  } else {
-                    elem.beat = elem.beat + move.beat;
-                    elem.y = elem.y - this.minHeight;
-                  }
-                //if the element is on the highest beat in a bar -> go to next bar and set beat = 0
-                } else {
-                  elem.beat = 1;
-                  elem.bar = elem.bar + 1;
-                  elem.y = elem.y - this.minHeight;
-                }
-              //arrow down
-              } else if (move.beat == -1) {
-                // standard case if the new beat is still >= 0
-                if (elem.beat + move.beat >= 0) {
-                  elem.beat = elem.beat + move.beat;
-                  elem.y = elem.y + this.minHeight;
-                // if the new beat would be the top beat of the bar before the current bar
-                } else {
-                  //if moving the element one beat down would put it in the starting pos, put it there and set the height accordingly
-                  if (elem.bar == 1) {
-                    elem.beat = 0;
-                    elem.y = elem.y + elem.height + this.startBarOffset;
-                    elem.height = this.minHeight * 2;
-                    elem.bar = elem.bar -1;
-                  //if there are more bars below, move the element one bar down and set the beat to the max amount
-                  } else if (elem.bar > 1) {
-                    elem.beat = this.beats - 1;
-                    elem.y = elem.y + this.minHeight;
-                    elem.bar = elem.bar -1;
-                  }
-                }
-              }
-              console.log("beat: " + elem.beat + " bar: " + elem.bar);
+              this.moveSign(elem, move.beat);
+              console.log("beat: " + elem.signData.beat + " bar: " + elem.signData.bar + " collumn: " + elem.signData.col);
             }
           }
         }
@@ -450,7 +473,6 @@ export default {
      */
     resizeStart (event) {
       let target = event.target;
-
       //load svg -> TODO: do via global link or smth in actual editor
       const svgns = "http://www.w3.org/2000/svg";
       //create shadow element to show the effect of the drag on end
@@ -459,6 +481,9 @@ export default {
       //get current element position
       let  x = (parseFloat(target.getAttribute("x")) || 0) + event.dx;
       let  y = (parseFloat(target.getAttribute("y")) || 0) + event.dy;
+      target.setAttribute("start-y", y) 
+      target.setAttribute("start-h", target.querySelector(".draggable").getAttribute("height"));
+
       //set shadow position to element and give styling
       shadow.setAttributeNS( null,"x",x );
       shadow.setAttributeNS( null,"y",y );
@@ -479,9 +504,8 @@ export default {
      * @arg event the resize-move event
      */
     resizeMove (event) {
-      //TODO: MAKE RESIZE INTO STARTING POSITION IMPOSSIBLE -> data-y
       //TODO: IF CONTEXT IS ACTIVE: CHANGE POSITION OF CONTEXT
-      //TODO: IF RESIZING FROM TOP AND LOWER BORDER IS AT STARTING POS -> CHECK IF HEIGHT IS STILL >= minHeight AND ALSO STOP RESIZE
+
       //get the saved x and y data
       let target = event.target;
       const targetID = target.getAttribute("signID");
@@ -496,6 +520,7 @@ export default {
       const blocksizeY = this.barHeight / this.beats;
       let actualY = Math.round(y / blocksizeY) * blocksizeY;
       let newHeight = this.signs[targetID].height + y - actualY;
+      let actualH = Math.round(newHeight / blocksizeY) * blocksizeY;
 
       // update the element height (-14 for the handles)
       this.signs[targetID].height = event.rect.height - this.handleDiam * 2;
@@ -507,10 +532,11 @@ export default {
 
       }
 
-      let actualH = Math.round(newHeight / blocksizeY) * blocksizeY;
+      //stop resizing at the starting line
+      if (!(actualY + actualH > this.canvasDimNoPad.y - this.minHeight - this.barHeight / this.beats * 2 - this.startBarOffset)) {
+        shadow.setAttribute("height", actualH);
+      }
 
-      shadow.setAttribute("height", actualH);
-      
       //set new y data
       target.setAttribute("data-y", y);
       
@@ -526,27 +552,49 @@ export default {
       //TODO: set bar/beat after 
       let target = event.target;
       const targetID = target.getAttribute("signID");
+      let shadow = this.$refs.canvas.querySelector("#shadow");
 
       const blocksizeY = this.barHeight / this.beats;
-      let y = this.signs[targetID].y;
+      let y = parseFloat(target.getAttribute("data-y"));
       let actualY = Math.round(y / blocksizeY) * blocksizeY;
       
       //check if the element was resized from the top
       if (event.deltaRect.top != 0) {
         //top handle -> adjust y position to nearest grid position
         target.setAttribute("data-y", actualY);
-        this.signs[targetID].height += this.signs[targetID].y - actualY;
         this.signs[targetID].y = actualY;
       }
-      let height = this.signs[targetID].height;
-      let actualH = Math.round(height / blocksizeY) * blocksizeY;
-      this.signs[targetID].height = actualH;
+      this.signs[targetID].height = parseFloat(shadow.getAttribute("height"));
 
       if (actualY == 0 && target.getAttribute("y") != 0) {
         this.signs[targetID].y = 0;
       }
-      
-      this.$refs.canvas.querySelector("#shadow").remove();
+
+      let beatsMoved = ((this.signs[targetID].y + this.signs[targetID].height) - (parseFloat(target.getAttribute("start-y")) + parseFloat(target.getAttribute("start-h")))) / -blocksizeY;
+      if (beatsMoved != 0) {
+        let beatsOverall = this.signs[targetID].signData.beat + beatsMoved;
+        if (beatsOverall >= 0) {
+          if (beatsOverall < this.beats) {
+            this.signs[targetID].signData.beat = beatsOverall;
+          } else {
+            let barsMoved =  (beatsOverall - beatsOverall % this.beats) / this.beats;
+            this.signs[targetID].signData.beat = beatsOverall % this.beats;
+            this.signs[targetID].signData.bar = this.signs[targetID].signData.bar + barsMoved;
+          }
+        } else {
+          if (beatsOverall > -this.beats) {
+            this.signs[targetID].signData.beat = beatsOverall + this.beats;
+            this.signs[targetID].signData.bar = this.signs[targetID].signData.bar - 1;
+          } else {
+            let barsMoved = (beatsOverall - ((beatsOverall % this.beats) + this.beats) % this.beats) / this.beats;
+            this.signs[targetID].signData.beat = ((beatsOverall % this.beats) + this.beats) % this.beats;
+            this.signs[targetID].signData.bar = this.signs[targetID].signData.bar + barsMoved;
+          }
+        }
+      }
+      console.log("beat: " + this.signs[targetID].signData.beat + " bar: " + this.signs[targetID].signData.bar + " collumn: " + this.signs[targetID].signData.col);
+
+      shadow.remove();
       target.classList.remove("dragging");
     },
 
@@ -573,6 +621,9 @@ export default {
       //get current element position
       let  x = (parseFloat(target.getAttribute("x")) || 0) + event.dx;
       let  y = (parseFloat(target.getAttribute("y")) || 0) + event.dy;
+      target.setAttribute("start-y", y) 
+      target.setAttribute("start-h", target.querySelector(".draggable").getAttribute("height"));
+
       //set shadow position to element and give styling
       shadow.setAttributeNS( null,"x",x );
       shadow.setAttributeNS( null,"y",y );
@@ -610,9 +661,9 @@ export default {
       let actualX = Math.round(x / blocksizeX) * blocksizeX + collumnOffset;
       let actualY = Math.round(y / blocksizeY) * blocksizeY;
       //check if the current position is above (below in actual browser) the starting line -> snap there
-      if (actualY + target.getBoundingClientRect().height > this.canvasDimNoPad.y - this.barHeight / this.beats * 2 - this.startBarOffset) {
+      if (actualY + target.getBoundingClientRect().height > this.canvasDimNoPad.y - this.minHeight - this.barHeight / this.beats * 2 - this.startBarOffset) {
         shadow.setAttribute("height", this.barHeight / this.beats * 2);
-        actualY = this.canvasDimNoPad.y - this.barHeight / this.beats * 2;
+        actualY = this.canvasDimNoPad.y - this.minHeight - this.barHeight / this.beats * 2;
       }
 
         //set new element position
@@ -650,12 +701,12 @@ export default {
       let screenY = Math.round(y / blocksizeY) * blocksizeY;
 
       //check if the current position is above (below in actual browser) the starting line -> snap there
-      if (screenY >= (this.canvasDimNoPad.y - target.getBoundingClientRect().height - this.barHeight / this.beats - this.startBarOffset)) {
+      if (screenY >= (this.canvasDimNoPad.y - this.minHeight - target.getBoundingClientRect().height - this.barHeight / this.beats - this.startBarOffset)) {
         this.signs[targetID].height = this.barHeight / this.beats * 2;
-        screenY = this.canvasDimNoPad.y - this.barHeight / this.beats * 2;
-        this.signs[targetID].canResize = false;
+        screenY = this.canvasDimNoPad.y - this.barHeight / this.beats * 2 - this.minHeight;
+        this.signs[targetID].signData.canResize = false;
       } else {
-        this.signs[targetID].canResize = true;
+        this.signs[targetID].signData.canResize = true;
       }
 
       this.signs[targetID].x = screenX;

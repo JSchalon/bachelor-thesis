@@ -19,7 +19,7 @@
 </template>
 
 <script>
-
+//TODO: implements
 /**
  * A container for a sign category for the context menu
  * @displayName SignCategoryContainer

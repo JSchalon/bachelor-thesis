@@ -1,23 +1,12 @@
 <template>
-  <g v-if="place == 'left'" :transform="'translate(' + canvasMargin + ', ' + positionY +')'" ref="addRemove" v-on:click="$emit('addCollumn', place)">
+  <g :transform="'translate(' + positionX + ', ' + positionY +')'" ref="addRemove" v-on:click="clickEmit">
       <rect x="0" y="0" :width="addRemoveHeight" :height="addRemoveHeight" fill="white"/>
       <rect :x="halfHeight - halfWidth" y="0" :width="addRemoveWidth" :height="addRemoveHeight" fill="black"/>
       <rect x="0" :y="halfHeight - halfWidth" :width="addRemoveHeight" :height="addRemoveWidth" fill="black"/>
   </g>
-  <g v-if="place == 'right'" :transform="'translate(' + (canvasDim.x - canvasMargin - addRemoveHeight) + ', ' + positionY +')'" ref="addRemove" v-on:click="$emit('addCollumn', place)">
-    <rect x="0" y="0" :width="addRemoveHeight" :height="addRemoveHeight" fill="white"/>
-    <rect :x="halfHeight - halfWidth" y="0" :width="addRemoveWidth" :height="addRemoveHeight" fill="black"/>
-    <rect x="0" :y="halfHeight - halfWidth" :width="addRemoveHeight" :height="addRemoveWidth" fill="black"/>
-  </g>
-  <g v-if="place == 'top'" :transform="'translate(' + (canvasDim.x / 2 - halfHeight) + ', ' + canvasMargin +')'" ref="addRemove" v-on:click="$emit('addBar')">
-    <rect x="0" y="0" :width="addRemoveHeight" :height="addRemoveHeight" fill="white"/>
-    <rect :x="halfHeight - halfWidth" y="0" :width="addRemoveWidth" :height="addRemoveHeight" fill="black"/>
-    <rect x="0" :y="halfHeight - halfWidth" :width="addRemoveHeight" :height="addRemoveWidth" fill="black"/>
-  </g>
 </template>
 
 <script>
-//TODO: change from v-if to changing the transform.x and .y based off of the place prop
 /**
  * The add / remove knob for adding and maybe removing a collumn or bar
  * @emits addCollumn if it is placed left/right
@@ -31,7 +20,7 @@ export default {
     canvasDim: Object,
   },
   emits: ["addCollumn", "addBar"],
-  inject: ["addRemoveHeight", "addRemoveWidth", "canvasMargin"],
+  inject: ["addRemoveHeight", "addRemoveWidth", "innerCanvasMargin", "outerCanvasMargin"],
   computed: {
     /**
      * Calculates the half height of the addRemove Knob
@@ -49,10 +38,31 @@ export default {
      * Calculates the y position based on the canvas height prop and the halfheight method, for the placement of the collumn knobs
      */
     positionY () {
-      return this.canvasDim.y / 2 - this.halfHeight;
+      if (this.place == "top") {
+        return this.outerCanvasMargin / 2;
+      } else {
+        return this.canvasDim.y / 2 - this.halfHeight;
+      }
     },
-    
+    positionX () {
+      if (this.place == "left") {
+        return this.outerCanvasMargin;
+      } else if (this.place == "right") {
+        return this.canvasDim.x - this.outerCanvasMargin - this.addRemoveHeight;
+      } else {
+        return this.canvasDim.x / 2 - this.halfHeight;
+      }
+    },
   },
+  methods: {
+    clickEmit() {
+      if (this.place == "top") {
+        this.$emit('addBar');
+      } else {
+         this.$emit('addCollumn', this.place);
+      }
+    }
+  }
 };
 </script>
 
