@@ -3,9 +3,9 @@
       <div>
         <svg preserveAspectRatio="xMinYMax meet" ref="canvas" id="canvas" :width="canvasDimensions.x" :height="canvasDimensions.y" fill="white">
           <rect x="0" y="0" :width="canvasDimensions.x" :height="canvasDimensions.y" ref="canvasBG" @click="selectSign(-1)"/>
-          <AddRemoveKnob :place="'left'" :canvasDim="canvasDimensions" @addCollumn="addCollumn"/>
-          <AddRemoveKnob :place="'right'" :canvasDim="canvasDimensions" @addCollumn="addCollumn"/>
-          <AddRemoveKnob :place="'top'" :canvasDim="canvasDimensions" @addBar="addBar"/>
+          <AddRemoveKnob :place="'left'" :canvasDim="canvasDimensions" @addCollumn="addCollumn(-collumnsLeft)"/>
+          <AddRemoveKnob :place="'right'" :canvasDim="canvasDimensions" @addCollumn="addCollumn(collumnsRight + 1)"/>
+          <AddRemoveKnob :place="'top'" :canvasDim="canvasDimensions" @addBar="addBar(bars + 1)"/>
           <g :transform="'translate(' + canvasMarginLeft + ', ' + canvasMarginTop +')'" ref="bounding">
             <rect x="0" y="0" :width="canvasDimNoPad.x" :height="canvasDimNoPad.y" />
             <Grid @unselect="selectSign(-1)" :beats="beats" :bars="bars" :collumnsLeft="collumnsLeft" :collumnsRight="collumnsRight" :fullHeight="canvasDimNoPad.y" />
@@ -42,6 +42,8 @@ import GenericSignContext from "./Context Menus/GenericSignContext.vue"
 //TODO: MAKE SHADOW ELEM SEPERATE FUNCTIONS
 //TODO: properly fix the context menu "signdata undefined" problem
 //TODO: display signCategoryCOntainer to the left side if the side of the element is on the right
+//TODO: find a more elegant solution for the beats/bars moved problem (maybe take start and end for y and height -> use the drag stuff)
+//TODO: make checking for y + h < starting pos a seperate function that returns a bool
 
 export default {
   name: 'Score',
@@ -132,51 +134,90 @@ export default {
     /**
      * Method for adding a collumn on the chosen side in the vuex state
      * @arg side the side to add a collumn to  
+     * @arg beforeIndex the index to insert the new collumn after
      */
-    addCollumn(side) {
+    addCollumn(beforeIndex) {
       this.contextActive = false;
-      if (side == "left") {
-        for (let elem of this.signs) {
+      let side = "right";
+      if (beforeIndex < 1) {
+        side = "left";
+      }
+      for (let elem of this.signs) {
+        if (elem.signData.col >= beforeIndex) {
           elem.x = elem.x + this.collumnWidth;
-          elem.signData.col = elem.signData.col + 1;
         }
       }
+      
       this.$store.dispatch('addCollumn',side);
     },
     /**
      * Method for removing a collumn on the chosen side in the vuex state
-     * @arg side the side to remove a collumn from  
+     * @arg side the side to remove a collumn from
+     * @arg col the collumn to remove  
      */
-    removeCollumn(side) {
-      //TODO: delete signs inside the deleted collumn
+    removeCollumn(side, col) {
+      console.log(col);
       this.contextActive = false;
-      if (side == "left") {
-        for (let elem of this.signs) {
+      if ((side == "left" && this.collumnsLeft == 2) || (side == "right" && this.collumnsRight == 2)) {
+        return false;
+      }
+      let remove = [];
+      for (let elem of this.signs) {
+        if (elem.signData.col == col) {
+          remove.push(this.signs.indexOf(elem));
+        }
+        if (side == "left") {
           elem.x = elem.x - this.collumnWidth;
         }
+      }
+      for (let last = remove.length - 1; last >= 0; last--) {
+        this.removeSign(remove[last]);
       }
       this.$store.dispatch('removeCollumn',side);
     },
 
     /**
      * Method for adding a bar in the vuex state
+     * @arg beforeIndex the index to insert the new bar before
      */
-    addBar() {
-      //TODO: add an index so that signs in the bars after this index get moved up one bar
+    addBar(beforeIndex) {
       this.contextActive = false;
       for (let elem of this.signs) {
-        elem.y = elem.y + this.barHeight;
+        if (elem.signData.bar < beforeIndex) {
+          elem.y = elem.y + this.barHeight;
+        } else {
+          elem.signData.bar = elem.signData.bar + 1;
+        }
       }
       this.$store.dispatch('addBar');
     },
     /**
      * Method for removing a bar in the vuex state
      */
-    removeBar() {
+    removeBar(bar) {
       //TODO: add an index so that signs in the removed bar get deleted
       //TODO: move signs in a bar lower than this one bar up 
+      //only delete existing bars and always leave at least one bar
+      if (this.bars < bar || this.bars == 1) {
+        return false;
+      }
       this.contextActive = false;
-      this.$store.dispatch('removeBarBar');
+      let remove = [];
+      for (let elem of this.signs) {
+        
+        if (elem.signData.bar == bar) {
+          
+          remove.push(this.signs.indexOf(elem));
+        }  else if (elem.signData.bar < bar) {
+          elem.y = elem.y - this.barHeight;
+        } else {
+          elem.signData.bar = elem.signData.bar - 1;
+        }
+      }
+      for (let last = remove.length - 1; last >= 0; last--) {
+        this.removeSign(remove[last]);
+      }
+      this.$store.dispatch('removeBar');
     },
 
 
@@ -197,11 +238,14 @@ export default {
      * Method for removing a sign from the score
      * @arg id the id of the sign to remove
      */
-    removeSign (id = this.selectedSigns[0]) {
+    removeSign (id = -1) {
+        console.log("delete " + id)
         this.selectSign(-1);
         this.contextActive = false;
-        this.signs.splice(id, 1);
-        this.contextSign = 0;
+        if (id > 0) {
+          this.signs.splice(id, 1);
+          this.contextSign = 0;
+        }
     },
 
     /**
@@ -378,6 +422,7 @@ export default {
      * @arg event the context menu call event
      */
     openContextMenu (event) {
+      //TODO: render as html elem over the canvas, using the rounded target.boundingRect
       let target = event.target;
       const targetID = target.getAttribute("signID");
       this.contextSign = targetID;
@@ -607,6 +652,8 @@ export default {
       //fire a selection request to the score component for proper styling
       this.selectSign(-1);
       //TODO: MAKE SHADOW BY ADDING TO SIGNS LIST TEMPORARILY BY ADDING ADD/REMOVE FUNCTIONS? or by copying element
+      //TODO: get start-x of element to set collumn after
+      //TODO: get height/width from bounding box instead of query string
 
       //move element to top of Render
       this.placeSignOnTop(target);
@@ -678,7 +725,6 @@ export default {
      * @arg event the drag-move event
      */
     dragEnd: function(event) {
-      //TODO: change beat/bar/collumn after drag
       //TODO: if context was active before start -> re-render after ?
       let target = event.target;
 
@@ -716,7 +762,6 @@ export default {
         let beatsOverall = this.signs[targetID].signData.beat + beatsMoved;
         if (beatsOverall >= 0) {
           if (beatsMoved % 1 != 0) {
-            console.log(Math.floor(beatsMoved - 1));
             beatsMoved = Math.floor(beatsMoved + 2);
             beatsOverall = this.signs[targetID].signData.beat + beatsMoved;
           } 
@@ -729,7 +774,6 @@ export default {
           }
         } else {
           if (beatsMoved % 1 != 0) {
-            console.log(Math.floor(beatsMoved - 1));
             beatsMoved = Math.floor(beatsMoved - 1);
             beatsOverall = this.signs[targetID].signData.beat + beatsMoved;
           } 
@@ -743,7 +787,7 @@ export default {
           }
         }
       }
-      console.log("beat: " + this.signs[targetID].signData.beat + " bar: " + this.signs[targetID].signData.bar + " collumn: " + this.signs[targetID].signData.col);
+      //console.log("beat: " + this.signs[targetID].signData.beat + " bar: " + this.signs[targetID].signData.bar + " collumn: " + this.signs[targetID].signData.col);
 
       this.$refs.canvas.querySelector("#shadow").remove();
     },
