@@ -156,7 +156,6 @@ export default {
      * @arg col the collumn to remove  
      */
     removeCollumn(side, col) {
-      console.log(col);
       this.contextActive = false;
       if ((side == "left" && this.collumnsLeft == 2) || (side == "right" && this.collumnsRight == 2)) {
         return false;
@@ -195,8 +194,6 @@ export default {
      * Method for removing a bar in the vuex state
      */
     removeBar(bar) {
-      //TODO: add an index so that signs in the removed bar get deleted
-      //TODO: move signs in a bar lower than this one bar up 
       //only delete existing bars and always leave at least one bar
       if (this.bars < bar || this.bars == 1) {
         return false;
@@ -239,7 +236,6 @@ export default {
      * @arg id the id of the sign to remove
      */
     removeSign (id = -1) {
-        console.log("delete " + id)
         this.selectSign(-1);
         this.contextActive = false;
         if (id > 0) {
@@ -666,7 +662,8 @@ export default {
       //get current element position
       let  x = (parseFloat(target.getAttribute("x")) || 0) + event.dx;
       let  y = (parseFloat(target.getAttribute("y")) || 0) + event.dy;
-      target.setAttribute("start-y", y) 
+      target.setAttribute("start-x", x);
+      target.setAttribute("start-y", y);
       target.setAttribute("start-h", target.querySelector(".draggable").getAttribute("height"));
 
       //set shadow position to element and give styling
@@ -756,6 +753,9 @@ export default {
       this.signs[targetID].x = screenX;
       this.signs[targetID].y = screenY;
       target.setAttribute("data-y", screenY);
+
+      let collumnsMoved = (parseFloat(target.getAttribute("start-x")) - this.signs[targetID].x) / -blocksizeX;
+      this.signs[targetID].signData.col = this.signs[targetID].signData.col + collumnsMoved;
 
       let beatsMoved = ((this.signs[targetID].y + this.signs[targetID].height) - (parseFloat(target.getAttribute("start-y")) + parseFloat(target.getAttribute("start-h")))) / -blocksizeY;
       if (beatsMoved != 0) {
