@@ -38,8 +38,6 @@ import Grid from "./Grid.vue"
 import AddRemoveKnob from "./AddRemoveKnob.vue"
 import GenericSignContext from "./Context Menus/GenericSignContext.vue"
 
-
-//TODO: MAKE SHADOW ELEM SEPERATE FUNCTIONS
 //TODO: properly fix the context menu "signdata undefined" problem
 //TODO: display signCategoryCOntainer to the left side if the side of the element is on the right
 //TODO: find a more elegant solution for the beats/bars moved problem (maybe take start and end for y and height -> use the drag stuff)
@@ -66,63 +64,43 @@ export default {
       contextPos: {x: 0, y: 0},
       selectedSigns: [],
       contextSign: 0,
+      keyCommandsEnabled: true,
     };
   },
   computed: {
-    /**
-     * Gets the amount of collumns on the left side from the vuex state
-     */
     collumnsLeft () {
       return this.$store.state["collumnsLeft"];
     },
-    /**
-     * Gets the amount of collumns on the left side from the vuex state
-     */
     collumnsRight () {
       return this.$store.state["collumnsRight"];
     },
-    /**
-     * Gets the amount of bars from the vuex state
-     */
     bars () {
       return this.$store.state["bars"];
     },
-    /**
-     * Gets the amount of beats per bar from the vuex state
-     */
     beats () {
       return this.$store.state["beatsPerBar"];
     },
-    /**
-     * Calculates the minimum height of a sign based on the height of a beat
-     */
     minHeight () {
       return this.barHeight / this.beats;
     },
-    /**
-     * Calculates the full canvas dimensions including margins
-     */
+    blocksizeX () {
+      return this.collumnWidth;
+    },
+    blocksizeY () {
+      return this.barHeight / this.beats;
+    },
     canvasDimensions () {
       return {
         x: this.collumnWidth * (this.collumnsLeft + this.collumnsRight) + 2 * this.canvasMarginLeft, 
         y: this.barHeight * (this.bars + 0.5) + this.minHeight + this.innerCanvasMargin + this.outerCanvasMargin / 2 + 2 * (this.addRemoveHeight) + this.startBarOffset
       };
     },
-    /**
-     * Calculates the full canvas dimensions without the margins
-     */
     canvasDimNoPad () {
       return {x: this.collumnWidth * (this.collumnsLeft + this.collumnsRight), y: this.barHeight * (this.bars + 0.5) + this.minHeight + this.startBarOffset};
     },
-    /**
-     * Calculates the margin of the actual score from the top
-     */
     canvasMarginTop () {
       return this.innerCanvasMargin + this.outerCanvasMargin / 2 + this.addRemoveHeight;
     },
-    /**
-     * Calculates the margin of the actual score from the left
-     */
     canvasMarginLeft () {
       return this.innerCanvasMargin + this.outerCanvasMargin + this.addRemoveHeight;
     }
@@ -245,56 +223,44 @@ export default {
     },
 
     /**
-     * Method for removing a sign from the score
-     * @arg elem the signto move
-     * @arg beats the amount of beats to move
+     * Method for calculating the new beat and bar of an element after a vertical move
+     * @arg index the index of the sign
+     * @arg startY the y position before moving
+     * @arg startH the height of the element before moving
+     * @arg endY the y position after moving
+     * @arg endH the height of the element after moving
      */
-    moveSign(elem, beats = 0) {
-      let id = this.signs.indexOf(elem);
-      let signBars = this.signs[id].signData.bar;
-      let signBeats = this.signs[id].signData.beat;
-      if (beats != 0) {
-        //only move the sign if it isn't already at the top of the last bar
-        if (beats > 0 && this.signs[id].y - this.minHeight >= 0) {
-          //if the sign is not already on the highest beat in a bar
-          if (signBeats + beats <= this.beats - 1) {
-            // if the sign is in starting position (bar = 0) -> move up to bar = 1 
-            if (signBars == 0) {
-              this.signs[id].signData.beat = 0;
-              this.signs[id].signData.bar = 1;
-              this.signs[id].y = this.signs[id].y - this.minHeight * 2 - this.startBarOffset;
-            //else just move it up one beat
-            } else {
-              this.signs[id].signData.beat = this.signs[id].signData.beat + beats;
-              this.signs[id].y = this.signs[id].y - this.minHeight;
-            }
-          //if the sign is on the highest beat in a bar -> go to next bar and set beat = 0
+    calcBeatMove(index, startY, startH, endY, endH) {
+      let beatsMoved = ((endY + endH) - (startY + startH)) / -this.blocksizeY;
+      if (beatsMoved != 0) {
+        let beatsOverall = this.signs[index].signData.beat + beatsMoved;
+        if (beatsOverall >= 0) {
+          if (beatsMoved % 1 != 0) {
+            beatsMoved = Math.floor(beatsMoved + 2);
+            beatsOverall = this.signs[index].signData.beat + beatsMoved;
+          } 
+          if (beatsOverall < this.beats) {
+            this.signs[index].signData.beat = beatsOverall;
           } else {
-            this.signs[id].signData.beat = 0;
-            this.signs[id].signData.bar = this.signs[id].signData.bar + 1;
-            this.signs[id].y = this.signs[id].y - this.minHeight;
+            let barsMoved =  (beatsOverall - beatsOverall % this.beats) / this.beats;
+            this.signs[index].signData.beat = beatsOverall % this.beats;
+            this.signs[index].signData.bar = this.signs[index].signData.bar + barsMoved;
           }
-        } else if (beats < 0) {
-          // standard case if the new beat is still >= 0
-          if (signBeats + beats >= 0) {
-            this.signs[id].signData.beat = this.signs[id].signData.beat + beats;
-            this.signs[id].y = this.signs[id].y + this.minHeight;
-          // if the new beat would be the top beat of the bar before the current bar
+        } else {
+          if (beatsMoved % 1 != 0) {
+            beatsMoved = Math.floor(beatsMoved - 1);
+            beatsOverall = this.signs[index].signData.beat + beatsMoved;
+          } 
+          if (beatsOverall > -this.beats) {
+            this.signs[index].signData.beat = beatsOverall + this.beats;
+            this.signs[index].signData.bar = this.signs[index].signData.bar - 1;
           } else {
-            //if moving the sign one beat down would put it in the starting pos, put it there and set the height accordingly
-            if (signBars == 1) {
-              this.signs[id].signData.beat = 0;
-              this.signs[id].y = this.signs[id].y + this.signs[id].height + this.startBarOffset;
-              this.signs[id].height = this.minHeight * 2;
-              this.signs[id].signData.bar = this.signs[id].signData.bar -1;
-            //if there are more bars below, move the sign one bar down and set the beat to the max amount
-            } else if (signBars > 1) {
-              this.signs[id].signData.beat = this.beats - 1;
-              this.signs[id].y = this.signs[id].y + this.minHeight;
-              this.signs[id].signData.bar = this.signs[id].signData.bar -1;
-            }
+            let barsMoved = (beatsOverall - ((beatsOverall % this.beats) + this.beats) % this.beats) / this.beats;
+            this.signs[index].signData.bar = this.signs[index].signData.bar + barsMoved;
+            this.signs[index].signData.beat = ((beatsOverall % this.beats) + this.beats) % this.beats;
           }
         }
+        //console.log("beat: " + this.signs[index].signData.beat + " bar: " + this.signs[index].signData.bar + " collumn: " + this.signs[index].signData.col);
       }
     },
 
@@ -341,6 +307,9 @@ export default {
      * @arg event the keydown event 
      */
     keyEvent(event) {
+      if (!this.keyCommandsEnabled) {
+        return false;
+      }
       //delete sign on x or del
       if (event.key == "x" || event.key == "Delete") {
         for (let elem of this.selectedSigns) {
@@ -365,8 +334,27 @@ export default {
               }
             //if the key id is even -> up / down arrow key, move the sign up or down one beat if possible 
             } else {
-              this.moveSign(elem, move.beat);
-              console.log("beat: " + elem.signData.beat + " bar: " + elem.signData.bar + " collumn: " + elem.signData.col);
+              let startY = elem.y;
+              let startH = elem.height;
+              if (move.beat > 0) {
+                if (this.checkStartingPos(elem.y, elem.height)) {
+                  //if start pos and moving up -> change to bar 1 beat 0
+                  elem.y = elem.y - this.minHeight * 2 - this.startBarOffset;
+                } else if (elem.y - move.beat * this.minHeight >= 0) {
+                  elem.y = elem.y - this.minHeight;
+                }
+              } else {
+                let newY = elem.y + this.minHeight;
+                if (this.checkStartingPos(newY, elem.height) && newY + elem.height < this.canvasDimNoPad.y) {
+                  //if start pos and moving up -> change to bar 1 beat 0
+                  elem.y = elem.y + elem.height + this.startBarOffset;
+                  elem.height = this.minHeight * 2;
+                } else if (!this.checkStartingPos(newY, elem.height)) {
+                  elem.y = elem.y + this.minHeight;
+                  
+                }
+              }
+              this.calcBeatMove(this.signs.indexOf(elem), startY, startH, elem.y, elem.height);
             }
           }
         }
@@ -508,36 +496,44 @@ export default {
 
 
 
+    makeShadow (elem) {
+      let shadow = {};
+      for (const [key, value] of Object.entries(elem)) {
+        shadow[key] = value;
+      }
+
+      this.signs.push(shadow);
+    },
+
+    checkStartingPos(y, height) {
+      if (y + height > (this.canvasDimNoPad.y - this.minHeight - this.barHeight / this.beats * 2- this.startBarOffset)) {
+        return true;
+      } else {
+        return false;
+      }
+    },
+
     /**
      * The resize start event listener, creats the shadow element for resizing
      * @arg event the resize-start event
      */
     resizeStart (event) {
+      this.keyCommandsEnabled = false;
       let target = event.target;
-      //load svg -> TODO: do via global link or smth in actual editor
-      const svgns = "http://www.w3.org/2000/svg";
-      //create shadow element to show the effect of the drag on end
-      let shadow = document.createElementNS( svgns,"rect" );
+      const targetID = target.getAttribute("signID");
       
       //get current element position
-      let  x = (parseFloat(target.getAttribute("x")) || 0) + event.dx;
-      let  y = (parseFloat(target.getAttribute("y")) || 0) + event.dy;
-      target.setAttribute("start-y", y) 
-      target.setAttribute("start-h", target.querySelector(".draggable").getAttribute("height"));
+      let  y = (this.signs[targetID].y || 0) + event.dy;
+      target.setAttribute("start-y", y);
+      target.setAttribute("start-h", this.signs[targetID].height);
 
-      //set shadow position to element and give styling
-      shadow.setAttributeNS( null,"x",x );
-      shadow.setAttributeNS( null,"y",y );
-      shadow.setAttribute("width", parseFloat(target.querySelector(".draggable").getAttribute("width")));
-      shadow.setAttribute("height", parseFloat(target.querySelector(".draggable").getAttribute("height")));
-      shadow.classList.add("shadow");
-      shadow.setAttribute("id", "shadow");
+      this.makeShadow(this.signs[targetID]);
 
       //apply dragging styling to group
       target.classList.add("dragging");
 
-      //insert shadow before sign
-      target.parentElement.insertBefore(shadow, target);
+       //move element to top of Render
+      this.placeSignOnTop(target);
     },
 
     /**
@@ -550,18 +546,16 @@ export default {
       //get the saved x and y data
       let target = event.target;
       const targetID = target.getAttribute("signID");
-
-      let shadow = this.$refs.canvas.querySelector("#shadow");
+      const shadowID = this.signs.length - 1;
       let y = (parseFloat(target.getAttribute("data-y")) || 0);
 
       // keep the same position when resizing from the top
       y += event.deltaRect.top;
       
 
-      const blocksizeY = this.barHeight / this.beats;
-      let actualY = Math.round(y / blocksizeY) * blocksizeY;
+      let actualY = Math.round(y / this.blocksizeY) * this.blocksizeY;
       let newHeight = this.signs[targetID].height + y - actualY;
-      let actualH = Math.round(newHeight / blocksizeY) * blocksizeY;
+      let actualH = Math.round(newHeight / this.blocksizeY) * this.blocksizeY;
 
       // update the element height (-14 for the handles)
       this.signs[targetID].height = event.rect.height - this.handleDiam * 2;
@@ -569,13 +563,13 @@ export default {
       if (event.deltaRect.top != 0) {
         //top handle -> adjust y position to nearest grid position
         
-        shadow.setAttribute("y", actualY);
+        this.signs[shadowID].y = actualY;
 
       }
 
       //stop resizing at the starting line
-      if (!(actualY + actualH > this.canvasDimNoPad.y - this.minHeight - this.barHeight / this.beats * 2 - this.startBarOffset)) {
-        shadow.setAttribute("height", actualH);
+      if (!this.checkStartingPos(actualY, actualH)) {
+        this.signs[shadowID].height = actualH;
       }
 
       //set new y data
@@ -590,13 +584,13 @@ export default {
      * @arg event the resize-end event
      */
     resizeEnd (event) {
+      this.keyCommandsEnabled = true;
       let target = event.target;
       const targetID = target.getAttribute("signID");
-      let shadow = this.$refs.canvas.querySelector("#shadow");
+      const shadowID = this.signs.length - 1;
 
-      const blocksizeY = this.barHeight / this.beats;
       let y = parseFloat(target.getAttribute("data-y"));
-      let actualY = Math.round(y / blocksizeY) * blocksizeY;
+      let actualY = Math.round(y / this.blocksizeY) * this.blocksizeY;
       
       //check if the element was resized from the top
       if (event.deltaRect.top != 0) {
@@ -604,81 +598,44 @@ export default {
         target.setAttribute("data-y", actualY);
         this.signs[targetID].y = actualY;
       }
-      this.signs[targetID].height = parseFloat(shadow.getAttribute("height"));
+      this.signs[targetID].height = this.signs[shadowID].height;
 
-      if (actualY == 0 && target.getAttribute("y") != 0) {
+      if (actualY == 0 && this.signs[targetID].y != 0) {
         this.signs[targetID].y = 0;
       }
-
-      let beatsMoved = ((this.signs[targetID].y + this.signs[targetID].height) - (parseFloat(target.getAttribute("start-y")) + parseFloat(target.getAttribute("start-h")))) / -blocksizeY;
-      if (beatsMoved != 0) {
-        let beatsOverall = this.signs[targetID].signData.beat + beatsMoved;
-        if (beatsOverall >= 0) {
-          if (beatsOverall < this.beats) {
-            this.signs[targetID].signData.beat = beatsOverall;
-          } else {
-            let barsMoved =  (beatsOverall - beatsOverall % this.beats) / this.beats;
-            this.signs[targetID].signData.beat = beatsOverall % this.beats;
-            this.signs[targetID].signData.bar = this.signs[targetID].signData.bar + barsMoved;
-          }
-        } else {
-          if (beatsOverall > -this.beats) {
-            this.signs[targetID].signData.beat = beatsOverall + this.beats;
-            this.signs[targetID].signData.bar = this.signs[targetID].signData.bar - 1;
-          } else {
-            let barsMoved = (beatsOverall - ((beatsOverall % this.beats) + this.beats) % this.beats) / this.beats;
-            this.signs[targetID].signData.beat = ((beatsOverall % this.beats) + this.beats) % this.beats;
-            this.signs[targetID].signData.bar = this.signs[targetID].signData.bar + barsMoved;
-          }
-        }
-      }
-
-      shadow.remove();
+      this.calcBeatMove (targetID, parseFloat(target.getAttribute("start-y")), parseFloat(target.getAttribute("start-h")), this.signs[targetID].y, this.signs[targetID].height);
+      
+      this.removeSign(shadowID);
       target.classList.remove("dragging");
+      this.selectSign(targetID);
     },
-
-
 
     /**
      * The drag-start event listener, sets up the shadow element for the dragging
      * @arg event the drag-start event
      */
     dragStart: function(event) {
+      this.keyCommandsEnabled = false;
+      
       let target = event.target;
+      const targetID = target.getAttribute("signID");
       //fire a selection request to the score component for proper styling
       this.selectSign(-1);
-      //TODO: MAKE SHADOW BY ADDING TO SIGNS LIST TEMPORARILY BY ADDING ADD/REMOVE FUNCTIONS? or by copying element
-      //TODO: get start-x of element to set collumn after
-      //TODO: get height/width from bounding box instead of query string
-
-      //move element to top of Render
-      this.placeSignOnTop(target);
-
-      //load svg -> TODO: do via global link or smth in actual editor
-      const svgns = "http://www.w3.org/2000/svg";
-      //create shadow element to show the effect of the drag on end
-      let shadow = document.createElementNS( svgns,"rect" );
       
       //get current element position
-      let  x = (parseFloat(target.getAttribute("x")) || 0) + event.dx;
-      let  y = (parseFloat(target.getAttribute("y")) || 0) + event.dy;
+      let  x = (this.signs[targetID].x || 0) + event.dx;
+      let  y = (this.signs[targetID].y || 0) + event.dy;
       target.setAttribute("start-x", x);
       target.setAttribute("start-y", y);
-      target.setAttribute("start-h", target.querySelector(".draggable").getAttribute("height"));
+      target.setAttribute("start-h", this.signs[targetID].height);
 
-      //set shadow position to element and give styling
-      shadow.setAttributeNS( null,"x",x );
-      shadow.setAttributeNS( null,"y",y );
-      shadow.setAttribute("width", parseFloat(target.querySelector(".draggable").getAttribute("width")));
-      shadow.setAttribute("height", parseFloat(target.querySelector(".draggable").getAttribute("height")));
-      shadow.classList.add("shadow");
-      shadow.setAttribute("id", "shadow");
+      this.makeShadow(this.signs[targetID]);
 
       //apply dragging styling to group
       target.classList.add("dragging");
 
-      //insert shadow before sign
-      target.parentElement.insertBefore(shadow, target);
+       //move element to top of Render
+      this.placeSignOnTop(target);
     },
 
     /**
@@ -686,25 +643,23 @@ export default {
      * @arg event the drag-move event
      */
     dragMove: function(event) {
-      //TODO: get height form bounding box?
       this.selectSign(-1);
       let target = event.target;
+      
       const targetID = target.getAttribute("signID");
-      let shadow = this.$refs.canvas.querySelector("#shadow");
-      shadow.setAttribute("height", parseFloat(target.querySelector(".draggable").getAttribute("height")));
+      const shadowID = this.signs.length - 1;
+      this.signs[shadowID].height = this.signs[targetID].height;
 
       //get the current position from the x and y chords
       let  x = (this.signs[targetID].x || 0) + event.dx;
       let  y = (this.signs[targetID].y || 0) + event.dy;
 
-      const blocksizeX = this.collumnWidth;
-      const blocksizeY = this.barHeight / this.beats;
       const collumnOffset = (this.collumnWidth - this.signWidth) / 2;
-      let actualX = Math.round(x / blocksizeX) * blocksizeX + collumnOffset;
-      let actualY = Math.round(y / blocksizeY) * blocksizeY;
+      let actualX = Math.round(x / this.blocksizeX) * this.blocksizeX + collumnOffset;
+      let actualY = Math.round(y / this.blocksizeY) * this.blocksizeY;
       //check if the current position is above (below in actual browser) the starting line -> snap there
-      if (actualY + target.getBoundingClientRect().height > this.canvasDimNoPad.y - this.minHeight - this.barHeight / this.beats * 2 - this.startBarOffset) {
-        shadow.setAttribute("height", this.barHeight / this.beats * 2);
+      if (this.checkStartingPos(actualY, this.signs[targetID].height)) {
+        this.signs[shadowID].height = this.barHeight / this.beats * 2;
         actualY = this.canvasDimNoPad.y - this.minHeight - this.barHeight / this.beats * 2;
       }
 
@@ -713,8 +668,8 @@ export default {
         this.signs[targetID].y = y;
 
         //set new shadow element position
-        shadow.setAttribute("x", actualX);
-        shadow.setAttribute("y", actualY);
+        this.signs[shadowID].x = actualX;
+         this.signs[shadowID].y = actualY;
     },
     
     /**
@@ -722,27 +677,24 @@ export default {
      * @arg event the drag-move event
      */
     dragEnd: function(event) {
-      //TODO: if context was active before start -> re-render after ?
+      //TODO: if context was active before start -> re-render after
+      this.keyCommandsEnabled = true;
       let target = event.target;
 
       const targetID = target.getAttribute("signID");
-      this.selectSign(targetID);
-      
+
       target.classList.remove("dragging");
 
       //get the new x and y chords
       let x = this.signs[targetID].x;
       let y = this.signs[targetID].y;
 
-      //get the blocksize
-      const blocksizeX = this.collumnWidth;
-      const blocksizeY = this.barHeight / this.beats;
       const collumnOffset = (this.collumnWidth - this.signWidth) / 2;
-      let screenX = Math.round(x / blocksizeX) * blocksizeX + collumnOffset;
-      let screenY = Math.round(y / blocksizeY) * blocksizeY;
-
+      let screenX = Math.round(x / this.blocksizeX) * this.blocksizeX + collumnOffset;
+      let screenY = Math.round(y /this.blocksizeY) * this.blocksizeY;
+      
       //check if the current position is above (below in actual browser) the starting line -> snap there
-      if (screenY >= (this.canvasDimNoPad.y - this.minHeight - target.getBoundingClientRect().height - this.barHeight / this.beats - this.startBarOffset)) {
+      if (this.checkStartingPos(screenY, this.signs[targetID].height)) {
         this.signs[targetID].height = this.barHeight / this.beats * 2;
         screenY = this.canvasDimNoPad.y - this.barHeight / this.beats * 2 - this.minHeight;
         this.signs[targetID].signData.canResize = false;
@@ -754,42 +706,14 @@ export default {
       this.signs[targetID].y = screenY;
       target.setAttribute("data-y", screenY);
 
-      let collumnsMoved = (parseFloat(target.getAttribute("start-x")) - this.signs[targetID].x) / -blocksizeX;
+      let collumnsMoved = (parseFloat(target.getAttribute("start-x")) - this.signs[targetID].x) / -this.blocksizeX;
       this.signs[targetID].signData.col = this.signs[targetID].signData.col + collumnsMoved;
 
-      let beatsMoved = ((this.signs[targetID].y + this.signs[targetID].height) - (parseFloat(target.getAttribute("start-y")) + parseFloat(target.getAttribute("start-h")))) / -blocksizeY;
-      if (beatsMoved != 0) {
-        let beatsOverall = this.signs[targetID].signData.beat + beatsMoved;
-        if (beatsOverall >= 0) {
-          if (beatsMoved % 1 != 0) {
-            beatsMoved = Math.floor(beatsMoved + 2);
-            beatsOverall = this.signs[targetID].signData.beat + beatsMoved;
-          } 
-          if (beatsOverall < this.beats) {
-            this.signs[targetID].signData.beat = beatsOverall;
-          } else {
-            let barsMoved =  (beatsOverall - beatsOverall % this.beats) / this.beats;
-            this.signs[targetID].signData.beat = beatsOverall % this.beats;
-            this.signs[targetID].signData.bar = this.signs[targetID].signData.bar + barsMoved;
-          }
-        } else {
-          if (beatsMoved % 1 != 0) {
-            beatsMoved = Math.floor(beatsMoved - 1);
-            beatsOverall = this.signs[targetID].signData.beat + beatsMoved;
-          } 
-          if (beatsOverall > -this.beats) {
-            this.signs[targetID].signData.beat = beatsOverall + this.beats;
-            this.signs[targetID].signData.bar = this.signs[targetID].signData.bar - 1;
-          } else {
-            let barsMoved = (beatsOverall - ((beatsOverall % this.beats) + this.beats) % this.beats) / this.beats;
-            this.signs[targetID].signData.bar = this.signs[targetID].signData.bar + barsMoved; 
-            this.signs[targetID].signData.beat = ((beatsOverall % this.beats) + this.beats) % this.beats;
-          }
-        }
-      }
-      //console.log("beat: " + this.signs[targetID].signData.beat + " bar: " + this.signs[targetID].signData.bar + " collumn: " + this.signs[targetID].signData.col);
+      this.calcBeatMove(targetID, parseFloat(target.getAttribute("start-y")), parseFloat(target.getAttribute("start-h")), this.signs[targetID].y, this.signs[targetID].height);
 
-      this.$refs.canvas.querySelector("#shadow").remove();
+      const shadowID = this.signs.length - 1;
+      this.removeSign(shadowID);
+      this.selectSign(targetID);
     },
 
 
