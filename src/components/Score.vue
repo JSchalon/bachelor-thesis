@@ -40,8 +40,7 @@ import GenericSignContext from "./Context Menus/GenericSignContext.vue"
 
 //TODO: properly fix the context menu "signdata undefined" problem
 //TODO: display signCategoryCOntainer to the left side if the side of the element is on the right
-//TODO: find a more elegant solution for the beats/bars moved problem (maybe take start and end for y and height -> use the drag stuff)
-//TODO: make checking for y + h < starting pos a seperate function that returns a bool
+//TODO: (later) make multi drag/resize possible
 
 export default {
   name: 'Score',
@@ -312,8 +311,10 @@ export default {
       }
       //delete sign on x or del
       if (event.key == "x" || event.key == "Delete") {
-        for (let elem of this.selectedSigns) {
-            this.removeSign (elem);
+        let sortedSelected = this.selectedSigns.sort();
+        
+        for (let max = sortedSelected.length - 1; max >= 0; max--) {
+            this.removeSign (sortedSelected[max]);
         }
       }
       //move sign with arrow keys key.id are 37 to 40
@@ -482,7 +483,7 @@ export default {
     clickSign (event) {
       if (event.button == 0) {
         this.placeSignOnTop(event.target.parentElement);
-        this.selectSign(event.target.getAttribute("signID"));
+        this.selectSign(event.target.getAttribute("signID"), event.ctrlKey);
       }
     },
 

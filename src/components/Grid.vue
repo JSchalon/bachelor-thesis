@@ -1,8 +1,9 @@
 <template>
     <g ref="grid" id="grid">
-      <g :id="'grid-collumn' + (index - 1 - collumnsLeft)" :x="collumnWidth * (index - 1)" y="0" :key="index" v-for="index in (collumnsLeft+collumnsRight)" fill="white">
-        <rect :class="'ba' + (getBar(rect) + 1) + ' ' +  'be' + getBeat(rect)" :x="collumnWidth * (index - 1)" :y="(barHeight / beats) * (rect - 1)" :width="collumnWidth" :height="(barHeight / beats)"  :key="rect" v-for="rect in (bars * beats)"/>
-        <rect class="ba0 be0" :x="collumnWidth * (index - 1)" :y="barHeight * bars + startBarOffset" :width="collumnWidth" :height="(barHeight / beats * 2)" />
+      <g class="collumn" :id="'grid-collumn' + (index - 1 - collumnsLeft)" :x="collumnWidth * (index - 1)" y="0" :key="index" v-for="index in (collumnsLeft+collumnsRight)">
+        <rect :class="'beat-rect ba' + (getBar(rect) + 1) + ' ' +  'be' + getBeat(rect)" :x="collumnWidth * (index - 1)" :y="(barHeight / beats) * (rect - 1)" :width="collumnWidth" :height="(barHeight / beats)"  :key="rect" v-for="rect in (bars * beats)"/>
+        <rect class="fill-rect" :x="collumnWidth * (index - 1)" :y="barHeight * bars" :width="collumnWidth" :height="startBarOffset" />
+        <rect class="beat-rect ba0 be0" :x="collumnWidth * (index - 1)" :y="barHeight * bars + startBarOffset" :width="collumnWidth" :height="(barHeight / beats * 2)" />
       </g>
       <!--horizontal lines-->
       <!-- beat lines-->
@@ -29,7 +30,6 @@
 
 <script>
 import interact from "interactjs";
-//TODO: test snaping via the beat rects
 //TODO: add grid for presigns
 /**
  * The visual grid component
@@ -47,17 +47,45 @@ export default {
   },
   data() {
     return {
+      barSelected: false,
     };
   },
   mounted () {
-    interact(this.$refs.grid).on("tap", this.click);
+    interact(".beat-rect").on("tap", this.click);
+    interact(".beat-rect").on("doubletap", this.doubleClick);
+    this.$refs.grid.addEventListener("contextmenu", function (event) {
+      event.preventDefault();
+    });
   },
   methods: {
     /**
      * When the grid is clicked -> unselect all signs
      */
-    click () {
-      this.$emit("unselect");
+    click (event) {
+      if (event.button == 2) {
+        this.$emit("unselect");
+        this.highlight();
+      } else if (event.button == 0){
+        //collumn select/unselect
+        this.highlightCol(event.target.parentElement.id, true);
+        if (!event.double && this.barSelected) {
+          this.barSelected = false;
+          this.highlight();
+
+        }
+      }
+    },
+    doubleClick (event) {
+      if (event.button == 0) {
+        if (this.barSelected) {
+          this.highlight();
+          this.barSelected = false;
+        } else {
+          this.highlightCol(event.target.parentElement.id, false);
+          this.highlight(event.target.classList[1].slice(-1));
+          this.barSelected = true;
+        }
+      }
     },
     /**
      * Calculates the bar of a grid rect based on its' index
@@ -77,9 +105,17 @@ export default {
      * Highlights all rects in the specified collumn
      * @arg collumn the the collumn 
      */
-    highlightCol (collumn) {
-      let elem = this.$refs.grid.querySelector("#grid-collumn" + collumn);
-      elem.setAttribute("fill", "red");
+    highlightCol (collumn, highlight) {
+      let elem = this.$refs.grid.querySelector("#" + collumn);
+      let isHighlighted = elem.classList.contains("highlighted");
+      this.highlight();
+      if (highlight) {
+        if (!isHighlighted) {
+          elem.classList.toggle("highlighted");
+        }
+      } else {
+        elem.classList.remove("highlighted");
+      }
     },
     /**
      * Highlights all width the specified beat and or bar
@@ -95,12 +131,13 @@ export default {
         highl = highl + ".be" + beat;
       }
       if (highl != "") {
-        console.log(highl);
         let elems = this.$refs.grid.querySelectorAll(highl);
-        console.log(elems);
         for (let el of elems) {
-          console.log(el);
-          el.setAttribute("fill", "red");
+          el.classList.toggle("highlighted");
+        }
+      } else {
+        for (let elem of this.$refs.grid.querySelectorAll(".highlighted")) {
+          elem.classList.remove("highlighted");
         }
       }
     }
@@ -121,5 +158,12 @@ export default {
   .help {
     stroke-dasharray: 5,5;
     stroke: #c1c1c1;
+  }
+  .collumn {
+    fill: white;
+  }
+
+  .highlighted {
+    fill: #22ee99;
   }
 </style>

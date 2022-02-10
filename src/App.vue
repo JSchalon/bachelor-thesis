@@ -2,6 +2,15 @@
   <div id="app">
     <Header/>
     <router-view/>
+    <div class="alert-container" v-if="isPhone">
+      <div class="alert-box">
+        <p class="alert-text">We recommend using a Tablet or PC to use this editor. Using a phone is possible, but not advised.</p>
+        <div class="divider-bar"></div>
+        <div class="alert-btn-container">
+          <button class="alert-btn" @click="isPhone=false">Got it</button><p>>></p>
+        </div>  
+      </div>
+    </div> 
   </div>
 </template>
 
@@ -19,6 +28,12 @@ export default {
   components: {
     Header,
   },
+  data() {
+    return {
+      isPhone: false,
+      isTablet: false,
+    };
+  },
   provide: {
     //set global dimensions used by the score canvas, its subcomponents and the signs
     //change these here
@@ -30,26 +45,82 @@ export default {
     addRemoveHeight: 40,
     addRemoveWidth: 10,
     innerCanvasMargin: 30,
-    outerCanvasMargin: 200,
+    outerCanvasMargin: 50,
     handleDiam: 7,
     borderWidth: 2,
     contextMenuWidth: 250,
     contextItemHeight: 50,
   },
   mounted () {
+    let d = new Date();
+    d.setTime(d.getTime() + 1 * 24 * 60 * 60 * 1000);
+    document.cookie = "username=bee; expires=" + d.toUTCString() + "; path=/";
+    this.isPhone = window.matchMedia("only screen and (max-width: 760px)").matches;
+    this.isTablet = window.matchMedia("only screen and (max-width: 1024px)").matches;
   },
   methods: {
-  
+    
   }
 };
 </script>
 
 <style>
-body {
-  margin: 0;
+  body {
+    margin: 0;
+    user-select: none;
+  }
+  .alert-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(0,0,0,.5);
+    width: 100%;
+    height: 100%;
+    position: fixed;
+    top: 0;
+  }
 
-}
-text {
-  font-family: Arial;
-}
+    .alert-box {
+      width: 80%;
+      border-radius: 30px;
+      background-color: white;
+      box-shadow: 0 1px 8px 5px rgba(0, 0, 0, 0.15);
+    }
+    .alert-text {
+      width: 100%;
+      padding: 0 1em;
+      margin-bottom: 0.5em;
+      box-sizing: border-box;
+      font-size: 1.5em;
+    }
+
+    .divider-bar {
+      height: 0;
+      width:  calc(100% - 4em);
+      margin: 0 2em;
+      border-bottom: 2px solid;
+
+    }
+
+    .alert-btn-container {
+      width: 100%;
+      margin: 1em 0;
+      display: flex;
+      justify-content: center;
+    }
+
+    .alert-btn-container > * {
+      font-size: 1.5em;
+      color: #21a3fa;
+    }
+
+      .alert-btn {
+        background-color: white;
+        border: 0px;
+        
+      }
+
+  text, p {
+    font-family: Arial;
+  }
 </style>
