@@ -30,7 +30,6 @@
 
 <script>
 import interact from "interactjs";
-//TODO: add grid for presigns
 /**
  * The visual grid component
  * @displayName Grid
@@ -44,6 +43,7 @@ export default {
     bars: Number,
     beats: Number,
     fullHeight: Number,
+    contextActive: Boolean,
   },
   data() {
     return {
@@ -62,7 +62,7 @@ export default {
      * When the grid is clicked -> unselect all signs
      */
     click (event) {
-      if (event.button == 2) {
+      if (event.button == 2 || this.contextActive) {
         this.$emit("unselect");
         this.highlight();
       } else if (event.button == 0){

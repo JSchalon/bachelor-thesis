@@ -1,6 +1,5 @@
 <template>
   <div id="app">
-    <Header/>
     <router-view/>
     <div class="alert-container" v-if="isPhone">
       <div class="alert-box">
@@ -15,7 +14,7 @@
 </template>
 
 <script>
-import Header from "./components/Header";
+
 
 /**
  * The app component
@@ -26,7 +25,7 @@ import Header from "./components/Header";
 export default {
   name: "App",
   components: {
-    Header,
+    
   },
   data() {
     return {

@@ -1,17 +1,11 @@
 <template>
-  <div class="main">
-    <SignLibrary/>
-    <div id="interactionBox">
-      <InteractionMenu/>
-      <Score/>
-    </div>
-  </div>
+  <main class="main">
+    <InteractionMenu/>
+  </main>
 </template>
 
 <script>
-import InteractionMenu from "../components/InteractionMenu";
-import SignLibrary from "../components/SignLibrary";
-import Score from "../components/Score";
+import InteractionMenu from "../components/ScoreController.vue";
 
 /**
  * The main editor view
@@ -22,16 +16,10 @@ export default {
   name: 'Main',
   components: {
     InteractionMenu,
-    SignLibrary,
-    Score
   }
 }
 </script>
 
 <style>
 
-#interactionBox {
-  width: 84%;
-  float: right;
-}
 </style>
