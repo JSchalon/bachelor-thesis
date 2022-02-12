@@ -60,8 +60,16 @@ export default {
   },
   mounted () {
     let d = new Date();
-    d.setTime(d.getTime() + 1 * 24 * 60 * 60 * 1000);
-    document.cookie = "username=bee; expires=" + d.toUTCString() + "; path=/";
+    d.setTime(d.getTime() + 60 * 24 * 60 * 60 * 1000);
+    let settingsObj = JSON.parse(this.getSettingsCookie());
+    if (settingsObj == {}) {
+      //set settings cookie
+      let testObj = {seenIntro: false, language: "eng", showHelpLines: true};
+      document.cookie = "settings=" + JSON.stringify(testObj) + "; expires=" + d.toUTCString() + "; path=/";
+    } else {
+      //store action set settings
+      console.log(settingsObj);
+    }
     this.isPhone = window.matchMedia("only screen and (max-width: 760px)").matches;
     this.isTablet = window.matchMedia("only screen and (max-width: 1024px)").matches;
     document.documentElement.style.setProperty('--contextMenuWidth', this.contextMenuWidth + "px");
@@ -70,7 +78,12 @@ export default {
     document.documentElement.style.setProperty('--contextItemImageSize', this.contextItemImageSize + "px");
   },
   methods: {
-    
+    getSettingsCookie () {
+      const settings = (
+        document.cookie.match('(^|;)\\s*' + "settings" + '\\s*=\\s*([^;]+)')?.pop() || ''
+      )
+      return settings;
+    }
   }
 };
 </script>

@@ -10,6 +10,12 @@ Git Repo zur Bachelorarbeit zur Entwicklung eines webbasierten Interaktionsedito
 	- Use **npm run serve** to run the server at localhost:8080
 
 ## Versions
+
+### Version 0.1.1
+- Redid the context menu with html/css
+- added proper custom img support to context menu radio options
+- Now recalculates context menu after drag and resize
+
 ### Version 0.1.0
 - Finished implementing Feature set 1
 - Made some calculation optimizations

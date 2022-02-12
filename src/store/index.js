@@ -2,10 +2,15 @@ import { createStore } from 'vuex'
 
 export default createStore({
   state: {
+    //score properties
     collumnsLeft: 3,
     collumnsRight: 3,
     bars: 2,
     beatsPerBar: 4,
+    //editor settings
+    seenIntro: false, 
+    language: "eng", 
+    showHelpLines: true
   },
   mutations: {
     setCollumns (state, data) {

@@ -23,7 +23,6 @@
               v-for="(item, index) in signs"/>
           </g>
         </svg>
-        
       </div>
       <GenericSignContext :signData="signs[contextSign].signData" :signIndex="contextSign" :isActive="contextActive" :x="contextPos.x" :y="contextPos.y" @updateSignData="updateSignData" @delete="removeSign"/>
     </div>
@@ -57,6 +56,7 @@ export default {
       selectedSigns: [],
       contextSign: 0,
       keyCommandsEnabled: true,
+      contextWasActive: false,
     };
   },
   computed: {
@@ -402,23 +402,29 @@ export default {
      * Method for calling the custom sign context menu
      * @arg event the context menu call event
      */
-    openContextMenu (event) {
+    openContextMenu (event, p = false, additionalX = 0, additionalY = 0) {
       event.preventDefault();
       let target = event.target;
       const targetID = target.getAttribute("signID");
       this.contextSign = targetID;
-     
-      const boundingRect = event.target.parentElement.getBoundingClientRect();
-      this.contextPos.x = boundingRect.right;
+      let boundingRect = target.getBoundingClientRect();
+      if (p) {
+        boundingRect = target.getBoundingClientRect();
+        this.placeSignOnTop(event.target);
+      } else {
+        boundingRect = target.parentElement.getBoundingClientRect();
+        this.placeSignOnTop(event.target.parentElement);
+      }
+      this.contextPos.x = boundingRect.right + additionalX;
       if (this.signs[targetID].isSelected) {
-        this.contextPos.y = boundingRect.top + this.handleDiam;
+        this.contextPos.y = boundingRect.top + this.handleDiam + additionalY;
       } else {
         this.contextPos.y = boundingRect.top;
       }
       
       this.selectSign(targetID);
       this.contextActive = true;
-      this.placeSignOnTop(event.target.parentElement);
+      
     },
 
     /**
@@ -522,6 +528,11 @@ export default {
     resizeStart (event) {
       this.keyCommandsEnabled = false;
       let target = event.target;
+      if (this.contextActive) {
+        this.contextWasActive = true;
+      }
+      this.contextActive = false;
+      
       const targetID = target.getAttribute("signID");
       
       //get current element position
@@ -594,7 +605,7 @@ export default {
 
       let y = parseFloat(target.getAttribute("data-y"));
       let actualY = Math.round(y / this.blocksizeY) * this.blocksizeY;
-      
+
       //check if the element was resized from the top
       if (event.deltaRect.top != 0) {
         //top handle -> adjust y position to nearest grid position
@@ -607,10 +618,14 @@ export default {
         this.$emit("editSign", {type: "move", index: targetID, data: {x: targetElem.x, y: 0}});
       }
       this.calcBeatMove (targetID, parseFloat(target.getAttribute("start-y")), parseFloat(target.getAttribute("start-h")), this.signs[targetID].y, this.signs[targetID].height);
-      
       this.removeSign(shadowID);
       target.classList.remove("dragging");
       this.selectSign(targetID);
+      if (this.contextWasActive) {
+        this.openContextMenu(event, true, actualY - y);
+        this.contextWasActive = false;
+      }
+      
     },
 
     /**
@@ -622,6 +637,11 @@ export default {
       
       let target = event.target;
       const targetID = target.getAttribute("signID");
+
+      if (this.contextActive) {
+        this.contextWasActive = true;
+      }
+
       //fire a selection request to the score component for proper styling
       this.selectSign(-1);
       
@@ -714,6 +734,11 @@ export default {
       const shadowID = this.signs.length - 1;
       this.removeSign(shadowID);
       this.selectSign(targetID);
+
+      if (this.contextWasActive) {
+        this.openContextMenu(event, true, screenX - x, screenY - y - this.handleDiam);
+        this.contextWasActive = false;
+      }
     },
 
 
