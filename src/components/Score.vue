@@ -8,7 +8,7 @@
           <AddRemoveKnob :place="'top'" :canvasDim="canvasDimensions" @addBar="addBar(bars + 1)"/>
           <g :transform="'translate(' + canvasMarginLeft + ', ' + canvasMarginTop +')'" ref="bounding">
             <rect x="0" y="0" :width="canvasDimNoPad.x" :height="canvasDimNoPad.y" />
-            <Grid @unselect="selectSign(-1)" :beats="beats" :bars="bars" :collumnsLeft="collumnsLeft" :collumnsRight="collumnsRight" :fullHeight="canvasDimNoPad.y" :contextActive="contextActive" />
+            <Grid @unselect="selectSign(-1)" :beats="beats" :bars="bars" :collumnsLeft="collumnsLeft" :collumnsRight="collumnsRight" :fullHeight="canvasDimNoPad.y" :contextActive="contextActive" :signsSelected="signsSelected" />
             <component
               :is="item.signData.signType"
               @requestListeners="initListeners"
@@ -21,12 +21,11 @@
               :color="item.signData.color"
               :key="index"
               v-for="(item, index) in signs"/>
-            <GenericSignContext :signData="signs[contextSign].signData" :signIndex="contextSign" :isActive="contextActive" :x="contextPos.x" :y="contextPos.y" @updateSignData="updateSignData" @delete="removeSign" id="context-menu"/>
           </g>
-          
-          
         </svg>
+        
       </div>
+      <GenericSignContext :signData="signs[contextSign].signData" :signIndex="contextSign" :isActive="contextActive" :x="contextPos.x" :y="contextPos.y" @updateSignData="updateSignData" @delete="removeSign"/>
     </div>
 </template>
 
@@ -46,10 +45,11 @@ export default {
     AddRemoveKnob,
     GenericSignContext
   },
-  inject: ["signWidth", "barHeight", "collumnWidth", "handleDiam", "innerCanvasMargin", "outerCanvasMargin", "borderWidth", "addRemoveHeight", "startBarOffset", "contextMenuWidth"],
+  inject: ["signWidth", "barHeight", "collumnWidth", "handleDiam", "innerCanvasMargin", "outerCanvasMargin", "borderWidth", "addRemoveHeight", "startBarOffset",],
   props: {
     signs: Array
   },
+  emits: ["editSign"],
   data() {
     return {
       contextActive: false,
@@ -95,6 +95,13 @@ export default {
     },
     canvasMarginLeft () {
       return this.innerCanvasMargin + this.outerCanvasMargin + this.addRemoveHeight;
+    },
+    signsSelected () {
+      if (this.selectedSigns.length == 0) {
+        return false;
+      } else {
+        return true;
+      }
     }
   },
   mounted () {
@@ -275,9 +282,9 @@ export default {
         this.$emit("editSign", {type: "changeSelection", index: id, data: {isSelected: true}});
         this.selectedSigns.push(id);
       } else {
-        this.contextActive = false;
         this.selectedSigns = [];
       }
+      this.contextActive = false;
     },
 
     /**
@@ -396,16 +403,22 @@ export default {
      * @arg event the context menu call event
      */
     openContextMenu (event) {
+      event.preventDefault();
       let target = event.target;
       const targetID = target.getAttribute("signID");
       this.contextSign = targetID;
-      this.contextActive = true;
+     
+      const boundingRect = event.target.parentElement.getBoundingClientRect();
+      this.contextPos.x = boundingRect.right;
+      if (this.signs[targetID].isSelected) {
+        this.contextPos.y = boundingRect.top + this.handleDiam;
+      } else {
+        this.contextPos.y = boundingRect.top;
+      }
+      
       this.selectSign(targetID);
-      this.contextPos.x = this.signs[targetID].x + this.signWidth;
-      this.contextPos.y = this.signs[targetID].y;
-      this.placeSignOnTop(this.$refs.canvas.querySelector("#context-menu"));
-
-      event.preventDefault();
+      this.contextActive = true;
+      this.placeSignOnTop(event.target.parentElement);
     },
 
     /**

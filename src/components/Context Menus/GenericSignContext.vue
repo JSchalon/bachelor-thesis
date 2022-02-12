@@ -1,11 +1,20 @@
 <template>
-    <g :class="isActive ? 'active' : 'inactive'" :transform="'translate(' + x + ',' + y +')'">
-      <rect x="0" y="0" height="400" :width="contextMenuWidth" fill="white" stroke="black"/>
-      <RadioOption :mIndex="0" :options="['black','blue','red']" :initState="0" :optionText="'Border Color'" @switchState="this.changeBorderColor"/>
+    <div class="context-menu" :class="isActive ? 'active' : 'inactive'" id="context-menu" :style="'top: ' + y + 'px; left: ' + x + 'px'">
+      <RadioOption 
+        :mIndex="0" 
+        :options="[
+          {color: 'black', img: '/direction-sign-radio/layer-down.svg'},
+          {color: 'blue', img: '/direction-sign-radio/layer-middle.svg'},
+          {color: 'red', img: '/direction-sign-radio/layer-up.svg'}
+        ]" 
+        :initState="0"
+        :optionText="'Border Color'"
+        @switchState="this.changeBorderColor"
+      />
       <OnOffOption :mIndex="1" :initState="false" :optionText="'Color'" @switchState="this.changeColor"/>
       <SignCategoryContainer :mIndex="2" :optionText="'Direction'"/>
       <DeleteOption :mIndex="3" @delete="emitDelete"/>
-    </g>
+    </div>
 </template>
 
 <script>
@@ -31,7 +40,7 @@ export default {
     RadioOption,
     SignCategoryContainer,
   },
-  inject: ["contextMenuWidth"],
+  inject: [],
   props: {
     signData: Object,
     isActive: Boolean,
@@ -44,6 +53,9 @@ export default {
     return {
 
     };
+  },
+  computed: {
+    
   },
   mounted () {
   },
@@ -82,21 +94,57 @@ export default {
       this.$emit("delete", parseInt(this.signIndex))
     }
   },
-  computed: {
-    
-  }
 };
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
-  g.inactive {
+<style>
+  .context-menu.inactive {
     display: none;
   }
 
-  g.active {
+  .context-menu.active {
     display: block;
   }
 
-  
+  .context-item-interact-img.active {
+    border: 2px solid blue;
+  }
+
+  .context-menu {
+    width: auto;
+    position: absolute;
+    border: 2px solid black;
+    box-sizing: border-box;
+  }
+
+    .context-menu-item {
+      width: var(--contextMenuWidth);
+      background-color: white;
+    }
+    .context-item-text {
+      margin: 0 var(--contextItemMargin);
+    }
+
+    .center-vertically {
+
+      display: inline-flex;
+      height: var(--contextItemHeight);
+      align-items: center;
+    }
+
+    .context-item-interact-box {
+      float: right;
+      margin-right: var(--contextItemMargin);
+    }
+
+    .context-item-interact-img {
+      width: var(--contextItemImageSize);
+      height: var(--contextItemImageSize);
+    }
+
+    .context-item-interact-img.smaller {
+      width: var(--contextItemImageSize);
+      height: var(--contextItemImageSize);
+    }
 </style>

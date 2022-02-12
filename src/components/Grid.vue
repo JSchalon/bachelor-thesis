@@ -44,6 +44,7 @@ export default {
     beats: Number,
     fullHeight: Number,
     contextActive: Boolean,
+    signsSelected: Boolean,
   },
   data() {
     return {
@@ -62,7 +63,7 @@ export default {
      * When the grid is clicked -> unselect all signs
      */
     click (event) {
-      if (event.button == 2 || this.contextActive) {
+      if (event.button == 2 || this.contextActive || this.signsSelected) {
         this.$emit("unselect");
         this.highlight();
       } else if (event.button == 0){

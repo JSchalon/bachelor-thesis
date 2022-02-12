@@ -31,24 +31,32 @@ export default {
     return {
       isPhone: false,
       isTablet: false,
+      contextMenuWidth: 250,
+      contextItemHeight: 50,
+      contextItemMargin: 10,
+      contextItemImageSize: 25,
     };
   },
-  provide: {
+  provide () {
     //set global dimensions used by the score canvas, its subcomponents and the signs
     //change these here
-    signWidth: 50,
-    barHeight: 200,
-    startBarOffset: 5,
-    collumnWidth: 80,
-    beatLineWidth: 25,
-    addRemoveHeight: 40,
-    addRemoveWidth: 10,
-    innerCanvasMargin: 30,
-    outerCanvasMargin: 50,
-    handleDiam: 7,
-    borderWidth: 2,
-    contextMenuWidth: 250,
-    contextItemHeight: 50,
+    return {
+      signWidth: 50,
+      barHeight: 200,
+      startBarOffset: 5,
+      collumnWidth: 80,
+      beatLineWidth: 25,
+      addRemoveHeight: 40,
+      addRemoveWidth: 10,
+      innerCanvasMargin: 30,
+      outerCanvasMargin: 50,
+      handleDiam: 7,
+      borderWidth: 2,
+      contextMenuWidth: this.contextMenuWidth,
+      contextItemHeight: this.contextItemHeight,
+      contextItemMargin: this.contextItemMargin,
+      contextItemImageSize: this.contextItemImageSize,
+    }
   },
   mounted () {
     let d = new Date();
@@ -56,6 +64,10 @@ export default {
     document.cookie = "username=bee; expires=" + d.toUTCString() + "; path=/";
     this.isPhone = window.matchMedia("only screen and (max-width: 760px)").matches;
     this.isTablet = window.matchMedia("only screen and (max-width: 1024px)").matches;
+    document.documentElement.style.setProperty('--contextMenuWidth', this.contextMenuWidth + "px");
+    document.documentElement.style.setProperty('--contextItemHeight', this.contextItemHeight + "px");
+    document.documentElement.style.setProperty('--contextItemMargin', this.contextItemMargin + "px");
+    document.documentElement.style.setProperty('--contextItemImageSize', this.contextItemImageSize + "px");
   },
   methods: {
     

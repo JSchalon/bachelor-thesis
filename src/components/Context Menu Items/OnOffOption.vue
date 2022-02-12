@@ -1,34 +1,14 @@
 <template>
-    <g x="0" y="0" :transform="'translate(0, ' + contextItemHeight * mIndex +')'">
-      <text
-        :x="margin" 
-        :y="contextItemHeight / 2 - textHeight / 2" 
-        ref="optionText"
-        fill="black"
-        dominant-baseline="text-before-edge"
-      >
-        {{optionText}}
-      </text>
-      <g :transform="'translate(' + (contextMenuWidth - margin - contextItemHeight) + ', ' + margin +')'" @click="changeState">
-        <rect 
-          :x="0" 
-          :y="0"
-          :rx="onOffDimension / 2"
-          :height="onOffDimension"
-          :width="contextItemHeight"
-          fill="#bfbfbf"
-        />
-        <rect
-          class="anim"
-          :x="state ? margin * 2 + 2 : 2"
-          :y="2"
-          :rx="onOffDimension / 2"
-          :height="onOffDimension - 4"
-          :width="onOffDimension - 4"
-          :fill="state ? 'green' : '#868686'"
-        />
-      </g>
-    </g>
+    <div  class="context-menu-item">
+      <div class="center-vertically">
+        <p class="context-item-text">{{optionText}}</p>
+      </div>
+      <div class="center-vertically context-item-interact-box">
+        <div class="outer-on-off" @click="changeState">
+          <div class="inner-on-off" :class="state ? 'on' : 'off'"/>
+        </div>
+      </div>
+    </div>
 </template>
 
 <script>
@@ -39,7 +19,7 @@
  */
 export default {
   name: "OnOffOption",
-  inject: ["contextMenuWidth", "contextItemHeight"],
+  inject: ["contextItemHeight"],
   props: {
     mIndex: Number,
     optionText: String,
@@ -48,13 +28,12 @@ export default {
   emits: ["switchState"],
   data() {
     return {
-      textHeight: 0,
-      margin: 10,
       state: false,
     };
   },
+  computed: {
+  },
   mounted () {
-    this.textHeight = this.$refs.optionText.getBBox().height;
     this.state = this.initState;
   },
   methods: {
@@ -66,14 +45,7 @@ export default {
       this.$emit("switchState", this.state);
     }
   },
-  computed: {
-    /**
-     * calculates the height of the on/off button
-     */
-    onOffDimension () {
-      return this.contextItemHeight - this.margin * 2
-    }
-  }
+  
 };
 </script>
 
@@ -81,5 +53,25 @@ export default {
 <style scoped>
   .anim {
     transition: x 0.2s ease;
+  }
+
+  .inner-on-off {
+    width: calc(var(--contextItemImageSize) - 5px);
+    height: calc(var(--contextItemImageSize) - 5px);
+    transform: translate(2.5px, 2.5px);
+    background: #828282;
+    border-radius: 2000px;
+    transition: transform 0.2s ease, background-color 0.2s ease;
+  }
+  .outer-on-off {
+    width: calc(var(--contextItemImageSize) * 2);
+    height: var(--contextItemImageSize);
+    border-radius: 2000px;
+    background: #b1b1b1;
+  }
+
+  .inner-on-off.on {
+    background: #70be7b;
+    transform: translate(calc(var(--contextItemImageSize) * 2 - (var(--contextItemImageSize) - 2.5px)), 2.5px);
   }
 </style>

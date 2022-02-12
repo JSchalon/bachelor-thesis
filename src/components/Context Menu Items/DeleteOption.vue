@@ -1,22 +1,12 @@
 <template>
-    <g x="0" y="0" :transform="'translate(0, ' + contextItemHeight * mIndex +')'">
-      <text
-        :x="margin" 
-        :y="contextItemHeight / 2 - textHeight / 2" 
-        ref="optionText"
-        fill="black"
-        dominant-baseline="text-before-edge"
-      >
-        Delete
-      </text>
-      <g :transform="'translate(' + (contextMenuWidth - contextItemHeight + margin) + ', ' + margin +')'" v-on:click="deletesign">
-        <g :transform="'rotate(45,' + symbolHeight / 2 + ',' + symbolHeight / 2 + ')'">
-          <rect x="0" y="0" :width="symbolHeight" :height="symbolHeight" fill="white"/>
-          <rect :x="symbolHeight / 2 - symbolWidth / 2" y="0" :width="symbolWidth" :height="symbolHeight" fill="black"/>
-          <rect x="0" :y="symbolHeight / 2 - symbolWidth / 2" :width="symbolHeight" :height="symbolWidth" fill="black"/>
-        </g>
-      </g>
-    </g>
+    <div class="context-menu-item">
+      <div class="center-vertically">
+        <p class="context-item-text">Delete</p>
+      </div>
+      <div class="center-vertically context-item-interact-box">
+          <img class="context-item-interact-img" src="@/assets/images/context-images/x.svg" alt="delete" v-on:click="deletesign" />
+      </div>
+    </div>
 </template>
 
 <script>
@@ -27,19 +17,18 @@
  */
 export default {
   name: "DeleteOption",
-  inject: ["contextMenuWidth", "contextItemHeight"],
+  inject: ["contextItemHeight", "contextItemMargin"],
   props: {
     mIndex: Number,
   },
   emits: ["delete"],
   data() {
     return {
-      margin: 8,
-      textHeight: 0,
+
     };
   },
   mounted () {
-     this.textHeight = this.$refs.optionText.getBBox().height;
+
   },
   methods: {
     deletesign() {
