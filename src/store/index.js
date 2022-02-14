@@ -7,6 +7,11 @@ export default createStore({
     collumnsRight: 3,
     bars: 2,
     beatsPerBar: 4,
+    author: "Jebb",
+    title: "Jebb",
+    description: "Jebb",
+    timeUnit: "second",
+    beatDuration: 1,
     //editor settings
     seenIntro: false, 
     language: "eng", 

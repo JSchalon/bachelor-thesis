@@ -141,10 +141,11 @@ export default {
     .context-item-interact-img {
       width: var(--contextItemImageSize);
       height: var(--contextItemImageSize);
+      transition: transform 0.3s ease;
     }
 
     .context-item-interact-img.smaller {
-      width: var(--contextItemImageSize);
-      height: var(--contextItemImageSize);
+      width: calc(var(--contextItemImageSize) / 1.5);
+      height: calc(var(--contextItemImageSize) / 1.5);
     }
 </style>

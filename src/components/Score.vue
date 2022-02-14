@@ -1,6 +1,6 @@
 <template>
     <div id="canvasContainer">
-      <div>
+      <div class="margin-box">
         <svg preserveAspectRatio="xMinYMax meet" ref="canvas" id="canvas" :width="canvasDimensions.x" :height="canvasDimensions.y" fill="white">
           <rect x="0" y="0" :width="canvasDimensions.x" :height="canvasDimensions.y" ref="canvasBG" @click="selectSign(-1)"/>
           <AddRemoveKnob :place="'left'" :canvasDim="canvasDimensions" @addCollumn="addCollumn(-collumnsLeft)"/>
@@ -241,7 +241,7 @@ export default {
           if (beatsOverall < this.beats) {
             this.$emit("editSign", {type: "changeSignData", index: this.signs.indexOf(elem), data: {bar: elem.signData.bar, beat: beatsOverall}});
           } else {
-            let barsMoved =  (beatsOverall - beatsOverall % this.beats) / this.beats;
+            let barsMoved = (beatsOverall - beatsOverall % this.beats) / this.beats;
             this.$emit("editSign", {type: "changeSignData", index: this.signs.indexOf(elem), data: {bar: (elem.signData.bar + barsMoved), beat: (beatsOverall % this.beats)}});
           }
         } else {
@@ -344,11 +344,10 @@ export default {
                 let newY = elem.y + this.minHeight;
                 if (this.checkStartingPos(newY, elem.height) && newY + elem.height < this.canvasDimNoPad.y) {
                   //if start pos and moving up -> change to bar 1 beat 0
-                  elem.y = elem.y + elem.height + this.startBarOffset;
                   this.$emit("editSign", {type: "move", index: this.signs.indexOf(elem), data: {x: elem.x, y: (elem.y + elem.height + this.startBarOffset)}});
                   this.$emit("editSign", {type: "resize", index: this.signs.indexOf(elem), data: {height: (this.minHeight * 2)}});
                 } else if (!this.checkStartingPos(newY, elem.height)) {
-                  this.$emit("editSign", {type: "move", index: this.signs.indexOf(elem), data: {x: elem.x, y: (elem.y - this.minHeight)}});
+                  this.$emit("editSign", {type: "move", index: this.signs.indexOf(elem), data: {x: elem.x, y: (elem.y + this.minHeight)}});
                 }
               }
               this.calcBeatMove(this.signs.indexOf(elem), startY, startH, elem.y, elem.height);
@@ -783,5 +782,9 @@ svg text {
   stroke-width: 2;
   stroke: rgb(0,0,0);
   
+}
+
+.margin-box {
+  margin: 10px;
 }
 </style>
