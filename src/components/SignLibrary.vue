@@ -1,7 +1,7 @@
 <template>
     <div id="library">
       <div id="cur-sign-container"><p class="cur-sign-text">Current Sign: {{curSign}}</p></div>
-      <LibraryItem :active="item.active" :category="item.category" :index="index" :key="index" v-for="(item, index) of categories" @expand="selectCategory"/>
+      <LibraryItem :active="item.active" :selected="item.selected" :category="item.category" :catIndex="index" :key="index" v-for="(item, index) of categories" @expand="selectCategory" @selectSign="updateCurSign"/>
   </div>
 </template>
 
@@ -22,14 +22,14 @@ export default {
   data() {
     return {
       categories: [
-        {active: false, category: "Direction signs"},
-        {active: false, category: "Turn signs"},
-        {active: false, category: "Relationship bows"},
-        {active: false, category: "Space measurement signs"},
-        {active: false, category: "Path signs"},
-        {active: false, category: "Room direction signs"},
-        {active: false, category: "Bodypart signs"},
-        {active: false, category: "Misc signs"},
+        {active: false, category: "Direction signs", selected: -1},
+        {active: false, category: "Turn signs", selected: -1},
+        //{active: false, category: "Relationship bows", selected: -1},
+        //{active: false, category: "Space measurement signs", selected: -1},
+        //{active: false, category: "Path signs", selected: -1},
+        //{active: false, category: "Room direction signs", selected: -1},
+        //{active: false, category: "Bodypart signs", selected: -1},
+        //{active: false, category: "Misc signs", selected: -1},
       ],
       curSign: "---"
     };
@@ -49,9 +49,12 @@ export default {
       }
       this.categories[index].active = !this.categories[index].active;
     },
-    changeCurSign(name) {
-      console.log(name)
-      //change cur sign
+    updateCurSign (data) {
+      this.curSign = data.name;
+      for (let elem of this.categories) {
+        elem.selected = -1;
+      }
+      this.categories[data.catIndex].selected = data.index;
     }
   },
 }
@@ -74,7 +77,7 @@ export default {
 }
 
 .cur-sign-text {
-  margin: 0 5px;
+  margin: 0 var(--contextItemMargin);
 }
 
 .library-category-container {
@@ -87,15 +90,19 @@ export default {
   width: 100%;
   display: flex;
   flex-wrap: wrap;
+  border-top: 1px solid #c1c1c1;
+  box-sizing: border-box;
 }
 .library-item {
   width: calc(100% / 3);
   height: 70px;
-  background-color: red;
+  background-color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .library-category-name {
-  border-bottom: 1px solid #a1a1a1;
   width: 100%;
   box-sizing: border-box;
 }
@@ -107,6 +114,6 @@ export default {
 }
 
 .library-category-text {
-  margin: 0 5px;
+  margin: 0 var(--contextItemMargin);
 }
 </style>

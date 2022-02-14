@@ -11,6 +11,9 @@ Git Repo zur Bachelorarbeit zur Entwicklung eines webbasierten Interaktionsedito
 
 ## Versions
 
+### Version 0.3.2
+- Mostly implemented sign library functionality (without proper sign graphics)
+
 ### Version 0.3.1
 - Added the groundwork for saving and loading cookies
 - Implemented the groundwork for the score controller with the basic xml structure

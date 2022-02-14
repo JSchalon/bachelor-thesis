@@ -56,6 +56,7 @@ export default {
       contextItemHeight: this.contextItemHeight,
       contextItemMargin: this.contextItemMargin,
       contextItemImageSize: this.contextItemImageSize,
+      libraryImgHeight: 60,
     }
   },
   mounted () {

@@ -9,20 +9,8 @@
       </div>
     </div>
     <div v-show="active" class="library-item-container">
-      <div class="library-item">
-
-      </div>
-      <div class="library-item">
-
-      </div>
-      <div class="library-item">
-
-      </div>
-      <div class="library-item">
-
-      </div>
-      <div class="library-item">
-
+      <div class="library-item" :key="index" v-for="(elem, index) of signs" @click="selectSign(index)">
+        <img :height="libraryImgHeight" :src="loadSignImg(elem.file)" :alt="elem.name"  :class="{selected: selected == index}"/>
       </div>
     </div>
   </div>
@@ -35,18 +23,17 @@
  */
 export default {
   name: 'LibraryItem',
-  inject: [],
-  emits: ["expand"],
+  inject: ["libraryImgHeight"],
+  emits: ["expand", "selectSign"],
   props: {
     active: Boolean,
     category: String,
-    index: Number,
+    catIndex: Number,
+    selected: Number,
   },
   data() {
     return {
-      signs: [
-
-      ],
+      signs: [],
     };
   },
   computed: {
@@ -54,13 +41,25 @@ export default {
   },
   mounted () {
     //load signs and add click functionality
+    let json = require('@/assets/images/sign-categories/' + this.category + '/' + this.category + '.json');
+    let obj = JSON.parse(JSON.stringify(json));
+    
+    for (let [key, value] of Object.entries(obj)) {
+      let signsObj = {};
+      signsObj["name"] = key;
+      signsObj["file"] = value;
+      this.signs.push(signsObj);
+    }
   },
   methods: {
     loadSignImg(name) {
-      console.log(name);
+      return require('@/assets/images/sign-categories/' + this.category + '/' + name);
     },
     expand () {
-      this.$emit("expand", this.index);
+      this.$emit("expand", this.catIndex);
+    },
+    selectSign (index) {
+      this.$emit("selectSign", {catIndex: this.catIndex, name: this.signs[index].name, index: index});
     }
   },
 }
@@ -70,5 +69,9 @@ export default {
 <style scoped>
   .turned {
     transform: rotate(90deg);
+  }
+
+  .selected {
+    border: 1px solid blue;
   }
 </style>
