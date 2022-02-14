@@ -22,7 +22,7 @@ export default {
   data() {
     return {
       categories: [
-        {active: true, category: "Direction signs"},
+        {active: false, category: "Direction signs"},
         {active: false, category: "Turn signs"},
         {active: false, category: "Relationship bows"},
         {active: false, category: "Space measurement signs"},
@@ -31,7 +31,7 @@ export default {
         {active: false, category: "Bodypart signs"},
         {active: false, category: "Misc signs"},
       ],
-      curSign: "Sussy"
+      curSign: "---"
     };
   },
   computed: {
@@ -48,6 +48,10 @@ export default {
         }
       }
       this.categories[index].active = !this.categories[index].active;
+    },
+    changeCurSign(name) {
+      console.log(name)
+      //change cur sign
     }
   },
 }
