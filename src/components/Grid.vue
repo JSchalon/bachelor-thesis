@@ -8,24 +8,24 @@
       </g>
       <!--horizontal lines-->
       <!-- beat lines-->
-      <line :x1="collumnWidth * collumnsLeft - beatLineWidth" :y1="(barHeight / beats) * (line - 1)" :x2="collumnWidth * collumnsLeft + beatLineWidth" :y2="(barHeight / beats) * (line - 1)" :key="line" v-for="line in ((bars) * beats)" stroke-width="2" stroke="black"/>
+      <line class="grid-line" :x1="collumnWidth * collumnsLeft - beatLineWidth" :y1="(barHeight / beats) * (line - 1)" :x2="collumnWidth * collumnsLeft + beatLineWidth" :y2="(barHeight / beats) * (line - 1)" :key="line" v-for="line in ((bars) * beats)" stroke-width="2" stroke="black"/>
       <!-- bar lines-->
-      <line :x1="collumnWidth * (collumnsLeft - 2)" :y1="barHeight * (line - 1)" :x2="collumnWidth * (collumnsLeft + 2)" :y2="barHeight * (line - 1)" :key="line" v-for="line in (bars + 1)" stroke-width="2" stroke="black"/>
+      <line class="grid-line" :x1="collumnWidth * (collumnsLeft - 2)" :y1="barHeight * (line - 1)" :x2="collumnWidth * (collumnsLeft + 2)" :y2="barHeight * (line - 1)" :key="line" v-for="line in (bars + 1)" stroke-width="2" stroke="black"/>
       <!-- start bar lines -->
-      <line :x1="collumnWidth * (collumnsLeft - 2)" :y1="barHeight * bars + startBarOffset" :x2="collumnWidth * (collumnsLeft + 2)" :y2="barHeight * bars + startBarOffset" stroke-width="2" stroke="black"/>
-      <line :x1="collumnWidth * (collumnsLeft - 2)" :y1="barHeight * (bars + .5) + startBarOffset" :x2="collumnWidth * (collumnsLeft + 2)" :y2="barHeight * (bars + .5) + startBarOffset" stroke-width="2" stroke="black"/>
+      <line class="grid-line" :x1="collumnWidth * (collumnsLeft - 2)" :y1="barHeight * bars + startBarOffset" :x2="collumnWidth * (collumnsLeft + 2)" :y2="barHeight * bars + startBarOffset" stroke-width="2" stroke="black"/>
+      <line class="grid-line" :x1="collumnWidth * (collumnsLeft - 2)" :y1="barHeight * (bars + .5) + startBarOffset" :x2="collumnWidth * (collumnsLeft + 2)" :y2="barHeight * (bars + .5) + startBarOffset" stroke-width="2" stroke="black"/>
 
       <!--vertical lines-->
       <!-- left outer line -->
-      <line :x1="collumnWidth * (collumnsLeft - 2)" y1="0" :x2="collumnWidth * (collumnsLeft - 2)" :y2="barHeight * (bars + .5) + startBarOffset" stroke-width="2" stroke="black"/>
+      <line class="grid-line" :x1="collumnWidth * (collumnsLeft - 2)" y1="0" :x2="collumnWidth * (collumnsLeft - 2)" :y2="barHeight * (bars + .5) + startBarOffset" stroke-width="2" stroke="black"/>
       <!-- middle line -->
-      <line :x1="collumnWidth * (collumnsLeft)" y1="0" :x2="collumnWidth * (collumnsLeft)" :y2="barHeight * (bars + .5) + startBarOffset" stroke-width="3" stroke="black"/>
+      <line class="grid-line" :x1="collumnWidth * (collumnsLeft)" y1="0" :x2="collumnWidth * (collumnsLeft)" :y2="barHeight * (bars + .5) + startBarOffset" stroke-width="3" stroke="black"/>
       <!-- right outer line -->
-      <line :x1="collumnWidth * (collumnsLeft + 2)" y1="0" :x2="collumnWidth * (collumnsLeft + 2)" :y2="barHeight * (bars + .5) + startBarOffset" stroke-width="2" stroke="black"/>
+      <line class="grid-line" :x1="collumnWidth * (collumnsLeft + 2)" y1="0" :x2="collumnWidth * (collumnsLeft + 2)" :y2="barHeight * (bars + .5) + startBarOffset" stroke-width="2" stroke="black"/>
       <!-- help lines left -->
-      <line class="help" :x1="collumnWidth * (helpLine - 1)" y1="0" :x2="collumnWidth * (helpLine - 1)" :y2="barHeight * (bars + .5) + startBarOffset" stroke-width="2" :key="helpLine" v-for="helpLine in (collumnsLeft - 2)"/>
+      <line class="grid-line help" :x1="collumnWidth * (helpLine - 1)" y1="0" :x2="collumnWidth * (helpLine - 1)" :y2="barHeight * (bars + .5) + startBarOffset" stroke-width="2" :key="helpLine" v-for="helpLine in (collumnsLeft - 2)"/>
       <!-- help lines right -->
-      <line class="help" :x1="collumnWidth * (collumnsLeft + helpLine + 2)" y1="0" :x2="collumnWidth * (collumnsLeft + helpLine + 2)" :y2="barHeight * (bars + .5) + startBarOffset" stroke-width="2" :key="helpLine" v-for="helpLine in (collumnsRight - 2)"/>
+      <line class="grid-line help" :x1="collumnWidth * (collumnsLeft + helpLine + 2)" y1="0" :x2="collumnWidth * (collumnsLeft + helpLine + 2)" :y2="barHeight * (bars + .5) + startBarOffset" stroke-width="2" :key="helpLine" v-for="helpLine in (collumnsRight - 2)"/>
     </g>
 </template>
 
@@ -54,6 +54,7 @@ export default {
   },
   mounted () {
     interact(".beat-rect").on("tap", this.click);
+    interact(".grid-line").on("tap", this.lineClick);
     interact(".beat-rect").on("doubletap", this.doubleClick);
     this.$refs.grid.addEventListener("contextmenu", function (event) {
       event.preventDefault();
@@ -73,7 +74,6 @@ export default {
         if (!event.double && this.barSelected) {
           this.barSelected = false;
           this.highlight();
-
         }
       }
     },
@@ -88,6 +88,9 @@ export default {
           this.barSelected = true;
         }
       }
+    },
+    lineClick () {
+      this.$emit("unselect");
     },
     /**
      * Calculates the bar of a grid rect based on its' index

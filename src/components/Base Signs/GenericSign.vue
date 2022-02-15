@@ -1,25 +1,22 @@
 <template>
-    <g :x="x" :y="y" :data-y="y" :transform="'translate(' + x + ',' + y +')'" ref="GenericSign" :signID="id">
+    <g :signID="id">
       <rect
         x="0"
         y="0"
         class="draggable actual-sign"
         :width="signWidth"
         :height="height"
-        :stroke="borderColor"
-        :fill="color"
+        :stroke="signData.borderColor"
+        :fill="signData.color"
         :signID="id"
         :class="{active: isSelected}"
         :stroke-width="isSelected ? borderWidth + 1: borderWidth">
       </rect>
       <text x="10" y="20" class="text no-select" fill="black" :signID="id">{{name}}</text>
-      <ResizeHandle :isFirst="true" :isActive="isSelected && canResize" :signHeight="height" :signID="id"/>
-      <ResizeHandle :isFirst="false" :isActive="isSelected && canResize" :signHeight="height" :signID="id"/>
     </g>
 </template>
 
 <script>
-import ResizeHandle from "../ResizeHandle.vue"
 
 /**
  * The generic laban sign component.
@@ -30,19 +27,11 @@ import ResizeHandle from "../ResizeHandle.vue"
  */
 export default {
   name: "GenericSign",
-  components: {
-    ResizeHandle,
-  },
-  emits: ["requestListeners"],
   props: {
     id: Number,
     isSelected: Boolean,
     height: Number,
-    x: Number,
-    y: Number,
-    canResize: Boolean,
-    color: String,
-    borderColor: String,
+    signData: Object
   },
   inject: ["signWidth","borderWidth"],
   data() {
@@ -54,9 +43,6 @@ export default {
   mounted () {
     //give it a random number to differentiate between signs
     this.name= Math.round(Math.random() * 100);
-    let sign = this.$refs.GenericSign;
-    //request event listeners on the outer group
-    this.$emit("requestListeners", sign);
   },
   methods: {
     
@@ -67,25 +53,4 @@ export default {
 </script>
 
 <style scoped>
-
-.dragging {
-  touch-action: none;
-  overscroll-behavior: none;
-  user-select: none;
-
-}
-
-  .dragging > rect {
-    opacity: 0.5;
-    stroke:#5e9fc7;
-    z-index: 100;
-  }
-
-.draggable {
-  touch-action: none;
-}
-
-  .draggable.active {
-    stroke:#5e9fc7;
-  }
 </style>

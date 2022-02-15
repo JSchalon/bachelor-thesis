@@ -11,37 +11,10 @@ Git Repo zur Bachelorarbeit zur Entwicklung eines webbasierten Interaktionsedito
 
 ## Versions
 
-### Version 0.3.2
-- Mostly implemented sign library functionality (without proper sign graphics)
-
-### Version 0.3.1
-- Added the groundwork for saving and loading cookies
-- Implemented the groundwork for the score controller with the basic xml structure
-- Started implementing the sign library
-- Fixed some bugs
-
-### Version 0.1.1
-- Redid the context menu with html/css
-- added proper custom img support to context menu radio options
-- Now recalculates context menu after drag and resize
-
-### Version 0.1.0
-- Finished implementing Feature set 1
-- Made some calculation optimizations
-
-### Version 0.0.3
-- Implemented most of the components for context menus and added a context menu to the generic sign
-- Added deletion via "x" and "del" keys
-- Added moving of signs via arrow keys
-- Fixed some issues with previous versions
-
-### Version 0.0.2
-- Added visual grid
-- Added global variables and constants
-- Added the ability to add collumns and bars
-
-### Version 0.0.1
-- Created vue project
-- Set up basic component and router structure
-- Implemented basic canvas beahavior
-- Implemented dragging and resizing of signs
+### Version 0.3.3
+- Created vue components for actual signs
+- implemented direction signs
+- Simplified the rendering of the context menu
+- fixed some bugs by redoing the selectSign method
+- fixed some bugs by redoing the placeOnTop method
+- fixed a bug with the grid

@@ -10,10 +10,6 @@
 </template>
 
 <script>
-import InteractionMenu from "./InteractionMenu.vue";
-import SignLibrary from "./SignLibrary.vue";
-import Score from "./Score.vue";
-import Header from "./Header.vue";
 
 /**
  * The visual grid component
@@ -21,12 +17,6 @@ import Header from "./Header.vue";
  */
 export default {
   name: "Grid",
-  components: {
-    Header,
-    InteractionMenu,
-    SignLibrary,
-    Score
-  },
   inject: [],
   props: {
     
@@ -35,10 +25,10 @@ export default {
     return {
       //instead of here, save in vuex -> better accessebility for views
       signs: [
-        {isSelected: false, purpose: "dummy sign", signData: {borderColor: "black", color: "white"}},
-        {isSelected: false, height: 100, x: 95, y: 100, signData: {signType: "GenericSign", borderColor: "black", color: "white", side: "left", col: -2, bar: 2, beat: 0, canResize: true, }},
-        {isSelected: false, height: 50, x: 15, y: 0, signData: {signType: "GenericSign", borderColor: "black", color: "white", side: "left", col: -3, bar: 2, beat: 3, canResize: true, }},
-        {isSelected: false, height: 100, x: 95, y: 0, signData: {signType: "GenericSign", borderColor: "black", color: "white", side: "left", col: -2, bar: 2, beat: 2, canResize: true, }},
+        {isSelected: false, height: 0, x: -1000, y: 0, purpose: "dummy sign", signData: {baseType: "DirectionSign", signType: "In place"}},
+        {isSelected: false, canResize: true, height: 100, x: 95, y: 100, signData: {baseType: "DirectionSign", signType: "Backward direction left", side: "left", col: -2, bar: 2, beat: 0,}},
+        {isSelected: false, canResize: true, height: 50, x: 15, y: 0, signData: {baseType: "DirectionSign", signType: "Left forward direction", side: "left", col: -3, bar: 2, beat: 3, }},
+        {isSelected: false, canResize: true, height: 100, x: 95, y: 0, signData: {baseType: "DirectionSign", signType: "Right direction", side: "left", col: -2, bar: 2, beat: 2, }},
       ],
       xmlScore: null,
     };
@@ -83,6 +73,8 @@ export default {
         this.resizeSign(obj.index, obj.data);
       } else if (obj.type == "changeSelection") {
         this.changeSelect(obj.index, obj.data);
+      } else if (obj.type == "changeCanResize") {
+        this.changeCanResize(obj.index, obj.data);
       } else if (obj.type == "changeSignData") {
         this.changeSignData(obj.index, obj.data);
       } else if (obj.type == "delete") {
@@ -106,6 +98,10 @@ export default {
     },
     changeSelect (index, data) {
       this.signs[index].isSelected = data.isSelected;
+      //no xml change
+    },
+    changeCanResize (index, data) {
+      this.signs[index].canResize = data.canResize;
       //no xml change
     },
     changeSignData (index, data) {

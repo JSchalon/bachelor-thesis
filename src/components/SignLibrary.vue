@@ -6,7 +6,6 @@
 </template>
 
 <script>
-import LibraryItem from "./LibraryItem.vue"
 
 /**
  * The sign library component
@@ -14,9 +13,6 @@ import LibraryItem from "./LibraryItem.vue"
  */
 export default {
   name: 'SignLibrary',
-  components: {
-    LibraryItem
-  },
   props: {
   },
   data() {
@@ -50,11 +46,19 @@ export default {
       this.categories[index].active = !this.categories[index].active;
     },
     updateCurSign (data) {
-      this.curSign = data.name;
+      this.curSign = "---";
+      let unselect = false;
+      if (this.categories[data.catIndex].selected == data.index) {
+        //if the new selected sign == the old selected sign -> unselect
+        unselect = true;
+      }
       for (let elem of this.categories) {
         elem.selected = -1;
+      }if (!unselect) {
+        //if the new selected sign == the old selected sign -> unselect
+        this.categories[data.catIndex].selected = data.index;
+        this.curSign = data.name;
       }
-      this.categories[data.catIndex].selected = data.index;
     }
   },
 }
@@ -95,11 +99,12 @@ export default {
 }
 .library-item {
   width: calc(100% / 3);
-  height: 70px;
+  padding: 5px 0;
   background-color: white;
   display: flex;
   justify-content: center;
   align-items: center;
+  box-sizing: border-box;
 }
 
 .library-category-name {

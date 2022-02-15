@@ -10,7 +10,7 @@
     </div>
     <div v-show="active" class="library-item-container">
       <div class="library-item" :key="index" v-for="(elem, index) of signs" @click="selectSign(index)">
-        <img :height="libraryImgHeight" :src="loadSignImg(elem.file)" :alt="elem.name"  :class="{selected: selected == index}"/>
+        <img :height="imgHeight" :src="loadSignImg(elem.file)" :alt="elem.name" :class="{selected: selected == index}"/>
       </div>
     </div>
   </div>
@@ -23,7 +23,7 @@
  */
 export default {
   name: 'LibraryItem',
-  inject: ["libraryImgHeight"],
+  inject: ["barHeight"],
   emits: ["expand", "selectSign"],
   props: {
     active: Boolean,
@@ -37,7 +37,9 @@ export default {
     };
   },
   computed: {
-    
+    imgHeight () {
+      return this.barHeight / this.$store.state["beatsPerBar"] * 2;
+    }
   },
   mounted () {
     //load signs and add click functionality
@@ -74,4 +76,5 @@ export default {
   .selected {
     border: 1px solid blue;
   }
+  
 </style>

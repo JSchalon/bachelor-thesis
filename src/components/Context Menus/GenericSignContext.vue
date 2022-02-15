@@ -18,10 +18,6 @@
 </template>
 
 <script>
-import DeleteOption from "../Context Menu Items/DeleteOption.vue"
-import OnOffOption from "../Context Menu Items/OnOffOption.vue"
-import RadioOption from "../Context Menu Items/RadioOption.vue"
-import SignCategoryContainer from "../Context Menu Items/SignCategoryContainer.vue"
 
 //TODO: fully implement options -> requires sign library and signs
 //TODO: load initState from signData
@@ -34,12 +30,6 @@ import SignCategoryContainer from "../Context Menu Items/SignCategoryContainer.v
  */
 export default {
   name: "GenericSignContext",
-  components: {
-    DeleteOption,
-    OnOffOption,
-    RadioOption,
-    SignCategoryContainer,
-  },
   inject: [],
   props: {
     signData: Object,

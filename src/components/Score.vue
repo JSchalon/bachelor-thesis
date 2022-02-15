@@ -9,18 +9,18 @@
           <g :transform="'translate(' + canvasMarginLeft + ', ' + canvasMarginTop +')'" ref="bounding">
             <rect x="0" y="0" :width="canvasDimNoPad.x" :height="canvasDimNoPad.y" />
             <Grid @unselect="selectSign(-1)" :beats="beats" :bars="bars" :collumnsLeft="collumnsLeft" :collumnsRight="collumnsRight" :fullHeight="canvasDimNoPad.y" :contextActive="contextActive" :signsSelected="signsSelected" />
-            <component
-              :is="item.signData.signType"
+            <SignContainer
               @requestListeners="initListeners"
+              :signData="item.signData"
               :id="index"
               :isSelected="item.isSelected"
-              :canResize="item.signData.canResize"
-              :height="item.height" :x="item.x"
+              :canResize="item.canResize"
+              :height="item.height"
+              :x="item.x"
               :y="item.y"
-              :borderColor="item.signData.borderColor"
-              :color="item.signData.color"
               :key="index"
-              v-for="(item, index) in signs"/>
+              v-for="(item, index) in signs"
+            />
           </g>
         </svg>
       </div>
@@ -31,19 +31,8 @@
 <script>
 import interact from "interactjs";
 
-import GenericSign from "./Base Signs/GenericSign.vue"
-import Grid from "./Grid.vue"
-import AddRemoveKnob from "./AddRemoveKnob.vue"
-import GenericSignContext from "./Context Menus/GenericSignContext.vue"
-
 export default {
   name: 'Score',
-  components: {
-    GenericSign,
-    Grid,
-    AddRemoveKnob,
-    GenericSignContext
-  },
   inject: ["signWidth", "barHeight", "collumnWidth", "handleDiam", "innerCanvasMargin", "outerCanvasMargin", "borderWidth", "addRemoveHeight", "startBarOffset",],
   props: {
     signs: Array
@@ -291,8 +280,15 @@ export default {
      * Method for placing an element on top of the canvas (placing it as the last element on the canvas svg)
      * @arg elem the element node to place on top 
      */
-    placeSignOnTop (elem) {
+    placeSignOnTop (index) {
+      let elem = this.$refs.bounding.querySelector(".sign-container[signID='"+ index + "']");
       this.$refs.bounding.appendChild(elem);
+    },
+
+    getSignRect(index) {
+      let elem = this.$refs.bounding.querySelector(".sign-container[signID='"+ index + "']");
+      let rect = elem.getBoundingClientRect();
+      return rect;
     },
 
 
@@ -401,19 +397,15 @@ export default {
      * Method for calling the custom sign context menu
      * @arg event the context menu call event
      */
-    openContextMenu (event, p = false, additionalX = 0, additionalY = 0) {
+    openContextMenu (event, additionalX = 0, additionalY = 0) {
       event.preventDefault();
       let target = event.target;
       const targetID = target.getAttribute("signID");
       this.contextSign = targetID;
-      let boundingRect = target.getBoundingClientRect();
-      if (p) {
-        boundingRect = target.getBoundingClientRect();
-        this.placeSignOnTop(event.target);
-      } else {
-        boundingRect = target.parentElement.getBoundingClientRect();
-        this.placeSignOnTop(event.target.parentElement);
-      }
+      let boundingRect = this.getSignRect(targetID);
+
+      this.placeSignOnTop(targetID);
+
       this.contextPos.x = boundingRect.right + additionalX;
       if (this.signs[targetID].isSelected) {
         this.contextPos.y = boundingRect.top + this.handleDiam + additionalY;
@@ -488,8 +480,9 @@ export default {
      */
     clickSign (event) {
       if (event.button == 0) {
-        this.placeSignOnTop(event.target.parentElement);
-        this.selectSign(event.target.getAttribute("signID"), event.ctrlKey);
+        const targetID = event.target.getAttribute("signID")
+        this.placeSignOnTop(targetID);
+        this.selectSign(targetID, event.ctrlKey);
       }
     },
 
@@ -545,7 +538,7 @@ export default {
       target.classList.add("dragging");
 
        //move element to top of Render
-      this.placeSignOnTop(target);
+      this.placeSignOnTop(targetID);
     },
 
     /**
@@ -621,7 +614,7 @@ export default {
       target.classList.remove("dragging");
       this.selectSign(targetID);
       if (this.contextWasActive) {
-        this.openContextMenu(event, true, actualY - y);
+        this.openContextMenu(event, actualY - y);
         this.contextWasActive = false;
       }
       
@@ -657,7 +650,7 @@ export default {
       target.classList.add("dragging");
 
        //move element to top of Render
-      this.placeSignOnTop(target);
+      this.placeSignOnTop(targetID);
     },
 
     /**
@@ -717,9 +710,9 @@ export default {
       if (this.checkStartingPos(screenY, this.signs[targetID].height)) {
         this.$emit("editSign", {type: "resize", index: targetID, data: {height: (this.barHeight / this.beats * 2)}});
         screenY = this.canvasDimNoPad.y - this.barHeight / this.beats * 2 - this.minHeight;
-        this.$emit("editSign", {type: "changeSignData", index: targetID, data: {canResize: false}});
+        this.$emit("editSign", {type: "changeCanResize", index: targetID, data: {canResize: false}});
       } else {
-        this.$emit("editSign", {type: "changeSignData", index: targetID, data: {canResize: true}});
+        this.$emit("editSign", {type: "changeCanResize", index: targetID, data: {canResize: true}});
       }
 
       this.$emit("editSign", {type: "move", index: targetID, data: {x: screenX, y: screenY}});
@@ -735,7 +728,7 @@ export default {
       this.selectSign(targetID);
 
       if (this.contextWasActive) {
-        this.openContextMenu(event, true, screenX - x, screenY - y - this.handleDiam);
+        this.openContextMenu(event, screenX - x, screenY - y - this.handleDiam);
         this.contextWasActive = false;
       }
     },
