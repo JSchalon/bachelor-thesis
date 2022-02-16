@@ -16,11 +16,11 @@
 
 
 /**
- * The sign library component
- * @displayName Sign Library
+ * The general Direction Sign component
+ * @displayName Direction Sign
  */
 export default {
-  name: 'SignLibrary',
+  name: 'DirectionSign',
   props: {
     isSelected: Boolean,
     id: Number,
@@ -63,7 +63,7 @@ export default {
       ];
       let straigtPoints = "0,0 " + (this.signWidth / 2) + ",0 " + (this.signWidth / 2) + "," + (this.beatHeight / 2) + " " + this.signWidth + "," + (this.beatHeight / 2) + " " + this.signWidth + "," + this.height + " 0," + this.height;
       baseSigns[0].points = straigtPoints;
-      let diagonalPoints = "0,0 " + this.signWidth + "," + (this.beatHeight / 2) + " " + this.signWidth + "," + this.height + " 0," + this.height;
+      let diagonalPoints = "0,0 " + this.signWidth + "," + (this.beatHeight / 3) + " " + this.signWidth + "," + this.height + " 0," + this.height;
       baseSigns[1].points = diagonalPoints;
       let sidewaysPoints = this.signWidth + ",0 0," + (this.height / 2) + " " + this.signWidth + "," + this.height;
       baseSigns[2].points = sidewaysPoints;
@@ -93,7 +93,13 @@ export default {
       return transformString;
     },
     variation () {
-      return this.variations.find(o => o.name === this.signData.signType);
+      let variation = {};
+      if (this.signData.signType == "Backward direction" || this.signData.signType == "Forward direction") {
+        variation = this.variations.find(o => o.name === this.signData.signType + " " + this.signData.side);
+      } else {
+        variation = this.variations.find(o => o.name === this.signData.signType);
+      }
+      return variation;
     }
   },
   mounted () {

@@ -41,7 +41,7 @@ export default {
     //set global dimensions used by the score canvas, its subcomponents and the signs
     //change these here
     return {
-      signWidth: 50,
+      signWidth: 40,
       barHeight: 200,
       startBarOffset: 5,
       collumnWidth: 80,

@@ -12,7 +12,7 @@
         :class="{active: isSelected}"
         :stroke-width="isSelected ? borderWidth + 1: borderWidth">
       </rect>
-      <text x="10" y="20" class="text no-select" fill="black" :signID="id">{{name}}</text>
+      <!--<text x="10" y="20" class="text no-select" fill="black" :signID="id">{{name}}</text>-->
     </g>
 </template>
 
@@ -20,7 +20,6 @@
 
 /**
  * The generic laban sign component.
- * - Signs that can be resized must be wrapped in a group containing the sign, as well as two resize handles
  * - All sign categories must have a corresponding "SignName" + "Context.vue" component that is loaded by the score, that implements the context menu for that category 
  * @emits requestListeners at mount, so that the score can implement dragging, resizing, clicking and double clicking
  * @displayName Generic Sign

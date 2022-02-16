@@ -318,8 +318,8 @@ export default {
             if (event.which % 2 == 1) {
               if (elem.signData.col + move.collumn  >= -this.collumnsLeft && elem.signData.col + move.collumn < this.collumnsRight) {
                 this.$emit("editSign", {type: "changeSignData", index: this.signs.indexOf(elem), data: {col: (elem.signData.col + move.collumn)}});
-                if (elem.col < 0) {
-                  this.$emit("editSign", {type: "changeSignData", index: this.signs.indexOf(elem), data: {col: (elem.signData.col + move.collumn), side: "left"}});
+                if (elem.signData.col < 0) {
+                  this.$emit("editSign", {type: "changeSignData", index: this.signs.indexOf(elem), data: {side: "left"}});
                 } else {
                   this.$emit("editSign", {type: "changeSignData", index: this.signs.indexOf(elem), data: {side: "right"}});
                 }
@@ -629,7 +629,6 @@ export default {
       
       let target = event.target;
       const targetID = target.getAttribute("signID");
-
       if (this.contextActive) {
         this.contextWasActive = true;
       }
@@ -720,6 +719,11 @@ export default {
 
       let collumnsMoved = (parseFloat(target.getAttribute("start-x")) - this.signs[targetID].x) / -this.blocksizeX;
       this.$emit("editSign", {type: "changeSignData", index: targetID, data: {col: (this.signs[targetID].signData.col + collumnsMoved)}});
+      if (this.signs[targetID].signData.col >= 0 ) {
+        this.$emit("editSign", {type: "changeSignData", index: targetID, data: {side: "right"}});
+      } else {
+        this.$emit("editSign", {type: "changeSignData", index: targetID, data: {side: "left"}});
+      }
 
       this.calcBeatMove(targetID, parseFloat(target.getAttribute("start-y")), parseFloat(target.getAttribute("start-h")), this.signs[targetID].y, this.signs[targetID].height);
 

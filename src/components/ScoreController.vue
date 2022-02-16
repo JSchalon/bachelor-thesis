@@ -25,10 +25,13 @@ export default {
     return {
       //instead of here, save in vuex -> better accessebility for views
       signs: [
-        {isSelected: false, height: 0, x: -1000, y: 0, purpose: "dummy sign", signData: {baseType: "DirectionSign", signType: "In place"}},
-        {isSelected: false, canResize: true, height: 100, x: 95, y: 100, signData: {baseType: "DirectionSign", signType: "Backward direction left", side: "left", col: -2, bar: 2, beat: 0,}},
-        {isSelected: false, canResize: true, height: 50, x: 15, y: 0, signData: {baseType: "DirectionSign", signType: "Left forward direction", side: "left", col: -3, bar: 2, beat: 3, }},
-        {isSelected: false, canResize: true, height: 100, x: 95, y: 0, signData: {baseType: "DirectionSign", signType: "Right direction", side: "left", col: -2, bar: 2, beat: 2, }},
+        {isSelected: false, height: 0, x: 0, y: 0, purpose: "dummy sign", signData: {baseType: "GenericSign", signType: "In place"}},
+        {isSelected: false, canResize: true, height: 100, x: 100, y: 100, signData: {baseType: "DirectionSign", signType: "Backward direction", side: "left", col: -2, bar: 2, beat: 0, resizable: true}},
+        {isSelected: false, canResize: true, height: 50, x: 20, y: 0, signData: {baseType: "DirectionSign", signType: "Left forward direction", side: "left", col: -3, bar: 2, beat: 3, resizable: true}},
+        {isSelected: false, canResize: true, height: 100, x: 100, y: 0, signData: {baseType: "DirectionSign", signType: "Right direction", side: "left", col: -2, bar: 2, beat: 2, resizable: true}},
+        {isSelected: false, canResize: true, height: 100, x: 180, y: 200, signData: {baseType: "TurnSign", signType: "Left turn", side: "left", col: -1, bar: 1, beat: 2, resizable: true}},
+        {isSelected: false, canResize: true, height: 100, x: 260, y: 200, signData: {baseType: "VibrationSign", side: "left", col: 0, bar: 1, beat: 2, resizable: true}},
+        {isSelected: false, canResize: false, height: 50, x: 180, y: 505, signData: {baseType: "SpaceMeasurementSign", signType: "Unfolding", degree: 1, side: "left", col: -1, bar: -1, beat: 0, resizable: true}},
       ],
       xmlScore: null,
     };

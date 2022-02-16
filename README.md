@@ -11,10 +11,9 @@ Git Repo zur Bachelorarbeit zur Entwicklung eines webbasierten Interaktionsedito
 
 ## Versions
 
-### Version 0.3.3
-- Created vue components for actual signs
-- implemented direction signs
-- Simplified the rendering of the context menu
-- fixed some bugs by redoing the selectSign method
-- fixed some bugs by redoing the placeOnTop method
-- fixed a bug with the grid
+### Version 0.3.4
+- Implemented turn signs
+- Implemented the vibration sign
+- Implemented switching of the forward direction sign orientation in the different collumns
+- Implemented the space measurement signs
+- Started implementing the room direction sign (requires pin signs)

@@ -4,7 +4,7 @@
         <rect :class="'beat-rect ba' + (getBar(rect) + 1) + ' ' +  'be' + getBeat(rect)" :x="collumnWidth * (index - 1)" :y="(barHeight / beats) * (rect - 1)" :width="collumnWidth" :height="(barHeight / beats)"  :key="rect" v-for="rect in (bars * beats)"/>
         <rect class="fill-rect" :x="collumnWidth * (index - 1)" :y="barHeight * bars" :width="collumnWidth" :height="startBarOffset" />
         <rect class="beat-rect ba0 be0" :x="collumnWidth * (index - 1)" :y="barHeight * bars + startBarOffset" :width="collumnWidth" :height="(barHeight / beats * 2)" />
-        <rect class="beat-rect ba-1 be0" :x="collumnWidth * (index - 1)" :y="barHeight * bars + startBarOffset + barHeight / beats" :width="collumnWidth" :height="(barHeight / beats * 2)" />
+        <rect class="beat-rect ba-1 be0" :x="collumnWidth * (index - 1)" :y="barHeight * bars + startBarOffset + barHeight / 2" :width="collumnWidth" :height="(barHeight / beats)" />
       </g>
       <!--horizontal lines-->
       <!-- beat lines-->

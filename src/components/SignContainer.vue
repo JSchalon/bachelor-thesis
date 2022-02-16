@@ -1,8 +1,8 @@
 <template>
     <g class="sign-container" :x="x" :y="y" :data-y="y" :transform="'translate(' + x + ',' + y +')'" ref="sign" :signID="id">
       <component :is="signData.baseType" :id="id" :isSelected="isSelected" :height="height" :signData="signData"/>
-      <ResizeHandle :isFirst="true" :isActive="isSelected && canResize" :signHeight="height" :signID="id"/>
-      <ResizeHandle :isFirst="false" :isActive="isSelected && canResize" :signHeight="height" :signID="id"/>
+      <ResizeHandle :isFirst="true" :isActive="isSelected && canResize && signData.resizable" :signHeight="height" :signID="id"/>
+      <ResizeHandle :isFirst="false" :isActive="isSelected && canResize && signData.resizable" :signHeight="height" :signID="id"/>
     </g>
 </template>
 
@@ -56,17 +56,12 @@ export default {
 
 }
 
-  .dragging rect {
+  .dragging .draggable {
     opacity: 0.5;
     stroke:#5e9fc7;
     z-index: 100;
   }
 
-   .dragging polygon {
-    opacity: 0.5;
-    stroke:#5e9fc7;
-    z-index: 100;
-  }
 
 .draggable {
   touch-action: none;
