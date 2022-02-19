@@ -24,11 +24,11 @@
 
 
 /**
- * The general Direction Sign component
- * @displayName Direction Sign
+ * The Turn Sign component
+ * @displayName Turn Sign
  */
 export default {
-  name: 'DirectionSign',
+  name: 'TurnSign',
   props: {
     isSelected: Boolean,
     id: Number,

@@ -17,11 +17,11 @@
 
 
 /**
- * The general Direction Sign component
- * @displayName Direction Sign
+ * The Vibration Sign component
+ * @displayName Vibration Sign
  */
 export default {
-  name: 'DirectionSign',
+  name: 'VibrationSign',
   props: {
     isSelected: Boolean,
     id: Number,

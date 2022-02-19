@@ -7,7 +7,9 @@
       :transform="transform" stroke="black" 
       :stroke-width="isSelected ? borderWidth + 1: borderWidth"
       :signID="id"
+      :fill="signData.dimension != 'Middle' ? getFill() : 'white'"
     />
+    <circle v-if="signData.dimension == 'Middle'" :cx="signWidth / 2" :cy="height / 2" r="4" fill="black"/>
     <!-- add aditional stuff to display, like another sign or smth-->
   </g>
 </template>
@@ -45,12 +47,6 @@ export default {
         {name: "Backward direction right", base: 0, transform: ["mirror-x", "mirror-y"]},
         {name: "Right backward direction", base: 1, transform: ["mirror-x", "mirror-y"]},
       ],
-      //handle pattern on svg canvas level
-      pattern: [
-        {name: "low", svg: ``},
-        {name: "middle", svg: ``},
-        {name: "high", svg: ``},
-      ],
     };
   },
   computed: {
@@ -61,7 +57,7 @@ export default {
         {name: "sideways", points: ""},
         {name: "place", points: ""},
       ];
-      let straigtPoints = "0,0 " + (this.signWidth / 2) + ",0 " + (this.signWidth / 2) + "," + (this.beatHeight / 2) + " " + this.signWidth + "," + (this.beatHeight / 2) + " " + this.signWidth + "," + this.height + " 0," + this.height;
+      let straigtPoints = 0 + "," + (this.beatHeight / 2) + " " + (this.signWidth / 2) + "," + (this.beatHeight / 2) + " " + (this.signWidth / 2) + ",0 " + " " + this.signWidth + ",0 " + this.signWidth + "," + this.height + " 0," + this.height;
       baseSigns[0].points = straigtPoints;
       let diagonalPoints = "0,0 " + this.signWidth + "," + (this.beatHeight / 3) + " " + this.signWidth + "," + this.height + " 0," + this.height;
       baseSigns[1].points = diagonalPoints;
@@ -106,7 +102,18 @@ export default {
     
   },
   methods: {
-    
+    getFill () {
+      if (this.signData.dimension == "Low") {
+        return "black";
+      } else if (this.signData.dimension == "High") {
+        if (this.signData.signType == "Backward direction" || this.signData.signType == "Forward direction") {
+          return "url(#direction-high-" + this.signData.side + ")";
+        }
+        return "url(#direction-high-left)";
+      } else {
+        return "white";
+      }
+    }
   },
 }
 </script>

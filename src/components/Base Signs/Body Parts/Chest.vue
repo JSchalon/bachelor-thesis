@@ -1,20 +1,26 @@
 <template>
   <g>
-    <rect class="no-save draggable" x="0" y="1" :width="signWidth" :height="height - 2" :signID="id"/>
     <rect 
       class="draggable actual-sign" 
       stroke="black" 
-      :x="signWidth / 4" 
-      :y="height / 2 - signWidth / 4" 
-      :width="signWidth / 2" 
-      :height="signWidth / 2"
+      :x="signWidth / 6" 
+      :y="signWidth / 6" 
+      :width="signWidth / 1.5" 
+      :height="signWidth / 1.5"
       :class="{active: isSelected}" 
       :stroke-width="isSelected ? borderWidth + 1: borderWidth"
       :signID="id"
     />
-    <g >
-      <Pin :id="id" :height="height" :isSelected="isSelected" :signData="pinData" />
-    </g>
+    <circle 
+      class="draggable actual-sign" 
+      stroke="black" 
+      :cx="signWidth / 2" 
+      :cy="signWidth / 2" 
+      r="8"
+      :class="{active: isSelected}" 
+      :stroke-width="isSelected ? borderWidth + 1: borderWidth"
+      :signID="id">
+    </circle>
     <!--todo: add a flat pin with the rotation given by the signData.angle-->
   </g>
 </template>
@@ -23,11 +29,11 @@
 
 
 /**
- * The general room direction Sign component
- * @displayName Room Direction Sign
+ * The chest sign component
+ * @displayName Chest Sign
  */
 export default {
-  name: 'RoomDirectionSign',
+  name: 'ChestSign',
   props: {
     isSelected: Boolean,
     id: Number,
@@ -37,16 +43,14 @@ export default {
   inject: ["signWidth", "borderWidth", "barHeight"],
   data() {
     return {
-      
+      textWidth: 0,
+      textHeight: 0,
     };
   },
   computed: {
-    pinData () {
-      return {signType: "Middle", degree: this.signData.degree};
-    },
   },
+
   mounted () {
-    
   },
   methods: {
     
@@ -56,5 +60,4 @@ export default {
 
 
 <style scoped>
-
 </style>

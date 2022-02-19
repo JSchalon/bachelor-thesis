@@ -62,14 +62,17 @@ export default {
   mounted () {
     let d = new Date();
     d.setTime(d.getTime() + 60 * 24 * 60 * 60 * 1000);
-    let settingsObj = JSON.parse(this.getSettingsCookie());
-    if (settingsObj == {}) {
-      //set settings cookie
+    let cookie = this.getSettingsCookie();
+    let settingsObj = null;
+    if (cookie) {
+      settingsObj = JSON.parse(this.getSettingsCookie());
+    }
+    if (settingsObj == null) {
+      //create settings cookie
       let testObj = {seenIntro: false, language: "eng", showHelpLines: true};
       document.cookie = "settings=" + JSON.stringify(testObj) + "; expires=" + d.toUTCString() + "; path=/";
     } else {
       //store action set settings
-      console.log(settingsObj);
     }
     this.isPhone = window.matchMedia("only screen and (max-width: 760px)").matches;
     this.isTablet = window.matchMedia("only screen and (max-width: 1024px)").matches;
@@ -80,9 +83,7 @@ export default {
   },
   methods: {
     getSettingsCookie () {
-      const settings = (
-        document.cookie.match('(^|;)\\s*' + "settings" + '\\s*=\\s*([^;]+)')?.pop() || ''
-      )
+      const settings =  document.cookie.match('(^|;)\\s*' + "settings" + '\\s*=\\s*([^;]+)')?.pop() || '';
       return settings;
     }
   }

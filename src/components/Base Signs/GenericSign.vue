@@ -21,7 +21,6 @@
 /**
  * The generic laban sign component.
  * - All sign categories must have a corresponding "SignName" + "Context.vue" component that is loaded by the score, that implements the context menu for that category 
- * @emits requestListeners at mount, so that the score can implement dragging, resizing, clicking and double clicking
  * @displayName Generic Sign
  */
 export default {

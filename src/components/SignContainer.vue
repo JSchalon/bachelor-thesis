@@ -1,8 +1,18 @@
 <template>
-    <g class="sign-container" :x="x" :y="y" :data-y="y" :transform="'translate(' + x + ',' + y +')'" ref="sign" :signID="id">
-      <component :is="signData.baseType" :id="id" :isSelected="isSelected" :height="height" :signData="signData"/>
-      <ResizeHandle :isFirst="true" :isActive="isSelected && canResize && signData.resizable" :signHeight="height" :signID="id"/>
-      <ResizeHandle :isFirst="false" :isActive="isSelected && canResize && signData.resizable" :signHeight="height" :signID="id"/>
+    <g class="sign-container" :class="signData.baseType == 'RelationshipBow' ? 'bow' : 'normal'" :x="x" :y="y" :data-y="y" :transform="'translate(' + x + ',' + y +')'" ref="sign" :signID="id">
+      <component :is="signData.baseType" :id="id" :isSelected="isSelected" :height="height" :width="width" :signData="signData"/>
+      <ResizeHandle 
+        :pos="signData.baseType == 'RelationshipBow' ? 'left' : 'top'" 
+        :isActive="isSelected && canResize && signData.resizable" 
+        :signHeight="height" 
+        :width="signData.baseType == 'RelationshipBow' ? width : signWidth"
+        :signID="id"/>
+      <ResizeHandle 
+        :pos="signData.baseType == 'RelationshipBow' ? 'right' : 'bottom'" 
+        :isActive="isSelected && canResize && signData.resizable"
+        :signHeight="height"
+        :width="signData.baseType == 'RelationshipBow' ? width : signWidth"
+        :signID="id"/>
     </g>
 </template>
 
@@ -21,12 +31,13 @@ export default {
     id: Number,
     isSelected: Boolean,
     height: Number,
+    width: Number,
     x: Number,
     y: Number,
     canResize: Boolean,
     signData: Object
   },
-  inject: ["signWidth","borderWidth"],
+  inject: ["borderWidth", "signWidth"],
   data() {
     return {
       name: ""

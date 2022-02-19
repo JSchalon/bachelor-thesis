@@ -1,10 +1,10 @@
 <template>
   <circle 
-    :cx="signWidth / 2" 
-    :cy="isFirst ? 0 : signHeight" 
+    :cx="getPos.x" 
+    :cy="getPos.y" 
     :r="handleDiam"
     class="resize-handle" 
-    :class="isFirst ? 'handle-first' : 'handle-second'"
+    :class="getClass"
     :display="isActive ? 'block' : 'none'" 
     :stroke-width="borderWidth + 1" 
   />
@@ -18,11 +18,32 @@
 export default {
   name: "ResizeHandle",
   props: {
-    isFirst: Boolean,
+    pos: String,
     isActive: Boolean,
     signHeight: Number,
+    width: Number,
   },
-  inject: ["signWidth", "handleDiam", "borderWidth"],
+  inject: ["handleDiam", "borderWidth"],
+  computed: {
+    getPos () {
+      if (this.pos == "top") {
+        return{x: this.width / 2, y: 0}
+      } else if (this.pos == "bottom") {
+        return{x: this.width / 2, y: this.signHeight}
+      } if (this.pos == "left") {
+        return{x: 0, y: this.signHeight / 2}
+      } else {
+        return{x: this.width, y: this.signHeight / 2}
+      }
+    },
+    getClass () {
+      if (this.pos == 'top' || this.pos == 'left') {
+        return "handle-first";
+      } else {
+        return "handle-second";
+      }
+    }
+  }
 };
 </script>
 

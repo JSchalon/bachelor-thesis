@@ -2,6 +2,16 @@
     <div id="canvasContainer">
       <div class="margin-box">
         <svg preserveAspectRatio="xMinYMax meet" ref="canvas" id="canvas" :width="canvasDimensions.x" :height="canvasDimensions.y" fill="white">
+          <defs>
+            <pattern id="direction-high-left" width="10" height="10" patternTransform="rotate(-45 0 0)" patternUnits="userSpaceOnUse">
+              <rect x="0" y="0" width="10" height="10" fill="white"/>
+              <line x1="0" y1="0" x2="0" y2="10" stroke="black" stroke-width="2" />
+            </pattern>
+            <pattern id="direction-high-right" width="10" height="10" patternTransform="rotate(45 0 0)" patternUnits="userSpaceOnUse">
+              <rect x="0" y="0" width="10" height="10" fill="white"/>
+              <line x1="0" y1="0" x2="0" y2="10" stroke="black" stroke-width="2" />
+            </pattern>
+          </defs>
           <rect x="0" y="0" :width="canvasDimensions.x" :height="canvasDimensions.y" ref="canvasBG" @click="selectSign(-1)"/>
           <AddRemoveKnob :place="'left'" :canvasDim="canvasDimensions" @addCollumn="addCollumn(-collumnsLeft)"/>
           <AddRemoveKnob :place="'right'" :canvasDim="canvasDimensions" @addCollumn="addCollumn(collumnsRight + 1)"/>
@@ -10,12 +20,13 @@
             <rect x="0" y="0" :width="canvasDimNoPad.x" :height="canvasDimNoPad.y" />
             <Grid @unselect="selectSign(-1)" :beats="beats" :bars="bars" :collumnsLeft="collumnsLeft" :collumnsRight="collumnsRight" :fullHeight="canvasDimNoPad.y" :contextActive="contextActive" :signsSelected="signsSelected" />
             <SignContainer
-              @requestListeners="initListeners"
+              @requestListeners="initSignListeners"
               :signData="item.signData"
               :id="index"
               :isSelected="item.isSelected"
               :canResize="item.canResize"
               :height="item.height"
+              :width="item.width"
               :x="item.x"
               :y="item.y"
               :key="index"
@@ -95,6 +106,7 @@ export default {
   },
   mounted () {
     window.addEventListener('keydown', this.keyEvent);
+    this.initInteractListeners();
   },
   methods: {
     /**
@@ -383,14 +395,68 @@ export default {
 
 
     /**
-     * Method for initializing event listeners on a sign
-     * @arg elem the grouping element of the sign
+     * Method for initializing the event listeners on a sign
      */
-    initListeners (elem) {
-      this.initSignInteraction(elem);
-      this.initSignClick(elem);
+    initInteractListeners () {
+      this.initSignInteraction();
+      this.initSignClick();
+    },
+    initSignListeners (elem) {
       elem.addEventListener("contextmenu", this.openContextMenu, false);
       ["touchstart", "touchmove", "touchend"].forEach((et) => elem.addEventListener(et, this.ignoreTouch));
+      if (elem.classList.contains("normal")) {
+        interact(".normal").resizable({
+          // resize from top and bottom via the handles. no resize -> no handles
+          edges: { 
+            left: false, 
+            right: false,
+            bottom: ".handle-second",  
+            top: ".handle-first", 
+          },
+          listeners: {
+            start: this.resizeStart,
+            move: this.resizeMove,
+            end: this.resizeEnd,
+          },
+          modifiers: [
+            // minimum size
+            interact.modifiers.restrictSize({
+              min: { width: 0, height: this.minHeight + this.handleDiam * 2 }
+            }),
+            interact.modifiers.restrictEdges({
+              outer: "parent",
+            })
+          ],
+
+          inertia: false
+        });
+      } else {
+        interact(".bow").resizable({
+          // resize from top and bottom via the handles. no resize -> no handles
+          edges: { 
+            left: ".handle-first", 
+            right: ".handle-second",
+            bottom: false,  
+            top: false, 
+          },
+          listeners: {
+            start: this.bowResizeStart,
+            move: this.bowResizeMove,
+            end: this.bowResizeEnd,
+          },
+          modifiers: [
+            // minimum size
+            interact.modifiers.restrictSize({
+              min: { width: this.collumnWidth * 2 + this.handleDiam*2, height: this.minHeight + this.handleDiam * 2 }
+            }),
+            interact.modifiers.restrictEdges({
+              outer: "parent",
+            })
+          ],
+
+          inertia: false
+        })
+      }
     },
 
     /**
@@ -408,7 +474,7 @@ export default {
 
       this.contextPos.x = boundingRect.right + additionalX;
       if (this.signs[targetID].isSelected) {
-        this.contextPos.y = boundingRect.top + this.handleDiam + additionalY;
+        this.contextPos.y = boundingRect.top + additionalY;
       } else {
         this.contextPos.y = boundingRect.top;
       }
@@ -420,10 +486,9 @@ export default {
 
     /**
      * Inititalizes the dragging and resizing settings and event listeners
-     * @arg sign the draggable & resizable element
      */
-    initSignInteraction (sign) {
-      interact(sign).draggable({
+    initSignInteraction () {
+      interact(".sign-container").draggable({
         inertia: false,
         restrict: {
           restriction: "parent",
@@ -436,42 +501,18 @@ export default {
         onstart: this.dragStart,
         onmove: this.dragMove,
         onend: this.dragEnd
-      }).resizable({
-        // resize from top and bottom via the handles. no resize -> no handles
-        edges: { 
-          left: false, 
-          right: false,
-          bottom: ".handle-second",  
-          top: ".handle-first", 
-        },
-        listeners: {
-          start: this.resizeStart,
-          move: this.resizeMove,
-          end: this.resizeEnd,
-        },
-        modifiers: [
-          // minimum size
-          interact.modifiers.restrictSize({
-            min: { width: 0, height: this.minHeight + this.handleDiam * 2 }
-          }),
-          interact.modifiers.restrictEdges({
-            outer: "parent",
-          })
-        ],
+      });
 
-        inertia: false
-      })
     },
 
     
 
     /**
      * Inititalizes the clicking event listener
-     * @arg selector the clickable element
      */
-    initSignClick: function(selector) {
-      interact(selector).on("tap", this.clickSign);
-      interact(selector).on("doubletap", this.doubleClickSign);
+    initSignClick () {
+      interact(".sign-container").on("tap", this.clickSign)
+      .on("doubletap", this.doubleClickSign);
     },
 
     /**
@@ -614,7 +655,112 @@ export default {
       target.classList.remove("dragging");
       this.selectSign(targetID);
       if (this.contextWasActive) {
-        this.openContextMenu(event, actualY - y);
+        this.openContextMenu(event, 0, actualY - y);
+        this.contextWasActive = false;
+      }
+      
+    },
+
+    /**
+     * The resize start event listener for the horizontal bow resizing, creats the shadow element for resizing
+     * @arg event the resize-start event
+     */
+    bowResizeStart (event) {
+      this.keyCommandsEnabled = false;
+      let target = event.target;
+      if (this.contextActive) {
+        this.contextWasActive = true;
+      }
+      this.contextActive = false;
+      
+      const targetID = target.getAttribute("signID");
+      
+      //get current element position
+      let  x = (this.signs[targetID].x || 0) + event.dx;
+      target.setAttribute("start-x", x);
+      target.setAttribute("start-w", this.signs[targetID].width);
+
+      this.makeShadow(this.signs[targetID]);
+
+      //apply dragging styling to group
+      target.classList.add("dragging");
+
+       //move element to top of Render
+      this.placeSignOnTop(targetID);
+    },
+
+    /**
+     * The bow resize move event listener, resizes the event target along the x axis
+     * @arg event the resize-move event
+     */
+    bowResizeMove (event) {
+      //get the saved x and y data
+      let target = event.target;
+      const targetID = target.getAttribute("signID");
+      const shadowID = this.signs.length - 1;
+      let targetElem = this.signs[targetID];
+      let shadowElem = this.signs[shadowID];
+      let x = (parseFloat(target.getAttribute("data-x")) || 0);
+
+      // keep the same position when resizing from the left
+      x += event.deltaRect.left;
+      
+
+      let actualX = Math.round(x / this.blocksizeX) * this.blocksizeX;
+      let newWidth = targetElem.width + x - actualX;
+      let actualW = Math.round(newWidth / this.blocksizeX) * this.blocksizeX;
+
+      // update the element height (-14 for the handles)
+      this.$emit("editSign", {type: "resize", index: targetID, data: {width: (event.rect.width - this.handleDiam * 2)}});
+      //check if the element was resized from the top
+      if (event.deltaRect.left != 0) {
+        //top handle -> adjust y position to nearest grid position
+        this.$emit("editSign", {type: "move", index: shadowID, data: {x: actualX, y: shadowElem.y}});
+
+      }
+
+      //stop resizing at the starting line
+      this.$emit("editSign", {type: "resize", index: shadowID, data: {width: actualW}});
+
+      //set new y data
+      target.setAttribute("data-x", x);
+      
+      //translate group
+      this.$emit("editSign", {type: "move", index: targetID, data: {x: (targetElem.x + event.deltaRect.left), y: targetElem.y}});
+    },
+
+    /**
+     * The bow resize end listener, sets the actual height/position after a resize
+     * @arg event the resize-end event
+     */
+    bowResizeEnd (event) {
+      this.keyCommandsEnabled = true;
+      let target = event.target;
+      const targetID = target.getAttribute("signID");
+      const shadowID = this.signs.length - 1;
+      let targetElem = this.signs[targetID];
+      let shadowElem = this.signs[shadowID];
+
+      let x = parseFloat(target.getAttribute("data-x"));
+      let actualX = Math.round(x / this.blocksizeX) * this.blocksizeX;
+
+      //check if the element was resized from the top
+      if (event.deltaRect.left != 0) {
+        //left handle -> adjust x position to nearest grid position
+        target.setAttribute("data-x", actualX);
+        this.$emit("editSign", {type: "move", index: targetID, data: {x: actualX, y: targetElem.y}});
+      }
+      this.$emit("editSign", {type: "resize", index: targetID, data: {width: shadowElem.width}});
+
+      if (actualX == 0 && this.signs[targetID].x != 0) {
+        this.$emit("editSign", {type: "move", index: targetID, data: {x: 0, y: targetElem.y}});
+      }
+      //calculate new collumn?
+      this.removeSign(shadowID);
+      target.classList.remove("dragging");
+      this.selectSign(targetID);
+      if (this.contextWasActive) {
+        this.openContextMenu(event, actualX - x);
         this.contextWasActive = false;
       }
       
@@ -624,7 +770,7 @@ export default {
      * The drag-start event listener, sets up the shadow element for the dragging
      * @arg event the drag-start event
      */
-    dragStart: function(event) {
+    dragStart (event) {
       this.keyCommandsEnabled = false;
       
       let target = event.target;
@@ -664,18 +810,28 @@ export default {
       const shadowID = this.signs.length - 1;
       let targetElem = this.signs[targetID];
       this.$emit("editSign", {type: "resize", index: shadowID, data: {height: targetElem.height}});
+      const isBow = (targetElem.signData.baseType == "RelationshipBow");
 
       //get the current position from the x and y chords
       let  x = (this.signs[targetID].x || 0) + event.dx;
       let  y = (this.signs[targetID].y || 0) + event.dy;
 
       const collumnOffset = (this.collumnWidth - this.signWidth) / 2;
+
       let actualX = Math.round(x / this.blocksizeX) * this.blocksizeX + collumnOffset;
       let actualY = Math.round(y / this.blocksizeY) * this.blocksizeY;
+      if (isBow) {
+        actualX = actualX - collumnOffset;
+      }
+      
       //check if the current position is above (below in actual browser) the starting line -> snap there
       if (this.checkStartingPos(actualY, this.signs[targetID].height)) {
-        this.$emit("editSign", {type: "resize", index: shadowID, data: {height: (this.barHeight / this.beats * 2)}});
-        actualY = this.canvasDimNoPad.y - this.minHeight - this.barHeight / this.beats * 2;
+        if (isBow) {
+          actualY = this.canvasDimNoPad.y - this.minHeight - this.barHeight / this.beats * 2 + this.blocksizeY;
+        }else {
+          this.$emit("editSign", {type: "resize", index: shadowID, data: {height: (this.barHeight / this.beats * 2)}});
+          actualY = this.canvasDimNoPad.y - this.minHeight - this.barHeight / this.beats * 2;
+        }
       }
 
         //set new element position
@@ -689,11 +845,13 @@ export default {
      * The drag-end event listener, places the sign at the proper position and removes the shadow
      * @arg event the drag-move event
      */
-    dragEnd: function(event) {
+    dragEnd (event) {
       this.keyCommandsEnabled = true;
       let target = event.target;
 
       const targetID = target.getAttribute("signID");
+
+      const isBow = (this.signs[targetID].signData.baseType == "RelationshipBow");
 
       target.classList.remove("dragging");
 
@@ -704,12 +862,20 @@ export default {
       const collumnOffset = (this.collumnWidth - this.signWidth) / 2;
       let screenX = Math.round(x / this.blocksizeX) * this.blocksizeX + collumnOffset;
       let screenY = Math.round(y /this.blocksizeY) * this.blocksizeY;
+      if (isBow) {
+        screenX = screenX - collumnOffset;
+      }
+      
       
       //check if the current position is above (below in actual browser) the starting line -> snap there
       if (this.checkStartingPos(screenY, this.signs[targetID].height)) {
-        this.$emit("editSign", {type: "resize", index: targetID, data: {height: (this.barHeight / this.beats * 2)}});
-        screenY = this.canvasDimNoPad.y - this.barHeight / this.beats * 2 - this.minHeight;
-        this.$emit("editSign", {type: "changeCanResize", index: targetID, data: {canResize: false}});
+        if (isBow) {
+          screenY = this.canvasDimNoPad.y - this.barHeight / this.beats * 2 - this.minHeight + this.blocksizeY;
+        } else {
+          this.$emit("editSign", {type: "resize", index: targetID, data: {height: (this.barHeight / this.beats * 2)}});
+          screenY = this.canvasDimNoPad.y - this.barHeight / this.beats * 2 - this.minHeight;
+          this.$emit("editSign", {type: "changeCanResize", index: targetID, data: {canResize: false}});
+        }
       } else {
         this.$emit("editSign", {type: "changeCanResize", index: targetID, data: {canResize: true}});
       }
