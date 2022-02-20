@@ -1,0 +1,43 @@
+{
+  "catName": "Direction Signs",
+  "names": [
+    {
+      "name": "Left forward direction",
+      "signType": "Left forward direction"
+    },
+    {
+      "name": "Forward direction",
+      "signType": "Forward direction",
+      "side": "left"
+    },
+    {
+      "name": "Right forward direction",
+      "signType": "Right forward direction"
+    },
+    {
+      "name": "Left direction",
+      "signType": "Left direction"
+    },
+    {
+      "name": "In place",
+      "signType": "In place"
+    },
+    {
+      "name": "Right direction",
+      "signType": "Right direction"
+    },
+    {
+      "name": "Left backward direction",
+      "signType": "Left backward direction"
+    },
+    {
+      "name": "Backward direction",
+      "signType": "Backward direction",
+      "side": "left"
+    },
+    {
+      "name": "Right backward direction",
+      "signType": "Right backward direction"
+    }
+  ]
+}

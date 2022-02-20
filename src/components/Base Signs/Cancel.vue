@@ -56,7 +56,6 @@ export default {
       let path = 
         "M 0," + (this.height / 2) + " Q " + (this.signWidth * 3 / 8) + "," + (this.height ) + "," + (this.signWidth * 3 / 4) + "," + (this.height / 2) + 
         "M " + (this.signWidth / 4) + "," + (this.height / 2) + " Q " + (this.signWidth * 5 / 8) + "," + 0 + "," + this.signWidth + "," + (this.height / 2);
-      console.log(path);
       return path; 
     }
   },

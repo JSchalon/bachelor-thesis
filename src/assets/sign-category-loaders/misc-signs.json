@@ -1,0 +1,37 @@
+{
+  "catName": "Misc. Signs",
+  "catHeight": 40,
+  "baseHeight": 40,
+  "general": [
+    {
+      "isSelected": false,
+      "canResize": false,
+      "height": 40,
+      "x": 0,
+      "y": 0
+    }
+  ],
+  "signData": [
+    {
+      "baseType": "RoomDirectionSign",
+      "signType": "RoomDirectionSign",
+      "degree": 0,
+      "resizable": false
+    },
+    {
+      "baseType": "Cancel",
+      "signType": "BackToNormal",
+      "resizable": false
+    },
+    {
+      "baseType": "Cancel",
+      "signType": "ReleaseContact",
+      "resizable": false
+    },
+    {
+      "baseType": "VibrationSign",
+      "signType": "VibrationSign",
+      "resizable": true
+    }
+  ]
+}

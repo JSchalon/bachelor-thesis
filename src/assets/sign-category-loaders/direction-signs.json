@@ -1,0 +1,72 @@
+{
+  "catName": "Direction Signs",
+  "catHeight": 80,
+  "baseHeight": 100,
+  "general": [
+    {
+      "isSelected": false,
+      "canResize": false,
+      "height": 80,
+      "x": 0,
+      "y": 0
+    }
+  ],
+  "signData": [
+    {
+      "baseType": "DirectionSign",
+      "signType": "Left forward direction",
+      "dimension": "Middle",
+      "resizable": true
+    },
+    {
+      "baseType": "DirectionSign",
+      "signType": "Forward direction",
+      "dimension": "Middle",
+      "side": "left",
+      "resizable": true
+    },
+    {
+      "baseType": "DirectionSign",
+      "signType": "Right forward direction",
+      "dimension": "Middle",
+      "resizable": true
+    },
+    {
+      "baseType": "DirectionSign",
+      "signType": "Left direction",
+      "dimension": "Middle",
+      "resizable": true
+    },
+    {
+      "baseType": "DirectionSign",
+      "signType": "In place",
+      "dimension": "Middle",
+      "resizable": true
+    },
+    {
+      "baseType": "DirectionSign",
+      "signType": "Right direction",
+      "dimension": "Middle",
+      "resizable": true
+    },
+    {
+      "baseType": "DirectionSign",
+      "signType": "Left backward direction",
+      "dimension": "Middle",
+      "resizable": true
+    },
+    {
+      "baseType": "DirectionSign",
+      "signType": "Backward direction",
+      "dimension": "Middle",
+      "side": "left",
+      "resizable": true
+    },
+    {
+      "baseType": "DirectionSign",
+      "signType": "Right backward direction",
+      "dimension": "Middle",
+      "resizable": true
+    }
+  ]
+}

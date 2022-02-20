@@ -18,7 +18,7 @@
           <AddRemoveKnob :place="'top'" :canvasDim="canvasDimensions" @addBar="addBar(bars + 1)"/>
           <g :transform="'translate(' + canvasMarginLeft + ', ' + canvasMarginTop +')'" ref="bounding">
             <rect x="0" y="0" :width="canvasDimNoPad.x" :height="canvasDimNoPad.y" />
-            <Grid @unselect="selectSign(-1)" :beats="beats" :bars="bars" :collumnsLeft="collumnsLeft" :collumnsRight="collumnsRight" :fullHeight="canvasDimNoPad.y" :contextActive="contextActive" :signsSelected="signsSelected" />
+            <Grid @unselect="selectSign(-1)" @placeSign="addSign" :beats="beats" :bars="bars" :collumnsLeft="collumnsLeft" :collumnsRight="collumnsRight" :fullHeight="canvasDimNoPad.y" :contextActive="contextActive" :signsSelected="signsSelected" />
             <SignContainer
               @requestListeners="initSignListeners"
               :signData="item.signData"
@@ -71,6 +71,9 @@ export default {
     },
     beats () {
       return this.$store.state["beatsPerBar"];
+    },
+    curLibrarySign () {
+      return this.$store.state["curSign"];
     },
     minHeight () {
       return this.barHeight / this.beats;
@@ -194,19 +197,24 @@ export default {
       }
       this.$store.dispatch('removeBar');
     },
-
-
-
     /**
      * Method for adding a sign to the score
-     * @arg type the sign type
-     * @arg height the height of the sign
-     * @arg x the x position of the sign
-     * @arg y the y position of the sign
+     * @arg data the data from the grid
      */
-    addSign (type, height, x, y) {
-      const newSign = {isSelected: false, signType: type, height: height, x: x, y: y};
+    addSign (elem) {
+      let x = parseInt(elem.getAttribute("x")) + (this.collumnWidth - this.signWidth) / 2;
+      let y = parseInt(elem.getAttribute("y"));
+      let pos = {col: parseInt(elem.getAttribute("col")), bar: parseInt(elem.getAttribute("bar")), beat: parseInt(elem.getAttribute("beat"))}
+      let signData = Object.assign(this.curLibrarySign.signData, pos);
+      let newSign = {isSelected: true, canResize: true, width: this.signWidth, height: this.curLibrarySign.height, x: x, y: y, signData: signData};
+      if (this.curLibrarySign.signData.baseType == "RelationshipBow") {
+        newSign.width = this.collumnWidth * 2;
+        newSign.x = parseInt(elem.getAttribute("x"));
+      }
+      console.log(newSign);
       this.$emit("editSign", {type: "add", data: newSign});
+      //the grid element beat/bar is at the y of the new sign, not y + height -> "move it" downwards after placing
+      this.calcBeatMove((this.signs.length-1), (y+this.curLibrarySign.height), this.curLibrarySign.height, y, this.curLibrarySign.height);
     },
     /**
      * Method for removing a sign from the score
@@ -220,6 +228,8 @@ export default {
           this.contextSign = 0;
         }
     },
+
+
 
     /**
      * Method for calculating the new beat and bar of an element after a vertical move
@@ -930,7 +940,7 @@ export default {
   overflow: auto;
 }
 
-svg {
+#canvas {
   margin: auto auto;
   display: block;
   box-shadow: 0 1px 6px 3px rgba(0, 0, 0, 0.15);

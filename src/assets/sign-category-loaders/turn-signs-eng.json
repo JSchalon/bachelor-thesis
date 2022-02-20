@@ -1,0 +1,17 @@
+{
+  "catName": "Turn Signs",
+  "names": [
+    {
+      "name": "Left turn",
+      "signType": "Left turn"
+    },
+    {
+      "name": "Right turn",
+      "signType": "Right turn"
+    },
+    {
+      "name": "Any turn",
+      "signType": "Any turn"
+    }
+  ]
+}

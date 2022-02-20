@@ -1,0 +1,44 @@
+{
+  "catName": "Relationship Bows",
+  "catHeight": 50,
+  "baseHeight": 50,
+  "general": [
+    {
+      "isSelected": false,
+      "canResize": false,
+      "height": 50,
+      "x": 0,
+      "y": 0
+    }
+  ],
+  "signData": [
+    {
+      "baseType": "RelationshipBow",
+      "signType": "Touch",
+      "passing": false, 
+      "grasping": false,
+      "resizable": true
+    },
+    {
+      "baseType": "RelationshipBow",
+      "signType": "Address",
+      "passing": false, 
+      "grasping": false,
+      "resizable": true
+    },
+    {
+      "baseType": "RelationshipBow",
+      "signType": "Near",
+      "passing": false, 
+      "grasping": false,
+      "resizable": true
+    },
+    {
+      "baseType": "RelationshipBow",
+      "signType": "Support",
+      "passing": false, 
+      "grasping": false,
+      "resizable": true
+    }
+  ]
+}

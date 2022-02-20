@@ -12,10 +12,13 @@ export default createStore({
     description: "Jebb",
     timeUnit: "second",
     beatDuration: 1,
+    //sign data
+    curSign: false,
+    signs: [{}],
     //editor settings
     seenIntro: false, 
     language: "eng", 
-    showHelpLines: true
+    showHelpLines: true,
   },
   mutations: {
     setCollumns (state, data) {
@@ -28,6 +31,12 @@ export default createStore({
     },
     setBars (state, number) {
       state["bars"] = state["bars"] + number;
+    },
+    setCurSign(state, data) {
+      state["curSign"] = data;
+    },
+    removeCurSign (state) {
+      state["curSign"] = false;
     }
   },
   actions: {
@@ -47,6 +56,13 @@ export default createStore({
       let number = -1;
       context.commit('setBars', number);
     },
+    changeCurSign (context, sign) {
+      if (sign != false) {
+        context.commit('setCurSign', sign);
+      } else {
+        context.commit('removeCurSign');
+      }
+    }
   },
   modules: {
   }

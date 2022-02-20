@@ -1,5 +1,6 @@
 <template>
   <path 
+    class="actual-sign draggable"
     stroke="black"
     :d="path"
     :class="{active: isSelected}" 

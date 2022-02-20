@@ -1,5 +1,6 @@
 <template>
   <path 
+    class="actual-sign draggable"
     stroke="black"
     :d="path"
     :class="{active: isSelected}" 
@@ -62,7 +63,6 @@ export default {
   },
   methods: {
     gradient (x) {
-      console.log(x)
       let y = -(5/6) * x + 50;
       if (this.signData.limb) {
         y = -(5/6) * x + 50;

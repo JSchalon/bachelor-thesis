@@ -34,6 +34,7 @@
       :signID="id"
     />
     <rect
+      v-if="signData.grasping"
       :x="(this.width / 2 - 5)"
       :y="(this.height / 2 - 5)"
       :transform="signData.passing ? 'translate(0, -2.5)' : ''"
@@ -68,7 +69,10 @@ export default {
     id: Number,
     signData: Object,
     height: Number,
-    width: Number,
+    width: {
+      Number,
+      default: 160
+    }
   },
   inject: ["signWidth","borderWidth", "barHeight"],
   data() {

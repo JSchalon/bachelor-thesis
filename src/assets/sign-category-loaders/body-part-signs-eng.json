@@ -1,0 +1,65 @@
+{
+  "catName": "Body Part Signs",
+  "names": [
+    { 
+      "name": "Ankle",
+      "signType": "Ankle"
+    },
+    {
+      "name": "Chest",
+      "signType": "Chest"
+    },
+    {
+      "name": "Elbow",
+      "signType": "Elbow"
+    },
+    {
+      "name": "Fingers",
+      "signType": "Fingers"
+    },
+    {
+      "name": "Foot",
+      "signType": "Foot"
+    },
+    {
+      "name": "Hand",
+      "signType": "Hand"
+    },
+    {
+      "name": "Head",
+      "signType": "Head"
+    },
+    {
+      "name": "Hip",
+      "signType": "Hip"
+    },
+    {
+      "name": "Knee",
+      "signType": "Knee"
+    },
+    {
+      "name": "Pelvis",
+      "signType": "Pelvis"
+    },
+    {
+      "name": "Shoulder",
+      "signType": "Shoulder"
+    },
+    {
+      "name": "Toes",
+      "signType": "Toes"
+    },
+    {
+      "name": "Torso",
+      "signType": "Torso"
+    },
+    {
+      "name": "Waist",
+      "signType": "Waist"
+    },
+    {
+      "name": "Wrist",
+      "signType": "Wrist"
+    }
+  ]
+}

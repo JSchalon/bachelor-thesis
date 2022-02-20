@@ -1,0 +1,21 @@
+{
+  "catName": "Path Signs",
+  "names": [
+    {
+      "name": "Straight path",
+      "signType": "Straight"
+    },
+    {
+      "name": "Circular path left",
+      "signType": "Circular left"
+    },
+    {
+      "name": "Circular path right",
+      "signType": "Circular right"
+    },
+    {
+      "name": "Any path",
+      "signType": "Any"
+    }
+  ]
+}

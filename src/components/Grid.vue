@@ -1,7 +1,16 @@
 <template>
     <g ref="grid" id="grid">
       <g class="collumn" :id="'grid-collumn' + (index - 1 - collumnsLeft)" :x="collumnWidth * (index - 1)" y="0" :key="index" v-for="index in (collumnsLeft+collumnsRight)">
-        <rect :class="'beat-rect ba' + (getBar(rect) + 1) + ' ' +  'be' + getBeat(rect)" :x="collumnWidth * (index - 1)" :y="(barHeight / beats) * (rect - 1)" :width="collumnWidth" :height="(barHeight / beats)"  :key="rect" v-for="rect in (bars * beats)"/>
+        <rect 
+          :class="'beat-rect ba' + (getBar(rect) + 1) + ' ' +  'be' + getBeat(rect)" 
+          :x="collumnWidth * (index - 1)" 
+          :y="(barHeight / beats) * (rect - 1)" 
+          :width="collumnWidth" :height="(barHeight / beats)" 
+          :col="index - 1 - collumnsLeft"
+          :beat="getBeat(rect)"
+          :bar="getBar(rect) + 1"
+          :key="rect" 
+          v-for="rect in (bars * beats)"/>
         <rect class="fill-rect" :x="collumnWidth * (index - 1)" :y="barHeight * bars" :width="collumnWidth" :height="startBarOffset" />
         <rect class="beat-rect ba0 be0" :x="collumnWidth * (index - 1)" :y="barHeight * bars + startBarOffset" :width="collumnWidth" :height="(barHeight / beats * 2)" />
         <rect class="beat-rect ba-1 be0" :x="collumnWidth * (index - 1)" :y="barHeight * bars + startBarOffset + barHeight / 2" :width="collumnWidth" :height="(barHeight / beats)" />
@@ -38,6 +47,7 @@ import interact from "interactjs";
 export default {
   name: "Grid",
   inject: ["barHeight", "collumnWidth", "borderWidth", "startBarOffset", "beatLineWidth"],
+  emits: ["unselect", "placeSign"],
   props: {
     collumnsLeft: Number,
     collumnsRight: Number,
@@ -51,6 +61,17 @@ export default {
     return {
       barSelected: false,
     };
+  },
+  computed: {
+    /**
+     * Calculates the total amount of beats in the score
+     */
+    totalBeats() {
+      return this.beats * this.bars;
+    },
+    curSign() {
+      return this.$store.state["curSign"];
+    }
   },
   mounted () {
     interact(".beat-rect").on("tap", this.click);
@@ -69,6 +90,10 @@ export default {
         this.$emit("unselect");
         this.highlight();
       } else if (event.button == 0){
+        if (this.curSign) {
+          this.$emit("placeSign", event.target);
+          return true;
+        }
         //collumn select/unselect
         this.highlightCol(event.target.parentElement.id, true);
         if (!event.double && this.barSelected) {
@@ -147,14 +172,6 @@ export default {
       }
     }
   },
-  computed: {
-    /**
-     * Calculates the total amount of beats in the score
-     */
-    totalBeats() {
-      return this.beats * this.bars;
-    }
-  }
 };
 </script>
 

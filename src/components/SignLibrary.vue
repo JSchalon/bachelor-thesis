@@ -18,20 +18,19 @@ export default {
   data() {
     return {
       categories: [
-        {active: false, category: "Direction signs", selected: -1},
-        {active: false, category: "Turn signs", selected: -1},
-        //{active: false, category: "Relationship bows", selected: -1},
-        //{active: false, category: "Space measurement signs", selected: -1},
-        //{active: false, category: "Path signs", selected: -1},
-        //{active: false, category: "Room direction signs", selected: -1},
-        //{active: false, category: "Bodypart signs", selected: -1},
-        //{active: false, category: "Misc signs", selected: -1},
+        {active: false, category: "direction-signs", selected: -1},
+        {active: false, category: "turn-signs", selected: -1},
+        {active: false, category: "relationship-bows", selected: -1},
+        {active: false, category: "space-measurement-signs", selected: -1},
+        {active: false, category: "path-signs", selected: -1},
+        {active: false, category: "body-part-signs", selected: -1},
+        
+        {active: false, category: "misc-signs", selected: -1},
       ],
       curSign: "---"
     };
   },
   computed: {
-    
   },
   mounted () {
     
@@ -54,10 +53,16 @@ export default {
       }
       for (let elem of this.categories) {
         elem.selected = -1;
-      }if (!unselect) {
+      }
+      if (!unselect) {
         //if the new selected sign == the old selected sign -> unselect
         this.categories[data.catIndex].selected = data.index;
         this.curSign = data.name;
+        //push to current sign
+        let sign = {height: data.height, signData: data.signData};
+        this.$store.dispatch('changeCurSign',sign);
+      } else {
+        this.$store.dispatch('changeCurSign',false);
       }
     }
   },

@@ -1,0 +1,31 @@
+{
+  "catName": "Turn Signs",
+  "catHeight": 80,
+  "baseHeight": 100,
+  "general": [
+    {
+      "isSelected": false,
+      "canResize": false,
+      "height": 80,
+      "x": 0,
+      "y": 0
+    }
+  ],
+  "signData": [
+    {
+      "baseType": "TurnSign",
+      "signType": "Left turn",
+      "resizable": true
+    },
+    {
+      "baseType": "TurnSign",
+      "signType": "Right turn",
+      "resizable": true
+    },
+    {
+      "baseType": "TurnSign",
+      "signType": "Any turn",
+      "resizable": true
+    }
+  ]
+}

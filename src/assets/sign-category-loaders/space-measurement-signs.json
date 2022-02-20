@@ -1,0 +1,59 @@
+{
+  "catName": "Space Measurement Signs",
+  "catHeight": 50,
+  "baseHeight": 50,
+  "general": [
+    {
+      "isSelected": false,
+      "canResize": false,
+      "height": 50,
+      "x": 0,
+      "y": 0
+    }
+  ],
+  "signData": [
+    {
+      "baseType": "SpaceMeasurementSign",
+      "signType": "Narrow",
+      "degree": 0,
+      "resizable": true
+    },
+    {
+      "baseType": "SpaceMeasurementSign",
+      "signType": "Wide",
+      "degree": 0,
+      "resizable": true
+    },
+    {
+      "baseType": "SpaceMeasurementSign",
+      "signType": "Joining",
+      "degree": 0,
+      "resizable": true
+    },
+    {
+      "baseType": "SpaceMeasurementSign",
+      "signType": "Spreading",
+      "degree": 0,
+      "resizable": true
+    },
+    {
+      "baseType": "SpaceMeasurementSign",
+      "signType": "Folding",
+      "degree": 0,
+      "resizable": true
+    },
+    {
+      "baseType": "SpaceMeasurementSign",
+      "signType": "Unfolding",
+      "degree": 0,
+      "resizable": true
+    },
+    {
+      "baseType": "SpaceMeasurementSign",
+      "signType": "NeitherOr",
+      "degree": 0,
+      "resizable": true
+    }
+
+  ]
+}

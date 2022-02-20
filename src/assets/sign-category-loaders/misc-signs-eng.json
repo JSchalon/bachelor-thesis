@@ -1,0 +1,21 @@
+{
+  "catName": "Misc. Signs",
+  "names": [
+    {
+      "name": "Room direction sign",
+      "signType": "RoomDirectionSign"
+    },
+    {
+      "name": "Back to normal",
+      "signType": "BackToNormal"
+    },
+    {
+      "name": "Release contact",
+      "signType": "ReleaseContact"
+    },
+    {
+      "name": "Vibration",
+      "signType": "VibrationSign"
+    }
+  ]
+}

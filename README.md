@@ -11,11 +11,6 @@ Git Repo zur Bachelorarbeit zur Entwicklung eines webbasierten Interaktionsedito
 
 ## Versions
 
-### Version 0.3.5
-- Implemented room direction signs
-- Implemented body part signs
-- Reimplemented the space measurement signs
-- Implemented path signs
-- Implemented horizontal resizing with resize handles for relation ship bows
-- Implemented Relationship bows
-- Implemented cancel signs
+### Version 0.3.6
+- Added all sign categories to the sign library
+- Implemented adding signs to the score via the library

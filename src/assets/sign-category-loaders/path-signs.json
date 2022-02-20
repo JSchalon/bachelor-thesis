@@ -1,0 +1,38 @@
+{
+  "catName": "Path Signs",
+  "catHeight": 70,
+  "baseHeight": 100,
+  "general": [
+    {
+      "isSelected": false,
+      "canResize": false,
+      "height": 70,
+      "x": 0,
+      "y": 0
+    }
+  ],
+  "signData": [
+    {
+      "baseType": "PathSign",
+      "signType": "Straight",
+      "resizable": true
+    },
+    {
+      "baseType": "PathSign",
+      "signType": "Circular left",
+      "direction": "left",
+      "resizable": true
+    },
+    {
+      "baseType": "PathSign",
+      "signType": "Circular right",
+      "direction": "right",
+      "resizable": true
+    },
+    {
+      "baseType": "PathSign",
+      "signType": "Any",
+      "resizable": true
+    }
+  ]
+}

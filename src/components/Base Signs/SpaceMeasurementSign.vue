@@ -1,6 +1,6 @@
 <template>
   <g>
-    <rect class="no-save" fill="white" x="1" :y="height - signWidth" :width="signWidth - 2" :height="signWidth - 1" :signID="id"/>
+    <rect class="no-save" opacity="0" x="0" y="0" :width="signWidth" :height="height" :signID="id"/>
     <line stroke="black" stroke-width="2" :x1="signWidth / 2" :x2="signWidth / 2" y1="0" :y2="height - signWidth - 10" :signID="id"/>
     <g :transform="'translate(0,' + (height - 40) + ')'">
       <component 

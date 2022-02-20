@@ -1,0 +1,21 @@
+{
+  "catName": "Relationship Bows",
+  "names": [
+    {
+      "name": "Touching",
+      "signType": "Touch"
+    },
+    {
+      "name": "Adressing",
+      "signType": "Address"
+    },
+    {
+      "name": "Near",
+      "signType": "Near"
+    },
+    {
+      "name": "Supporting",
+      "signType": "Support"
+    }
+  ]
+}
