@@ -2,32 +2,45 @@
     <div class="context-menu">
       <RadioOption 
         :mIndex="0" 
-        :options="[
-          {color: 'black', img: '/direction-sign-radio/layer-down.svg'},
-          {color: 'blue', img: '/direction-sign-radio/layer-middle.svg'},
-          {color: 'red', img: '/direction-sign-radio/layer-up.svg'}
-        ]" 
-        :initState="0"
+        :options="dimensions" 
+        :initState="getInitDimension()"
         :optionText="'Dimension'"
-        @switchState="this.changeBorderColor"
+        @switchState="this.changeDimension"
       />
-      <OnOffOption :mIndex="1" :initState="false" :optionText="'Color'" @switchState="this.changeColor"/>
-      <SignCategoryContainer :mIndex="2" :optionText="'Direction'"/>
-      <SliderOption :mIndex="3" :optionText="'Test'" :initState="0" :stops="2"/>
-      <DeleteOption :mIndex="4" @delete="emitDelete"/>
+      <!--
+        Todo: 
+          - hodl (on/off)
+          - direction (category)
+          - presign (body part): active -> display presign options
+          - - presign (body part) (on/off)
+            - type -> category
+            - limb (if applicable)
+            - if limb: surface (radio)
+          - presign (space measurement sign)
+            - type (category)
+            - if not unfoldnig/neitherOr ->  degree (slider, 0-5)
+          - angle (on/off)
+            - if angle: 
+              type(radio) (maybe actually set type?)
+              degree (slider 0-7)
+          - outer position (on/off)
+            type(radio) (maybe actually set type?)
+            - degree(slider 0-7)
+            
+      -->
+      <DeleteOption :mIndex="1" @delete="emitDelete"/>
     </div>
 </template>
 
 <script>
-
 /**
- * The context menu for the generic sign
+ * The context menu for the direction signs
  * @emits updateSignData updates the sign data given by the score
  * @emits delete deletes the sign
- * @displayName GenericSignContext
+ * @displayName Direction Sign Context
  */
 export default {
-  name: "GenericSignContext",
+  name: "DirectionSignContext",
   inject: [],
   props: {
     signData: Object,
@@ -37,7 +50,11 @@ export default {
   emits: ["updateSignData", "delete"],
   data() {
     return {
-
+      dimensions: [
+        {dimension: 'Low', img: '/direction-sign-radio/layer-down.svg'},
+        {dimension: 'Middle', img: '/direction-sign-radio/layer-middle.svg'},
+        {dimension: 'High', img: '/direction-sign-radio/layer-up.svg'}
+      ],
     };
   },
   computed: {
@@ -47,13 +64,17 @@ export default {
     
   },
   methods: {
+    getInitDimension () {
+      return this.dimensions.findIndex(obj => obj.dimension == this.signData.dimension); 
+    },
     /**
      * An example function changing the border color based of an radio Option, as an example for the actual radio funcitionality
      * @arg color the boolean changing the color 
      */
-    changeBorderColor(color) {
+    changeDimension(data) {
+      console.log(data)
       let newSignData = this.signData;
-      newSignData.borderColor = color;
+      newSignData.dimension = data.dimension;
 
       this.newSignData (newSignData);
     },

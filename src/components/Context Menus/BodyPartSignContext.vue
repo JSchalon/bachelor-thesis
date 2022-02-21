@@ -1,33 +1,24 @@
 <template>
     <div class="context-menu">
-      <RadioOption 
-        :mIndex="0" 
-        :options="[
-          {color: 'black', img: '/direction-sign-radio/layer-down.svg'},
-          {color: 'blue', img: '/direction-sign-radio/layer-middle.svg'},
-          {color: 'red', img: '/direction-sign-radio/layer-up.svg'}
-        ]" 
-        :initState="0"
-        :optionText="'Dimension'"
-        @switchState="this.changeBorderColor"
-      />
-      <OnOffOption :mIndex="1" :initState="false" :optionText="'Color'" @switchState="this.changeColor"/>
-      <SignCategoryContainer :mIndex="2" :optionText="'Direction'"/>
-      <SliderOption :mIndex="3" :optionText="'Test'" :initState="0" :stops="2"/>
-      <DeleteOption :mIndex="4" @delete="emitDelete"/>
+      <!--
+        Todo: 
+          - body part (category)
+          - limb (on/off) (unless area sign -> add tag for that) -> display surface options ()
+          - surface (2x radio)
+      -->
+      <DeleteOption :mIndex="0" @delete="emitDelete"/>
     </div>
 </template>
 
 <script>
-
 /**
- * The context menu for the generic sign
+ * The context menu for the body part signs
  * @emits updateSignData updates the sign data given by the score
  * @emits delete deletes the sign
- * @displayName GenericSignContext
+ * @displayName Body Part Sign Context
  */
 export default {
-  name: "GenericSignContext",
+  name: "BodyPartSignContext",
   inject: [],
   props: {
     signData: Object,
@@ -37,7 +28,11 @@ export default {
   emits: ["updateSignData", "delete"],
   data() {
     return {
-
+      dimensions: [
+        {dimension: 'Low', img: '/direction-sign-radio/layer-down.svg'},
+        {dimension: 'Middle', img: '/direction-sign-radio/layer-middle.svg'},
+        {dimension: 'High', img: '/direction-sign-radio/layer-up.svg'}
+      ],
     };
   },
   computed: {
@@ -47,13 +42,17 @@ export default {
     
   },
   methods: {
+    getInitDimension () {
+      return this.dimensions.findIndex(obj => obj.dimension == this.signData.dimension); 
+    },
     /**
      * An example function changing the border color based of an radio Option, as an example for the actual radio funcitionality
      * @arg color the boolean changing the color 
      */
-    changeBorderColor(color) {
+    changeDimension(data) {
+      console.log(data)
       let newSignData = this.signData;
-      newSignData.borderColor = color;
+      newSignData.dimension = data.dimension;
 
       this.newSignData (newSignData);
     },

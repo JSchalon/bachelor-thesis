@@ -35,7 +35,7 @@
           </g>
         </svg>
       </div>
-      <GenericSignContext :signData="signs[contextSign].signData" :signIndex="contextSign" :isActive="contextActive" :x="contextPos.x" :y="contextPos.y" @updateSignData="updateSignData" @delete="removeSign"/>
+      <ContextMenu v-if="contextActive" :signData="signs[contextSign].signData" :signIndex="contextSign" :isActive="contextActive" :x="contextPos.x" :y="contextPos.y" @updateSignData="updateSignData" @delete="removeSign"/>
     </div>
 </template>
 
@@ -211,7 +211,6 @@ export default {
         newSign.width = this.collumnWidth * 2;
         newSign.x = parseInt(elem.getAttribute("x"));
       }
-      console.log(newSign);
       this.$emit("editSign", {type: "add", data: newSign});
       //the grid element beat/bar is at the y of the new sign, not y + height -> "move it" downwards after placing
       this.calcBeatMove((this.signs.length-1), (y+this.curLibrarySign.height), this.curLibrarySign.height, y, this.curLibrarySign.height);

@@ -31,6 +31,9 @@ export default {
     };
   },
   computed: {
+    storedSign () {
+      return this.$store.state["curSign"];
+    }
   },
   mounted () {
     
@@ -66,6 +69,17 @@ export default {
       }
     }
   },
+  watch: {
+    storedSign (sign) {
+      //if a sign is placed, the state.curSign is reset -> reset selection in library
+      if (!sign) {
+        this.curSign = "---";
+        for (let elem of this.categories) {
+          elem.selected = -1;
+        }
+      }
+    }
+  }
 }
 </script>
 

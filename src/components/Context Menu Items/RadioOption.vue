@@ -44,7 +44,7 @@ export default {
      */
     changeSelect(index) {
       this.selectedID = index;
-      this.$emit("switchState", this.options[index].color);
+      this.$emit("switchState", this.options[index]);
     },
   },
   computed: {
