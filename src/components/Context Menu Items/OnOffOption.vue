@@ -5,7 +5,7 @@
       </div>
       <div class="center-vertically context-item-interact-box">
         <div class="outer-on-off" @click="changeState">
-          <div class="inner-on-off" :class="state ? 'on' : 'off'"/>
+          <div class="inner-on-off" :class="initState ? 'on' : 'off'"/>
         </div>
       </div>
     </div>
@@ -21,28 +21,25 @@ export default {
   name: "OnOffOption",
   inject: ["contextItemHeight"],
   props: {
-    mIndex: Number,
     optionText: String,
     initState: Boolean,
   },
   emits: ["switchState"],
   data() {
     return {
-      state: false,
     };
   },
   computed: {
   },
   mounted () {
-    this.state = this.initState;
+    
   },
   methods: {
     /**
      * Method for changing the state of the property
      */
     changeState() {
-      this.state = !this.state;
-      this.$emit("switchState", this.state);
+      this.$emit("switchState", !this.initState);
     }
   },
   

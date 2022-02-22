@@ -19,7 +19,6 @@ export default {
   name: "DeleteOption",
   inject: ["contextItemHeight", "contextItemMargin"],
   props: {
-    mIndex: Number,
   },
   emits: ["delete"],
   data() {

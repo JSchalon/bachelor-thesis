@@ -1,9 +1,6 @@
 <template>
     <div class="context-menu">
-      <!--
-        Todo: 
-          - type (radio)
-      -->
+      <SignCategoryContainer :optionText="'Type'" :category="'path-signs'" @updateSignData="changeType"/>
       <DeleteOption :mIndex="1" @delete="emitDelete"/>
     </div>
 </template>
@@ -26,11 +23,6 @@ export default {
   emits: ["updateSignData", "delete"],
   data() {
     return {
-      dimensions: [
-        {dimension: 'Low', img: '/direction-sign-radio/layer-down.svg'},
-        {dimension: 'Middle', img: '/direction-sign-radio/layer-middle.svg'},
-        {dimension: 'High', img: '/direction-sign-radio/layer-up.svg'}
-      ],
     };
   },
   computed: {
@@ -40,32 +32,8 @@ export default {
     
   },
   methods: {
-    getInitDimension () {
-      return this.dimensions.findIndex(obj => obj.dimension == this.signData.dimension); 
-    },
-    /**
-     * An example function changing the border color based of an radio Option, as an example for the actual radio funcitionality
-     * @arg color the boolean changing the color 
-     */
-    changeDimension(data) {
-      console.log(data)
-      let newSignData = this.signData;
-      newSignData.dimension = data.dimension;
-
-      this.newSignData (newSignData);
-    },
-    /**
-     * An example function changing the color based of an on/Off Option, as an example for the actual on/off funcitionality
-     * @arg color the boolean changing the color 
-     */
-    changeColor(colorState) {
-      let newSignData = this.signData;
-      if (colorState) {
-        newSignData.color = "red";
-      } else {
-        newSignData.color = "white";
-      }
-      this.newSignData (newSignData);
+    changeType (data) {
+      this.newSignData({signType: data.signType})
     },
     /**
      * The function that sends the updated sign data back to the score

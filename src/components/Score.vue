@@ -119,6 +119,7 @@ export default {
      */
     addCollumn(beforeIndex) {
       this.contextActive = false;
+      this.contextSign = 0;
       let side = "right";
       if (beforeIndex < 1) {
         side = "left";
@@ -138,6 +139,7 @@ export default {
      */
     removeCollumn(side, col) {
       this.contextActive = false;
+      this.contextSign = 0;
       if ((side == "left" && this.collumnsLeft == 2) || (side == "right" && this.collumnsRight == 2)) {
         return false;
       }
@@ -162,6 +164,7 @@ export default {
      */
     addBar(beforeIndex) {
       this.contextActive = false;
+      this.contextSign = 0;
       for (let elem of this.signs) {
         if (elem.signData.bar < beforeIndex) {
           this.$emit("editSign", {type: "move", index: this.signs.indexOf(elem), data: {x: elem.x, y: (elem.y + this.barHeight)}});
@@ -180,6 +183,7 @@ export default {
         return false;
       }
       this.contextActive = false;
+      this.contextSign = 0;
       let remove = [];
       for (let elem of this.signs) {
         
@@ -205,7 +209,7 @@ export default {
       let x = parseInt(elem.getAttribute("x")) + (this.collumnWidth - this.signWidth) / 2;
       let y = parseInt(elem.getAttribute("y"));
       let pos = {col: parseInt(elem.getAttribute("col")), bar: parseInt(elem.getAttribute("bar")), beat: parseInt(elem.getAttribute("beat"))}
-      let signData = Object.assign(this.curLibrarySign.signData, pos);
+      let signData = Object.assign(JSON.parse(JSON.stringify(this.curLibrarySign.signData)), pos);
       let newSign = {isSelected: true, canResize: true, width: this.signWidth, height: this.curLibrarySign.height, x: x, y: y, signData: signData};
       if (this.curLibrarySign.signData.baseType == "RelationshipBow") {
         newSign.width = this.collumnWidth * 2;
@@ -293,6 +297,7 @@ export default {
         this.selectedSigns.push(id);
       } else {
         this.selectedSigns = [];
+        this.contextSign = 0;
       }
       this.contextActive = false;
     },
@@ -474,6 +479,7 @@ export default {
      */
     openContextMenu (event, additionalX = 0, additionalY = 0) {
       event.preventDefault();
+      this.contextActive = false;
       let target = event.target;
       const targetID = target.getAttribute("signID");
       this.contextSign = targetID;

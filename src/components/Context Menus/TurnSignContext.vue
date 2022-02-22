@@ -19,6 +19,12 @@
               type (cat)
               degree (slider 0-5)
       -->
+      <RadioOption 
+        :options="types" 
+        :initState="signData.signType"
+        :optionText="'Type'"
+        @switchState="this.changeType"
+      />
       <DeleteOption :mIndex="0" @delete="emitDelete"/>
     </div>
 </template>
@@ -41,10 +47,10 @@ export default {
   emits: ["updateSignData", "delete"],
   data() {
     return {
-      dimensions: [
-        {dimension: 'Low', img: '/direction-sign-radio/layer-down.svg'},
-        {dimension: 'Middle', img: '/direction-sign-radio/layer-middle.svg'},
-        {dimension: 'High', img: '/direction-sign-radio/layer-up.svg'}
+      types: [
+        {text: 'Left turn', img: false},
+        {text: 'Right turn', img: false},
+        {text: 'Any turn', img: false},
       ],
     };
   },
@@ -55,6 +61,9 @@ export default {
     
   },
   methods: {
+    changeType(data) {
+      this.newSignData ({signType: data.text});
+    },
     getInitDimension () {
       return this.dimensions.findIndex(obj => obj.dimension == this.signData.dimension); 
     },

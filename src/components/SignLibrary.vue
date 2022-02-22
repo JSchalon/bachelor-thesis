@@ -1,7 +1,7 @@
 <template>
     <div id="library">
       <div id="cur-sign-container"><p class="cur-sign-text">Current Sign: {{curSign}}</p></div>
-      <LibraryItem :active="item.active" :selected="item.selected" :category="item.category" :catIndex="index" :key="index" v-for="(item, index) of categories" @expand="selectCategory" @selectSign="updateCurSign"/>
+      <LibraryItemContainer :active="item.active" :selected="item.selected" :category="item.category" :catIndex="index" :key="index" v-for="(item, index) of categories" @expand="selectCategory" @selectSign="updateCurSign"/>
   </div>
 </template>
 
@@ -23,8 +23,7 @@ export default {
         {active: false, category: "relationship-bows", selected: -1},
         {active: false, category: "space-measurement-signs", selected: -1},
         {active: false, category: "path-signs", selected: -1},
-        {active: false, category: "body-part-signs", selected: -1},
-        
+        {active: false, category: "body-part-signs", selected: -1}, 
         {active: false, category: "misc-signs", selected: -1},
       ],
       curSign: "---"

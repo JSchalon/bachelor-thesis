@@ -29,7 +29,7 @@ export default {
         {isSelected: false, canResize: true, height: 100, x: 100, y: 100, signData: {baseType: "DirectionSign", signType: "Backward direction", dimension: "High", side: "left", col: -2, bar: 2, beat: 0, resizable: true}},
         {isSelected: false, canResize: true, height: 100, x: 100, y: 0, signData: {baseType: "DirectionSign", signType: "Right direction", dimension: "Low", side: "left", col: -2, bar: 2, beat: 2, resizable: true}},
         {isSelected: false, canResize: true, height: 100, x: 180, y: 200, signData: {baseType: "TurnSign", signType: "Left turn", side: "left", col: -1, bar: 1, beat: 2, resizable: true}},
-        {isSelected: false, canResize: true, height: 100, x: 260, y: 200, signData: {baseType: "VibrationSign", side: "left", col: 0, bar: 1, beat: 2, resizable: true}},
+        {isSelected: false, canResize: true, height: 50, x: 260, y: 200, signData: {baseType: "BodyPartSign", signType:"Fingers", limb: true, surface: "thumb", finger: 1, digit: 5, canBeLimb: true, side: "left", col: 0, bar: 1, beat: 2, resizable: false}},
         {isSelected: false, canResize: true, height: 50, width: 80, x: 180, y: 300, signData: {baseType: "RoomDirectionSign", degree:0, side: "left", col: -3, bar: 1, beat: 0, resizable: false}},
         {isSelected: false, canResize: true, height: 50, width: 160, x: 0, y: 350, signData: {baseType: "SpaceMeasurementSign", signType: "Narrow", degree: 1, side: "left", col: -3, bar: 1, beat: 0, resizable: true}},
         {isSelected: false, canResize: true, height: 50, width: 160, x: 0, y: 300, signData: {baseType: "RelationshipBow", signType: "Touch", passing: true, grasping: true, side: "left", col: -3, bar: 1, beat: 1, resizable: true}},

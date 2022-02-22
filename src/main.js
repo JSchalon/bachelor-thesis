@@ -5,7 +5,6 @@ import store from './store'
 
 const app = createApp(App)
 
-
 // https://webpack.js.org/guides/dependency-management/#require-context
 const requireComponent = require.context(
   './', // Look for files in the current directory

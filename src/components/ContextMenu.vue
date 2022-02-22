@@ -35,7 +35,6 @@ export default {
   },
   methods: {
     updateSignData (data) {
-      console.log(data);
       this.$emit("updateSignData", data);
     },
     emitDelete() {
@@ -75,14 +74,20 @@ export default {
     }
 
     .center-vertically {
-
       display: inline-flex;
       height: var(--contextItemHeight);
       align-items: center;
     }
+    .center-vertically.small {
+      height: auto;
+    }
 
     .context-item-interact-box {
       float: right;
+      margin-right: var(--contextItemMargin);
+    }
+    .context-item-interact-box.full {
+      float:initial;
       margin-right: var(--contextItemMargin);
     }
 

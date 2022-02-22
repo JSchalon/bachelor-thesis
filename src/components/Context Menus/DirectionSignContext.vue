@@ -1,16 +1,15 @@
 <template>
     <div class="context-menu">
+      <SignCategoryContainer :optionText="'Type'" :category="'direction-signs'" @updateSignData="changeType"/>
       <RadioOption 
-        :mIndex="0" 
         :options="dimensions" 
-        :initState="getInitDimension()"
+        :initState="signData.dimension"
         :optionText="'Dimension'"
         @switchState="this.changeDimension"
       />
       <!--
         Todo: 
           - hodl (on/off)
-          - direction (category)
           - presign (body part): active -> display presign options
           - - presign (body part) (on/off)
             - type -> category
@@ -28,7 +27,7 @@
             - degree(slider 0-7)
             
       -->
-      <DeleteOption :mIndex="1" @delete="emitDelete"/>
+      <DeleteOption @delete="emitDelete"/>
     </div>
 </template>
 
@@ -51,9 +50,9 @@ export default {
   data() {
     return {
       dimensions: [
-        {dimension: 'Low', img: '/direction-sign-radio/layer-down.svg'},
-        {dimension: 'Middle', img: '/direction-sign-radio/layer-middle.svg'},
-        {dimension: 'High', img: '/direction-sign-radio/layer-up.svg'}
+        {text: 'Low', img: '/direction-sign-radio/layer-down.svg'},
+        {text: 'Middle', img: '/direction-sign-radio/layer-middle.svg'},
+        {text: 'High', img: '/direction-sign-radio/layer-up.svg'}
       ],
     };
   },
@@ -64,19 +63,18 @@ export default {
     
   },
   methods: {
-    getInitDimension () {
-      return this.dimensions.findIndex(obj => obj.dimension == this.signData.dimension); 
-    },
     /**
      * An example function changing the border color based of an radio Option, as an example for the actual radio funcitionality
      * @arg color the boolean changing the color 
      */
     changeDimension(data) {
-      console.log(data)
       let newSignData = this.signData;
-      newSignData.dimension = data.dimension;
+      newSignData.dimension = data.text;
 
       this.newSignData (newSignData);
+    },
+    changeType (data) {
+      this.newSignData({signType: data.signType})
     },
     /**
      * An example function changing the color based of an on/Off Option, as an example for the actual on/off funcitionality

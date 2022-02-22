@@ -1,10 +1,10 @@
 <template>
-    <div  class="context-menu-item">
+    <div class="context-menu-item">
       <div class="center-vertically">
-        <p class="context-item-text">{{optionText}}</p>
+        <p class="context-item-text">{{optionText + ": " + options[selectedID].text}}</p>
       </div>
-      <div class="context-item-interact-box">
-        <div class="center-vertically" :key="index" v-for="(each, index) of options" v-on:click="changeSelect(index)">
+      <div class="context-item-interact-box full">
+        <div class="center-vertically small" :key="index" v-for="(each, index) of options" v-on:click="changeSelect(index)">
           <img v-if="each.img" class="context-item-interact-img radio-option" :class="{active : index == selectedID}" :src="require(`@/assets/images/context-images` + each.img)" :alt="each.color"/>
           <div v-else class="context-item-interact-img radio-option flex" :class="{active : index == selectedID}">
             <div class="inner"/>
@@ -26,8 +26,7 @@ export default {
   props: {
     options: Array,
     optionText: String,
-    mIndex: Number,
-    initState: Number,
+    initState: [String, Boolean],
   },
   emits: ["switchState"],
   data() {
@@ -36,7 +35,11 @@ export default {
     };
   },
   mounted () {
-    this.selectedID = this.initState;
+    this.selectedID = this.options.findIndex(obj => obj.text.includes(this.initState));
+    if (this.selectedID == -1) {
+      this.selectedID = 0;
+    }
+    
   },
   methods: {
     /**

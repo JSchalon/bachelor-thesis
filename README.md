@@ -14,4 +14,5 @@ Git Repo zur Bachelorarbeit zur Entwicklung eines webbasierten Interaktionsedito
 ### Version 0.3.6
 - Added all sign categories to the sign library
 - Implemented adding signs to the score via the library
-- Added all sign context menus (no functionality yet)
+- Added all sign context menus
+- Added all simple context menu variations

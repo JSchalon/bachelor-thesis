@@ -1,12 +1,18 @@
 <template>
     <div class="context-menu">
-      <!--
-        Todo: 
-          - body part (category)
-          - limb (on/off) (unless area sign -> add tag for that) -> display surface options ()
-          - surface (2x radio)
-      -->
-      <DeleteOption :mIndex="0" @delete="emitDelete"/>
+      <SignCategoryContainer :optionText="'Type'" :category="'body-part-signs'" @updateSignData="newSignData"/>
+      <OnOffOption v-show="signData.canBeLimb" :optionText="'Limb'" :initState="signData.limb" @switchState="changeLimb"/>
+      <RadioOption v-show="signData.limb && signData.canBeLimb" :optionText="'Top Surface'" :options="surfaceInnerOuter" :initState="signData.surface" @switchState="this.changeTopSurface"/>
+      <RadioOption v-show="signData.limb && signData.canBeLimb" :optionText="'Side Surface'" :options="surfaceSides" :initState="signData.surface" @switchState="this.changeSideSurface"/>
+      <div v-if="signData.signType == 'Fingers'">
+        <SliderOption :optionText="'Digit'" :initState="signData.digit" :stops="5" @switchState="changeDigit" :id="'body-part-finger-slider-0'"/>
+        <SliderOption :optionText="'Finger'" :initState="signData.finger" :stops="5" @switchState="changeFinger" :id="'body-part-finger-slider-1'"/>
+      </div>
+      <div v-if="signData.signType == 'Toes'">
+        <SliderOption :optionText="'Digit'" :initState="signData.digit" :stops="4" @switchState="changeDigit" :id="'body-part-toe-slider-0'"/>
+        <SliderOption :optionText="'Toe'" :initState="signData.toe" :stops="5" @switchState="changeToe" :id="'body-part-toe-slider-1'"/>
+      </div>
+      <DeleteOption @delete="emitDelete"/>
     </div>
 </template>
 
@@ -28,11 +34,18 @@ export default {
   emits: ["updateSignData", "delete"],
   data() {
     return {
-      dimensions: [
-        {dimension: 'Low', img: '/direction-sign-radio/layer-down.svg'},
-        {dimension: 'Middle', img: '/direction-sign-radio/layer-middle.svg'},
-        {dimension: 'High', img: '/direction-sign-radio/layer-up.svg'}
+      surfaceInnerOuter: [
+        {text: "---", img: false},
+        {text: 'inner', img: false},
+        {text: 'outer', img: false}
       ],
+      surfaceSides: [
+        {text: "---", img: false},
+        {text: 'littleFinger', img: false},
+        {text: 'thumb', img: false}
+      ],
+      surfaceTop: "",
+      surfaceSide: "",
     };
   },
   computed: {
@@ -42,32 +55,38 @@ export default {
     
   },
   methods: {
-    getInitDimension () {
-      return this.dimensions.findIndex(obj => obj.dimension == this.signData.dimension); 
-    },
-    /**
-     * An example function changing the border color based of an radio Option, as an example for the actual radio funcitionality
-     * @arg color the boolean changing the color 
-     */
-    changeDimension(data) {
-      console.log(data)
-      let newSignData = this.signData;
-      newSignData.dimension = data.dimension;
-
-      this.newSignData (newSignData);
-    },
     /**
      * An example function changing the color based of an on/Off Option, as an example for the actual on/off funcitionality
-     * @arg color the boolean changing the color 
+     * @arg data the boolean changing the limb 
      */
-    changeColor(colorState) {
-      let newSignData = this.signData;
-      if (colorState) {
-        newSignData.color = "red";
-      } else {
-        newSignData.color = "white";
+    changeLimb(data) {
+      this.newSignData ({limb: data});
+    },
+    changeTopSurface(data) {
+      this.surfaceTop = data.text;
+      this.changeSurface();
+    },
+    changeSideSurface(data) {
+      this.surfaceSide = data.text;
+      this.changeSurface();
+    },
+    changeSurface() {
+      this.newSignData ({surface: this.surfaceTop + " " + this.surfaceSide});
+    },
+    changeFinger (data) {
+      if (this.isActive) {
+        this.newSignData({finger: (data.data - 1)});
       }
-      this.newSignData (newSignData);
+    },
+    changeToe (data) {
+      if (this.isActive) {
+        this.newSignData({toe: (data.data - 1)});
+      }
+    },
+    changeDigit (data) {
+      if (this.isActive) {
+        this.newSignData({digit: (data.data - 1)});
+      }
     },
     /**
      * The function that sends the updated sign data back to the score

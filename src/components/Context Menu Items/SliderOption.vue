@@ -1,10 +1,12 @@
 <template>
-    <div class="context-menu-item">
-      <div class="center-vertically" id="slider-text">
+    <div class="context-menu-item" ref="container">
+      <div class="center-vertically">
         <p class="context-item-text">{{optionText}}</p>
       </div>
-      <div class="center-vertically context-item-interact-box">
-          <div class="slider" :style="'width: ' + sliderWidth + 'px;'"/>
+      <div class="context-item-interact-box full">
+        <div class="center-vertically small">
+          <div class="slider" :id="id" :style="'width: ' + sliderWidth + 'px;'"/>
+        </div>
       </div>
     </div>
 </template>
@@ -21,20 +23,21 @@ export default {
   name: "SliderOption",
   inject: ["contextItemHeight", "contextItemMargin", "contextMenuWidth"],
   props: {
-    mIndex: Number,
     optionText: String,
-    initState: Number,
     stops: Number,
+    initState: [Number, Boolean],
+    id: String,
   },
-  emits: ["delete"],
+  emits: ["switchState"],
   data() {
     return {
       sliderWidth: 0,
     };
   },
   mounted () {
+    console.log(this.id);
     this.sliderWidth = this.getSliderWidth();
-    interact('.slider').draggable({ 
+    interact('#' + this.id).draggable({ 
       origin: 'self',
       inertia: false,
       modifiers: [
@@ -42,34 +45,30 @@ export default {
           targets: [
             interact.snappers.grid({ x: (this.sliderWidth / this.stops), y:30})
           ],
-          range: this.sliderWidth,
-          relativePoints: [ { x: 0, y: 0 } ]
         }),
       ],
       onmove: this.dragMove,
-      onend: this.dragEnd,
     })
+    
+    
   },
   methods: {
-    deletesign() {
-      this.$emit("switchState", false);
-    }, 
     getSliderWidth() {
-      return this.contextMenuWidth - this.contextItemMargin * 2 - document.getElementById("slider-text").offsetWidth - 16;
+      return this.contextMenuWidth - this.contextItemMargin * 2 - 16;
     },
     dragMove(event) {
-      const  x = (parseFloat(event.target.getAttribute("x")) || 0) + event.dx;
-      let value = x / this.sliderWidth;
+      let value = event.pageX / this.sliderWidth;
       if (value > 1) {
         value = 1;
       }
+      if (value < 0) {
+        value = 0;
+      }
       event.target.style.paddingLeft = (value * 100) + '%';
-      event.target.setAttribute('x', x);
-    },
-    dragEnd(event) {
-      parseFloat(event.target.getAttribute("x"));
-      //emit current position (0 to stopValue)
-    },
+      event.target.setAttribute('x', value);
+      console.log(value * (this.stops));
+      this.$emit("switchState",{index: this.id, data: (Math.round(value * this.stops) + 1)});
+    }
     
   },
   computed: {
@@ -83,7 +82,8 @@ export default {
 .slider {
   position: relative;
   height: 1em;
-  margin: 1.5em auto;
+  margin-left: calc(var(--contextItemMargin) + 0.5em);
+  margin-right: calc(var(--contextItemMargin) -1em);
   background-color: #29e;
   border-radius: 0.5em;
   box-sizing: border-box;
