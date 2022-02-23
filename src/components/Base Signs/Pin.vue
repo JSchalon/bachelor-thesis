@@ -1,6 +1,6 @@
 <template>
   <g>
-    <rect :x="signWidth / 2 - 10" :y="(this.height / 2 - 10)" :width="20" :height="20" opacity="0" :signID="id"/>
+    <rect :x="signWidth / 2 - 12" :y="(this.height / 2 - 18)" :width="24" :height="30" :opacity="signData.bgVisible ? 1 : 0" :signID="id"/>
     <path 
       class="actual-sign draggable"
       stroke="black" 
@@ -39,10 +39,10 @@
 
 /**
  * The relationship pin Sign component
- * @displayName Relationship Pin Sign
+ * @displayName Relationship Pin
  */
 export default {
-  name: 'RelationshipPinSign',
+  name: 'RelationshipPin',
   props: {
     isSelected: Boolean,
     id: Number,
@@ -61,7 +61,7 @@ export default {
     calculateStick () {
       let degree = this.signData.degree;
       let stick = {path: "", transform: ""};
-      let path = "M " + (this.signWidth / 2) + "," + (this.height / 2) + " V " + (this.height / 2 - this.beatHeight/2);
+      let path = "M " + (this.signWidth / 2) + "," + (this.height / 2) + " V " + (this.height / 2 - 15);
       
       stick.transform = "rotate(" + (degree % 360) + "," + (this.signWidth / 2) + "," + (this.height / 2) + ")";
       if (degree < 0) {

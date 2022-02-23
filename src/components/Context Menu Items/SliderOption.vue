@@ -35,7 +35,6 @@ export default {
     };
   },
   mounted () {
-    console.log(this.id);
     this.sliderWidth = this.getSliderWidth();
     interact('#' + this.id).draggable({ 
       origin: 'self',
@@ -66,12 +65,12 @@ export default {
       }
       event.target.style.paddingLeft = (value * 100) + '%';
       event.target.setAttribute('x', value);
-      console.log(value * (this.stops));
-      this.$emit("switchState",{index: this.id, data: (Math.round(value * this.stops) + 1)});
+      this.$emit("switchState",{index: this.id, data: (Math.round(value * this.stops))});
     }
     
   },
-  computed: {
+  beforeUnmount () {
+    interact('#' + this.id).unset()
   }
 };
 </script>

@@ -1,5 +1,6 @@
 <template>
   <g>
+    <circle v-if="signData.holding" :cx="signWidth / 2" :cy="5" r="5" class="draggable actual-sign" :class="{active: isSelected}" stroke="black" :stroke-width="isSelected ? borderWidth + 1: borderWidth" :signID="id"/>
     <polygon 
       class="draggable actual-sign" 
       :class="{active: isSelected}" 
@@ -10,6 +11,10 @@
       :fill="signData.dimension != 'Middle' ? getFill() : 'white'"
     />
     <circle v-if="signData.dimension == 'Middle'" :cx="signWidth / 2" :cy="height / 2" r="4" fill="black"/>
+    <Pin v-if="signData.definition" :isSelected="isSelected" :id="id" :signData="signData.definition" :height="height"/>
+    <g :transform="'translate(' + getPositionTransform() + ',0)'">
+      <Pin v-if="signData.position && signData.position != '---'" :isSelected="isSelected" :id="id" :signData="signData.position == 'Infront' ? {signType: 'Low', degree: 0}:{signType: 'Low', degree: 180}" :height="height"/>
+    </g>
     <!-- add aditional stuff to display, like another sign or smth-->
   </g>
 </template>
@@ -57,13 +62,17 @@ export default {
         {name: "sideways", points: ""},
         {name: "place", points: ""},
       ];
-      let straigtPoints = 0 + "," + (this.beatHeight / 2) + " " + (this.signWidth / 2) + "," + (this.beatHeight / 2) + " " + (this.signWidth / 2) + ",0 " + " " + this.signWidth + ",0 " + this.signWidth + "," + this.height + " 0," + this.height;
+      let holdPoint = 0;
+      if (this.signData.holding) {
+        holdPoint = 10;
+      }
+      let straigtPoints = 0 + "," + (this.beatHeight / 2) + " " + (this.signWidth / 2) + "," + (this.beatHeight / 2) + " " + (this.signWidth / 2) + "," + holdPoint + " " + this.signWidth + "," + holdPoint + " " + this.signWidth + "," + this.height + " 0," + this.height;
       baseSigns[0].points = straigtPoints;
-      let diagonalPoints = "0,0 " + this.signWidth + "," + (this.beatHeight / 3) + " " + this.signWidth + "," + this.height + " 0," + this.height;
+      let diagonalPoints = "0," + holdPoint + " " + this.signWidth + "," + (this.beatHeight / 3) + " " + this.signWidth + "," + this.height + " 0," + this.height;
       baseSigns[1].points = diagonalPoints;
-      let sidewaysPoints = this.signWidth + ",0 0," + (this.height / 2) + " " + this.signWidth + "," + this.height;
+      let sidewaysPoints = this.signWidth + ","+ holdPoint + " 0," + (this.height / 2) + " " + this.signWidth + "," + this.height;
       baseSigns[2].points = sidewaysPoints;
-      let placePoints = "0,0 " + this.signWidth + ",0 " + this.signWidth + "," + this.height + " 0," + this.height;
+      let placePoints = "0," + holdPoint + " " + this.signWidth + "," + holdPoint + " " + this.signWidth + "," + this.height + " 0," + this.height;
       baseSigns[3].points = placePoints;
 
       return baseSigns;
@@ -79,6 +88,9 @@ export default {
         if (this.variation.transform[i] == "mirror-x") {
           scale[1] = -1;
           translate[1] = this.height;
+          if (this.signData.holding) {
+            translate[1] = translate[1] + 10;
+          }
         } else if (this.variation.transform[i] == "mirror-y") {
           scale[0] = -1;
           translate[0] = this.signWidth;
@@ -112,6 +124,13 @@ export default {
         return "url(#direction-high-left)";
       } else {
         return "white";
+      }
+    },
+    getPositionTransform() {
+      if (this.signData.side == "left") {
+        return -this.signWidth + 10;
+      } else {
+        return this.signWidth - 10;
       }
     }
   },

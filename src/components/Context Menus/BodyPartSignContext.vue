@@ -75,17 +75,17 @@ export default {
     },
     changeFinger (data) {
       if (this.isActive) {
-        this.newSignData({finger: (data.data - 1)});
+        this.newSignData({finger: data.data});
       }
     },
     changeToe (data) {
       if (this.isActive) {
-        this.newSignData({toe: (data.data - 1)});
+        this.newSignData({toe: data.data});
       }
     },
     changeDigit (data) {
       if (this.isActive) {
-        this.newSignData({digit: (data.data - 1)});
+        this.newSignData({digit: data.data});
       }
     },
     /**

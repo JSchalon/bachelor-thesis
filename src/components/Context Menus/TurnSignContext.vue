@@ -11,10 +11,6 @@
           - presign (space measurement sign)
             - type (category)
             - if not unfoldnig/neitherOr ->  degree (slider, 0-5)
-          - angle//space (radio)
-            - if angle: 
-              type(radio)
-              degree (slider 0-7)
             - if space
               type (cat)
               degree (slider 0-5)
@@ -23,8 +19,27 @@
         :options="types" 
         :initState="signData.signType"
         :optionText="'Type'"
-        @switchState="this.changeType"
+        @switchState="changeType"
       />
+      <RadioOption 
+        :options="definitionTypes" 
+        :initState="signData.definition ? signData.definition.baseType : signData.definition"
+        :optionText="'Turn definition'"
+        @switchState="changeDefinition"
+      />
+      <div v-if="signData.definition && signData.definition.baseType == 'Pin'">
+        <RadioOption 
+          :options="definitions" 
+          :initState="signData.definition.signType"
+          :optionText="'Pin Dimension'"
+          @switchState="changeDefinitionPin"
+        />
+        <SliderOption :optionText="'Angle'" :initState="signData.definition.degree" :stops="8" @switchState="changeDefinitionPinAngle" :id="'direction-definition-slider-' + signIndex"/>
+      </div>
+      <div v-else-if="signData.definition && signData.definition.baseType == 'SpaceMeasurementSign'">
+        <SignCategoryContainer :optionText="'Space Measurement Sign'" :category="'space-measurement-signs'" @updateSignData="changeDefinitionSpace"/>
+        <SliderOption :optionText="'Angle'" :initState="signData.definition.degree" :stops="5" @switchState="changeDefinitionSpaceDegree" :id="'direction-definition-slider-' + signIndex"/>
+      </div>
       <DeleteOption :mIndex="0" @delete="emitDelete"/>
     </div>
 </template>
@@ -52,44 +67,64 @@ export default {
         {text: 'Right turn', img: false},
         {text: 'Any turn', img: false},
       ],
+      definitions: [
+        {text: 'Low', img: false},
+        {text: 'Middle', img:  false},
+        {text: 'High', img:  false}
+      ],
+      definitionTypes: [
+        {text: '---', img: false},
+        {text: 'Pin', img:  false},
+        {text: 'SpaceMeasurementSign', img:  false}
+      ],
     };
   },
   computed: {
     
   },
   mounted () {
-    
   },
   methods: {
     changeType(data) {
       this.newSignData ({signType: data.text});
     },
-    getInitDimension () {
-      return this.dimensions.findIndex(obj => obj.dimension == this.signData.dimension); 
-    },
-    /**
-     * An example function changing the border color based of an radio Option, as an example for the actual radio funcitionality
-     * @arg color the boolean changing the color 
-     */
-    changeDimension(data) {
-      console.log(data)
-      let newSignData = this.signData;
-      newSignData.dimension = data.dimension;
-
-      this.newSignData (newSignData);
-    },
-    /**
-     * An example function changing the color based of an on/Off Option, as an example for the actual on/off funcitionality
-     * @arg color the boolean changing the color 
-     */
-    changeColor(colorState) {
-      let newSignData = this.signData;
-      if (colorState) {
-        newSignData.color = "red";
+    changeDefinition (data) {
+      if (data.text != "---") {
+        if (data.text == "Pin") {
+          this.newSignData({definition: {baseType: "Pin", signType: "Low", degree: 0, bgVisible: true}})
+        } else {
+          this.newSignData({definition: {baseType: "SpaceMeasurementSign", signType: "Narrow", degree: 1}})
+        }
       } else {
-        newSignData.color = "white";
+        this.newSignData({definition: false});
       }
-      this.newSignData (newSignData);
+    },
+    changeDefinitionPin (data) {
+      let obj = JSON.parse(JSON.stringify(this.signData.definition)) || {baseType: "Pin", signType: "Low", degree: 0, bgVisible: true};
+      obj.signType = data.text;
+      this.newSignData ({definition: obj});
+    },
+    changeDefinitionPinAngle (data) {
+      if (this.isActive) {
+        let degree = data.data * 45;
+        if (data.data > 7) {
+          degree = -1;
+        }
+        let obj = JSON.parse(JSON.stringify(this.signData.definition)) || {baseType: "Pin", signType: "Low", degree: 0, bgVisible: true};
+        obj.degree = degree;
+        this.newSignData ({definition: obj});
+      }
+    },
+    changeDefinitionSpace(data) {
+      this.newSignData ({definition: data});
+    },
+    changeDefinitionSpaceDegree (data) {
+      if (this.isActive) {
+        let degree = data.data + 1;
+        let obj = JSON.parse(JSON.stringify(this.signData.definition));
+        obj.degree = degree;
+        this.newSignData ({definition: obj});
+      }
     },
     /**
      * The function that sends the updated sign data back to the score

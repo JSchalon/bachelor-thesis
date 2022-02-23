@@ -17,6 +17,10 @@
       :stroke-width="isSelected ? borderWidth + 1: borderWidth"
       :signID="id"
     />
+    <Pin v-if="signData.definition && signData.definition.baseType == 'Pin'" :isSelected="isSelected" :id="id" :signData="signData.definition" :height="height"/>
+    <g :transform="'translate(0, ' + (height / 2 - 25) + ')'" v-else-if="signData.definition && signData.definition.baseType == 'SpaceMeasurementSign'">
+      <SpaceMeasurementSign :isSelected="isSelected" :id="id" :signData="signData.definition" :height="50"/>
+    </g>
   </g>
 </template>
 

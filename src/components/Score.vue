@@ -35,7 +35,7 @@
           </g>
         </svg>
       </div>
-      <ContextMenu v-if="contextActive" :signData="signs[contextSign].signData" :signIndex="contextSign" :isActive="contextActive" :x="contextPos.x" :y="contextPos.y" @updateSignData="updateSignData" @delete="removeSign"/>
+      <ContextMenu v-if="contextActive" :signData="signs[contextSign].signData" :signIndex="contextSign" :isActive="contextActive" :x="contextPos.x" :y="contextPos.y" @updateSignData="updateSignData" :key="'context' + contextSign" @delete="removeSign"/>
     </div>
 </template>
 
@@ -480,6 +480,10 @@ export default {
     openContextMenu (event, additionalX = 0, additionalY = 0) {
       event.preventDefault();
       this.contextActive = false;
+      this.contextSign = 0;
+      this.openContext(event, additionalX,additionalY);
+    },
+    openContext(event, additionalX = 0, additionalY = 0) {
       let target = event.target;
       const targetID = target.getAttribute("signID");
       this.contextSign = targetID;
@@ -496,7 +500,6 @@ export default {
       
       this.selectSign(targetID);
       this.contextActive = true;
-      
     },
 
     /**

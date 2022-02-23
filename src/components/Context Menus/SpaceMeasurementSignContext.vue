@@ -35,7 +35,7 @@ export default {
   methods: {
     changeDegree (data) {
       if (this.isActive) {
-        this.newSignData ({degree: data.data});
+        this.newSignData ({degree: (data.data + 1)});
       }
     },
     /**

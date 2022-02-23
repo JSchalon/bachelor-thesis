@@ -1,7 +1,7 @@
 {
   "catName": "Misc. Signs",
   "catHeight": 40,
-  "baseHeight": 40,
+  "baseHeight": 50,
   "general": [
     {
       "isSelected": false,
@@ -31,7 +31,9 @@
     {
       "baseType": "VibrationSign",
       "signType": "VibrationSign",
-      "resizable": true
+      "resizable": true,
+      "firstPin": false,
+      "secondPin": false
     }
   ]
 }

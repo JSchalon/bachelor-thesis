@@ -42,7 +42,7 @@ export default {
   },
   computed: {
     pinData () {
-      return {signType: "Middle", degree: this.signData.degree};
+      return {signType: "Middle", degree: this.signData.degree, bgVisible: false};
     },
   },
   mounted () {

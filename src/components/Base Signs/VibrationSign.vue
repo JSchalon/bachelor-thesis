@@ -10,6 +10,12 @@
       :stroke-width="isSelected ? borderWidth + 1: borderWidth"
       :signID="id"
     />
+    <g :transform="'translate(0,' + (this.height - 20) + ')'">
+      <g :transform="'translate(0,' + -22 + ')'">
+        <Pin v-if="signData.firstPin" :isSelected="isSelected" :id="id" :signData="signData.firstPin" :height="30"/>
+      </g>
+      <Pin v-if="signData.secondPin" :isSelected="isSelected" :id="id" :signData="signData.secondPin" :height="30"/>
+    </g>
   </g>
 </template>
 
@@ -46,7 +52,11 @@ export default {
     },
     makeSquiggle() {
       // Adjust step so that there are a whole number of steps along the path
-      let numSteps = Math.round(this.height / this.squiggleStep);
+      let height = this.height;
+      if (this.signData.firstPin || this.signData.secondPin) {
+        height = this.height - 45;
+      }
+      let numSteps = Math.round(height / this.squiggleStep);
 
       let pos = {x: (this.signWidth / 2), y: 0};
       let newPath = "M" + [pos.x, pos.y].join(',');
@@ -54,7 +64,7 @@ export default {
       for (let i=1; i<=numSteps; i++)
       {
         let last = pos;
-        pos = {x: (this.signWidth / 2), y: i * this.height / numSteps};
+        pos = {x: (this.signWidth / 2), y: i * height / numSteps};
         
         // The vectorY component from the last to the new point 
         // (ignore x, it stays the same: x1 - x2 = 0 -> x^2 = 0)

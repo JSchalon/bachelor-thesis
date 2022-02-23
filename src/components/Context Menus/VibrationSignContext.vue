@@ -1,14 +1,22 @@
 <template>
     <div class="context-menu">
-      <!--
-        Todo: 
-          - first pin
-            - type (radio)
-            - degree (slider 0-7)
-          - second pin
-            - type (radio)
-            - degree (slider 0-7)
-      -->
+      <OnOffOption :optionText="'Pins'" :initState="displayPinOptions" @switchState="changePins"/>
+      <div v-if="displayPinOptions">
+        <RadioOption 
+        :options="pinType" 
+        :initState="signData.firstPin.signType"
+        :optionText="'First Pin'"
+        @switchState="this.changeFirstPin"
+      />
+      <SliderOption :optionText="'First Pin Angle'" :initState="signData.firstPin.degree" :stops="8" @switchState="changeFirstPinAngle" :id="'vibration-pin-slider-0-' + signIndex"/>
+      <RadioOption 
+        :options="pinType" 
+        :initState="signData.secondPin.signType"
+        :optionText="'Second Pin'"
+        @switchState="this.changeSecondPin"
+      />
+      <SliderOption :optionText="'Second Pin Angle'" :initState="signData.secondPin.degree" :stops="8" @switchState="changeSecondPinAngle" :id="'vibration-pin-slider-1-' + signIndex"/>
+      </div>
       <DeleteOption :mIndex="1" @delete="emitDelete"/>
     </div>
 </template>
@@ -31,46 +39,61 @@ export default {
   emits: ["updateSignData", "delete"],
   data() {
     return {
-      dimensions: [
-        {dimension: 'Low', img: '/direction-sign-radio/layer-down.svg'},
-        {dimension: 'Middle', img: '/direction-sign-radio/layer-middle.svg'},
-        {dimension: 'High', img: '/direction-sign-radio/layer-up.svg'}
+      pinType: [
+        {text: 'Low', img: false},
+        {text: 'Middle', img: false},
+        {text: 'High', img: false}
       ],
+      displayPinOptions: false
     };
   },
   computed: {
     
   },
   mounted () {
-    
+    this.displayPinOptions = (typeof this.signData.firstPin == "object" || typeof this.signData.secondPin == "object");
   },
   methods: {
-    getInitDimension () {
-      return this.dimensions.findIndex(obj => obj.dimension == this.signData.dimension); 
-    },
-    /**
-     * An example function changing the border color based of an radio Option, as an example for the actual radio funcitionality
-     * @arg color the boolean changing the color 
-     */
-    changeDimension(data) {
-      console.log(data)
-      let newSignData = this.signData;
-      newSignData.dimension = data.dimension;
-
-      this.newSignData (newSignData);
-    },
-    /**
-     * An example function changing the color based of an on/Off Option, as an example for the actual on/off funcitionality
-     * @arg color the boolean changing the color 
-     */
-    changeColor(colorState) {
-      let newSignData = this.signData;
-      if (colorState) {
-        newSignData.color = "red";
+    changePins (data) {
+      this.displayPinOptions = data;
+      if (!data) {
+        this.newSignData ({firstPin: false, secondPin: false});
       } else {
-        newSignData.color = "white";
+        this.newSignData ({firstPin: {signType: "Low", degree: 0}, secondPin: {signType: "Low", degree: 0}});
       }
-      this.newSignData (newSignData);
+      
+    },
+    changeFirstPin (data) {
+      let obj = JSON.parse(JSON.stringify(this.signData.firstPin)) || {signType: "Low", degree: 0};
+      obj.signType = data.text;
+      this.newSignData ({firstPin: obj});
+    },
+    changeFirstPinAngle (data) {
+      if (this.isActive) {
+        let degree = data.data * 45;
+        if (data.data > 7) {
+          degree = -1;
+        }
+        let obj = JSON.parse(JSON.stringify(this.signData.firstPin)) || {signType: "Low", degree: 0};
+        obj.degree = degree;
+        this.newSignData ({firstPin: obj});
+      }
+    },
+    changeSecondPin (data) {
+      let obj = JSON.parse(JSON.stringify(this.signData.secondPin)) || {signType: "Low", degree: 0};
+      obj.signType = data.text;
+      this.newSignData ({secondPin: obj});
+    },
+    changeSecondPinAngle (data) {
+      if (this.isActive) {
+        let degree = data.data * 45;
+        if (data.data > 7) {
+          degree = -1;
+        }
+        let obj = JSON.parse(JSON.stringify(this.signData.secondPin)) || {signType: "Low", degree: 0};
+        obj.degree = degree;
+        this.newSignData ({secondPin: obj});
+      }
     },
     /**
      * The function that sends the updated sign data back to the score

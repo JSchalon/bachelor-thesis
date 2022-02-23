@@ -1,6 +1,6 @@
 <template>
     <div class="context-menu">
-      <SliderOption :optionText="'Angle'" :initState="signData.degree" :stops="8" @switchState="changeAngle" :id="'room-direction-slider-' + signIndex"/>
+      <SliderOption :optionText="'Angle'" :initState="signData.degree" :stops="7" @switchState="changeAngle" :id="'room-direction-slider-' + signIndex"/>
       <DeleteOption @delete="emitDelete"/>
     </div>
 </template>
@@ -33,6 +33,7 @@ export default {
   },
   methods: {
     changeAngle (data) {
+      console.log(data)
       if (this.isActive){
         this.newSignData ({degree: data.data * 45});
       } 

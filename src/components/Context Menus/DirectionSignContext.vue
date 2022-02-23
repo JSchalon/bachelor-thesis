@@ -1,12 +1,29 @@
 <template>
     <div class="context-menu">
       <SignCategoryContainer :optionText="'Type'" :category="'direction-signs'" @updateSignData="changeType"/>
+      <OnOffOption :optionText="'Hold'" :initState="signData.holding" @switchState="changeHolding"/>
       <RadioOption 
         :options="dimensions" 
         :initState="signData.dimension"
         :optionText="'Dimension'"
         @switchState="this.changeDimension"
       />
+      <RadioOption 
+        :options="positions" 
+        :initState="signData.position"
+        :optionText="'Position'"
+        @switchState="this.changePosition"
+      />
+      <OnOffOption :optionText="'Angle Definition'" :initState="definitionActive" @switchState="changeDefinition"/>
+      <div v-if="definitionActive">
+        <RadioOption 
+          :options="definitions" 
+          :initState="signData.definition.signType"
+          :optionText="'Pin Dimension'"
+          @switchState="changeDefinitionPin"
+        />
+        <SliderOption :optionText="'Angle'" :initState="signData.definition.degree" :stops="8" @switchState="changeDefinitionAngle" :id="'direction-definition-slider-' + signIndex"/>
+      </div>
       <!--
         Todo: 
           - hodl (on/off)
@@ -18,14 +35,6 @@
           - presign (space measurement sign)
             - type (category)
             - if not unfoldnig/neitherOr ->  degree (slider, 0-5)
-          - angle (on/off)
-            - if angle: 
-              type(radio) (maybe actually set type?)
-              degree (slider 0-7)
-          - outer position (on/off)
-            type(radio) (maybe actually set type?)
-            - degree(slider 0-7)
-            
       -->
       <DeleteOption @delete="emitDelete"/>
     </div>
@@ -54,13 +63,24 @@ export default {
         {text: 'Middle', img: '/direction-sign-radio/layer-middle.svg'},
         {text: 'High', img: '/direction-sign-radio/layer-up.svg'}
       ],
+      definitions: [
+        {text: 'Low', img: false},
+        {text: 'Middle', img:  false},
+        {text: 'High', img:  false}
+      ],
+      positions: [
+        {text: '---', img: false},
+        {text: 'Infront', img: false},
+        {text: 'Behind', img: false}
+      ],
+      definitionActive: false,
     };
   },
   computed: {
     
   },
   mounted () {
-    
+    this.definitionActive = (typeof this.signData.definition == "object");
   },
   methods: {
     /**
@@ -75,6 +95,36 @@ export default {
     },
     changeType (data) {
       this.newSignData({signType: data.signType})
+    },
+    changeHolding (data) {
+      this.newSignData({holding: data})
+    },
+    changePosition (data) {
+      this.newSignData({position: data.text})
+    },
+    changeDefinition (data) {
+      this.definitionActive = data;
+      if (data) {
+        this.newSignData({definition: {signType: "Low", degree: 0, bgVisible: true}})
+      } else {
+        this.newSignData({definition: false});
+      }
+    },
+    changeDefinitionPin (data) {
+      let obj = JSON.parse(JSON.stringify(this.signData.definition)) || {signType: "Low", degree: 0, bgVisible: true};
+      obj.signType = data.text;
+      this.newSignData ({definition: obj});
+    },
+    changeDefinitionAngle (data) {
+      if (this.isActive) {
+        let degree = data.data * 45;
+        if (data.data > 7) {
+          degree = -1;
+        }
+        let obj = JSON.parse(JSON.stringify(this.signData.definition)) || {signType: "Low", degree: 0, bgVisible: true};
+        obj.degree = degree;
+        this.newSignData ({definition: obj});
+      }
     },
     /**
      * An example function changing the color based of an on/Off Option, as an example for the actual on/off funcitionality
