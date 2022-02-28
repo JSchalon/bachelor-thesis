@@ -26,12 +26,7 @@ export default {
       //instead of here, save in vuex -> better accessebility for views
       signs: [
         {isSelected: false, height: 0, x: 0, y: 0, purpose: "dummy sign", signData: {baseType: "GenericSign", signType: "In place"}},
-        {isSelected: false, canResize: true, height: 100, x: 100, y: 100, signData: {baseType: "DirectionSign", signType: "Backward direction", dimension: "High", position: "Infront", hold: true, side: "left", col: -2, bar: 2, beat: 0, resizable: true}},
-        {isSelected: false, canResize: true, height: 100, x: 100, y: 0, signData: {baseType: "DirectionSign", signType: "Right direction", dimension: "Low", side: "left", col: -2, bar: 2, beat: 2, resizable: true}},
-        {isSelected: false, canResize: true, height: 100, x: 180, y: 200, signData: {baseType: "TurnSign", signType: "Left turn", definition: {baseType: "Pin", signType: "Low", degree: 0, bgVisible: true}, side: "left", col: -1, bar: 1, beat: 2, resizable: true}},
-        {isSelected: false, canResize: true, height: 50, x: 260, y: 200, signData: {baseType: "BodyPartSign", signType:"Fingers", limb: true, surface: "thumb", finger: 1, digit: 5, canBeLimb: true, side: "left", col: 0, bar: 1, beat: 2, resizable: false}},
-        {isSelected: false, canResize: true, height: 50, width: 160, x: 0, y: 350, signData: {baseType: "SpaceMeasurementSign", signType: "Narrow", degree: 1, side: "left", col: -3, bar: 1, beat: 0, resizable: true}},
-        {isSelected: false, canResize: true, height: 50, width: 160, x: 0, y: 300, signData: {baseType: "RelationshipBow", signType: "Touch", passing: true, grasping: true, side: "left", col: -3, bar: 1, beat: 1, resizable: true}},
+        {isSelected: false, canResize: true, height: 50, x: 100, y: 350, signData: {baseType: "SpaceMeasurementSign", signType: "Narrow", degree: 1, side: "left", col: -3, bar: 1, beat: 0, resizable: true}},
       ],
       xmlScore: null,
     };
@@ -89,7 +84,7 @@ export default {
       this.signs.push(data);
       this.$store.dispatch('changeCurSign',false);
       //add new sign to xml
-      //distinguish between <collumn def> and <movement> (collumn def -> sign.bar: -1)
+      //distinguish between <column def> and <movement> (column def -> sign.bar: -1)
     },
     moveSign (index, data) {
       this.signs[index].x = data.x;
@@ -99,10 +94,9 @@ export default {
     resizeSign (index, data) {
       if (data.height && data.height >= 0 ) {
          this.signs[index].height = data.height;
-      } else {
+      } else if (data.width) {
         this.signs[index].width = data.width;
       }
-     
       //change xml sign height (height/beatheight) 
     },
     changeSelect (index, data) {
@@ -186,7 +180,7 @@ export default {
 
               staff.appendChild(timing);
 
-              let columns = xmlDoc.createElement("laban:collumns");
+              let columns = xmlDoc.createElement("laban:columns");
               staff.appendChild(columns);
               let movements = xmlDoc.createElement("laban:movements");
               staff.appendChild(movements);

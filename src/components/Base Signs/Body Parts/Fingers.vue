@@ -14,11 +14,11 @@
     stroke="black"
     stroke-width="2"
     :fill="signData.surface.includes('outer') ? 'black' : 'white' "/>
-  <g v-if="signData.finger >= 1 && signData.finger <=5">
-    <g v-if="signData.digit >= 1 && signData.digit < 5" :transform="signData.limb ? 'translate(27,-25)' : 'translate(28,-26)'">
-      <circle fill="black" :cx="-(index * 4)" :cy="(signData.finger - 1) * 6.25 + gradient(28 - (index * 4))" r="2" :key="index" v-for="index of (signData.digit)"/>
+  <g v-if="signData.digit >= 1 && signData.digit <=5">
+    <g v-if="signData.joint >= 1 && signData.joint < 5" :transform="signData.limb ? 'translate(27,-25)' : 'translate(28,-26)'">
+      <circle fill="black" :cx="-(index * 4)" :cy="(signData.digit - 1) * 6.25 + gradient(28 - (index * 4))" r="2" :key="index" v-for="index of (signData.joint)"/>
     </g>
-    <circle v-if="signData.digit && signData.digit == 5" fill="black" :cx="12" :cy="(signData.finger - 1) * 6.25 + gradient(8) - 28.5" r="2" />
+    <circle v-if="signData.joint && signData.joint == 5" fill="black" :cx="12" :cy="(signData.digit - 1) * 6.25 + gradient(8) - 28.5" r="2" />
   </g>
 </template>
 

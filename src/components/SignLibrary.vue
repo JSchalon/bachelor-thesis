@@ -89,6 +89,8 @@ export default {
   height: 92vh;
   background-color: #c1c1c1;
   float: left;
+  position: relative;
+  z-index: 5;
 }
 #cur-sign-container {
   border-bottom: 1px solid #a1a1a1;

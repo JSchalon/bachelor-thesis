@@ -1,5 +1,17 @@
 <template>
-    <g class="sign-container" :class="signData.baseType == 'RelationshipBow' ? 'bow' : 'normal'" :x="x" :y="y" :data-y="y" :transform="'translate(' + x + ',' + y +')'" ref="sign" :signID="id">
+    <g class="sign-container" 
+      :class="[
+        signData.baseType == 'RelationshipBow' ? 'bow' : 'normal', 
+        signData.baseType == 'RoomDirectionSign' ? 'room-direction' : '',
+        signData.baseType == 'PathSign' ? 'path' : '',
+        signData.baseType != 'PathSign' && signData.baseType != 'RoomDirectionSign' ? 'bound-inner' : ''
+      ]" 
+      :x="x" :y="y" 
+      :data-y="y" 
+      :transform="'translate(' + x + ',' + y +')'" 
+      ref="sign" 
+      :signID="id"
+    >
       <component :is="signData.baseType" :id="id" :isSelected="isSelected" :height="height" :width="width" :signData="signData"/>
       <ResizeHandle 
         :pos="signData.baseType == 'RelationshipBow' ? 'left' : 'top'" 

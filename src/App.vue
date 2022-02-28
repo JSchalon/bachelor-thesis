@@ -35,6 +35,7 @@ export default {
       contextItemHeight: 50,
       contextItemMargin: 10,
       contextItemImageSize: 25,
+      barHeight: 200,
     };
   },
   provide () {
@@ -42,9 +43,9 @@ export default {
     //change these here
     return {
       signWidth: 40,
-      barHeight: 200,
+      barHeight: this.barHeight,
       startBarOffset: 5,
-      collumnWidth: 80,
+      columnWidth: 80,
       beatLineWidth: 25,
       addRemoveHeight: 40,
       addRemoveWidth: 10,
@@ -80,6 +81,7 @@ export default {
     document.documentElement.style.setProperty('--contextItemHeight', this.contextItemHeight + "px");
     document.documentElement.style.setProperty('--contextItemMargin', this.contextItemMargin + "px");
     document.documentElement.style.setProperty('--contextItemImageSize', this.contextItemImageSize + "px");
+    document.documentElement.style.setProperty('--barHeight', this.barHeight + "px");
   },
   methods: {
     getSettingsCookie () {
@@ -94,6 +96,7 @@ export default {
   body {
     margin: 0;
     user-select: none;
+    overflow: hidden;
   }
   .alert-container {
     display: flex;

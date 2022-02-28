@@ -1,11 +1,11 @@
 <template>
   <main class="main">
-    <InteractionMenu/>
+    <ScoreController/>
   </main>
 </template>
 
 <script>
-import InteractionMenu from "../components/ScoreController.vue";
+import ScoreController from "../components/ScoreController.vue";
 
 /**
  * The main editor view
@@ -15,7 +15,7 @@ import InteractionMenu from "../components/ScoreController.vue";
 export default {
   name: 'Main',
   components: {
-    InteractionMenu,
+    ScoreController,
   }
 }
 </script>

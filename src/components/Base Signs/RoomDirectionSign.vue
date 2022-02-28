@@ -1,6 +1,6 @@
 <template>
   <g>
-    <rect class="no-save draggable" x="0" y="1" :width="signWidth" :height="height - 2" :signID="id"/>
+    <rect class="no-save draggable" x="0" y="1" opacity="0" :width="signWidth" :height="height - 2" :signID="id"/>
     <rect 
       class="draggable actual-sign" 
       stroke="black" 

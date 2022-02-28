@@ -8,8 +8,8 @@
 
 <script>
 /**
- * The add / remove knob for adding and maybe removing a collumn or bar
- * @emits addCollumn if it is placed left/right
+ * The add / remove knob for adding and maybe removing a column or bar
+ * @emits addColumn if it is placed left/right
  * @emits addBar if it is placed on top
  * @displayName AddRemove Knob
  */
@@ -19,7 +19,7 @@ export default {
     place: String,
     canvasDim: Object,
   },
-  emits: ["addCollumn", "addBar"],
+  emits: ["addColumn", "addBar"],
   inject: ["addRemoveHeight", "addRemoveWidth", "innerCanvasMargin", "outerCanvasMargin"],
   computed: {
     /**
@@ -35,7 +35,7 @@ export default {
       return this.addRemoveWidth / 2;
     },
     /**
-     * Calculates the y position based on the canvas height prop and the halfheight method, for the placement of the collumn knobs
+     * Calculates the y position based on the canvas height prop and the halfheight method, for the placement of the column knobs
      */
     positionY () {
       if (this.place == "top") {
@@ -59,7 +59,7 @@ export default {
       if (this.place == "top") {
         this.$emit('addBar');
       } else {
-         this.$emit('addCollumn', this.place);
+         this.$emit('addColumn', this.place);
       }
     }
   }

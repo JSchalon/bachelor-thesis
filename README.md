@@ -11,8 +11,6 @@ Git Repo zur Bachelorarbeit zur Entwicklung eines webbasierten Interaktionsedito
 
 ## Versions
 
-### Version 0.3.6
-- Added all sign categories to the sign library
-- Implemented adding signs to the score via the library
-- Added and implemented all context menus and implemented most options
-- Fixed a bug with vue not unmounting the context menu properly
+### Version 0.3.7
+- Fixed a global typo
+- Added the bar and column add/remove handles

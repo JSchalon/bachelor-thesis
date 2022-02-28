@@ -39,8 +39,8 @@
       "signType": "Fingers",
       "surface": false,
       "limb": false,
-      "finger": false,
-      "digit":false,
+      "digit": false,
+      "joint":false,
       "resizable": false,
       "canBeLimb": true
     },
@@ -101,8 +101,8 @@
       "signType": "Toes",
       "surface": false,
       "limb": false,
-      "toe": false,
-      "digit":false,
+      "digit": false,
+      "joint":false,
       "resizable": false,
       "canBeLimb": true
     },

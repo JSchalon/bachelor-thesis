@@ -3,8 +3,8 @@ import { createStore } from 'vuex'
 export default createStore({
   state: {
     //score properties
-    collumnsLeft: 3,
-    collumnsRight: 3,
+    columnsLeft: 3,
+    columnsRight: 3,
     bars: 2,
     beatsPerBar: 4,
     author: "Jebb",
@@ -21,12 +21,12 @@ export default createStore({
     showHelpLines: true,
   },
   mutations: {
-    setCollumns (state, data) {
+    setColumns (state, data) {
       if (data.side == "left") {
-        state["collumnsLeft"] = state["collumnsLeft"] + data.number;
+        state["columnsLeft"] = state["columnsLeft"] + data.number;
       } 
       if (data.side == "right") {
-        state["collumnsRight"] = state["collumnsRight"] + data.number;
+        state["columnsRight"] = state["columnsRight"] + data.number;
       }
     },
     setBars (state, number) {
@@ -40,13 +40,13 @@ export default createStore({
     }
   },
   actions: {
-    addCollumn (context, side) {
+    addColumn (context, side) {
       let data = {side: side, number: 1};
-      context.commit('setCollumns', data);
+      context.commit('setColumns', data);
     },
-    removeCollumn (context, side) {
+    removeColumn (context, side) {
       let data = {side: side, number: -1};
-      context.commit('setCollumns', data);
+      context.commit('setColumns', data);
     },
     addBar (context) {
       let number = 1;

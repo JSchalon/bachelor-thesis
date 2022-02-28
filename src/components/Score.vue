@@ -1,5 +1,5 @@
 <template>
-    <div id="canvasContainer">
+    <div id="canvasContainer" @scroll="getScroll">
       <div class="margin-box">
         <svg preserveAspectRatio="xMinYMax meet" ref="canvas" id="canvas" :width="canvasDimensions.x" :height="canvasDimensions.y" fill="white">
           <defs>
@@ -13,12 +13,25 @@
             </pattern>
           </defs>
           <rect x="0" y="0" :width="canvasDimensions.x" :height="canvasDimensions.y" ref="canvasBG" @click="selectSign(-1)"/>
-          <AddRemoveKnob :place="'left'" :canvasDim="canvasDimensions" @addCollumn="addCollumn(-collumnsLeft)"/>
-          <AddRemoveKnob :place="'right'" :canvasDim="canvasDimensions" @addCollumn="addCollumn(collumnsRight + 1)"/>
-          <AddRemoveKnob :place="'top'" :canvasDim="canvasDimensions" @addBar="addBar(bars + 1)"/>
           <g :transform="'translate(' + canvasMarginLeft + ', ' + canvasMarginTop +')'" ref="bounding">
-            <rect x="0" y="0" :width="canvasDimNoPad.x" :height="canvasDimNoPad.y" />
-            <Grid @unselect="selectSign(-1)" @placeSign="addSign" :beats="beats" :bars="bars" :collumnsLeft="collumnsLeft" :collumnsRight="collumnsRight" :fullHeight="canvasDimNoPad.y" :contextActive="contextActive" :signsSelected="signsSelected" />
+            <rect x="0" y="0" :width="columnWidth" :height="innerCanvasDimFull.y" ref="boundingOuterLeft" />
+            <rect :x="columnWidth * (columnsLeft + 1 + columnsRight)" y="0" :width="columnWidth" :height="innerCanvasDimRight.y" ref="boundingOuterRight" />
+            <rect :x="columnWidth" y="0" :width="innerCanvasDim.x" :height="innerCanvasDim.y" ref="boundingInner" />
+            <Grid 
+              @unselect="selectSign(-1)" 
+              @selectColumn="updateSelectedColumn" 
+              @selectBar="updateSelectedBar" 
+              @placeSign="addSign" 
+              @getGridHandles="placeGridHandles" 
+              @removeGridHandles="columnHandlesActive = false; barHandlesActive = false;" 
+              :beats="beats" 
+              :bars="bars" 
+              :selectedColumn="selectedColumn"
+              :selectedBar="selectedBar"
+              :fullHeight="innerCanvasDimFull.y" 
+              :contextActive="contextActive" 
+              :signsSelected="signsSelected"
+            />
             <SignContainer
               @requestListeners="initSignListeners"
               :signData="item.signData"
@@ -36,6 +49,16 @@
         </svg>
       </div>
       <ContextMenu v-if="contextActive" :signData="signs[contextSign].signData" :signIndex="contextSign" :isActive="contextActive" :x="contextPos.x" :y="contextPos.y" @updateSignData="updateSignData" :key="'context' + contextSign" @delete="removeSign"/>
+      <div class="column-handles" :style="columnHandleTranslate" v-if="columnHandlesActive && selectedSigns.length == 0">
+        <p class="add-remove-container green" @click="addColumn(selectedColumn)"/>
+        <p class="add-remove-container red" @click="removeColumn(selectedColumn)"/>
+        <p class="add-remove-container green" @click="addColumn(selectedColumn + 1)"/>
+      </div>
+      <div class="bar-handles" :style="barHandleTranslate" v-if="barHandlesActive && selectedSigns.length == 0">
+        <p class="add-remove-container green" @click="addBar(selectedBar + 1)"/>
+        <p class="add-remove-container red" @click="removeBar(selectedBar)"/>
+        <p class="add-remove-container green" @click="addBar(selectedBar)"/>
+      </div>
     </div>
 </template>
 
@@ -44,27 +67,40 @@ import interact from "interactjs";
 
 export default {
   name: 'Score',
-  inject: ["signWidth", "barHeight", "collumnWidth", "handleDiam", "innerCanvasMargin", "outerCanvasMargin", "borderWidth", "addRemoveHeight", "startBarOffset",],
+  inject: ["signWidth", "barHeight", "columnWidth", "handleDiam", "innerCanvasMargin", "outerCanvasMargin", "borderWidth", "addRemoveHeight", "startBarOffset",],
   props: {
     signs: Array
   },
   emits: ["editSign"],
   data() {
     return {
+      canvasScroll: {x: 0, y:0},
       contextActive: false,
       contextPos: {x: 0, y: 0},
       selectedSigns: [],
       contextSign: 0,
       keyCommandsEnabled: true,
       contextWasActive: false,
+      columnHandlesActive: false,
+      selectedColumn: false,
+      selectedColumnTranslate: {x: 0, y: 0},
+      barHandlesActive: false,
+      selectedBar: false,
+      selectedBarTranslate: {x: 0, y: 0},
     };
   },
   computed: {
-    collumnsLeft () {
-      return this.$store.state["collumnsLeft"];
+    columnHandleTranslate () {
+      return "left: " + this.selectedColumnTranslate.x + "px; top: " + this.selectedColumnTranslate.y + "px;";
     },
-    collumnsRight () {
-      return this.$store.state["collumnsRight"];
+    barHandleTranslate () {
+      return "left: " + this.selectedBarTranslate.x + "px; top: " + this.selectedBarTranslate.y + "px;";
+    },
+    columnsLeft () {
+      return this.$store.state["columnsLeft"];
+    },
+    columnsRight () {
+      return this.$store.state["columnsRight"];
     },
     bars () {
       return this.$store.state["bars"];
@@ -79,25 +115,31 @@ export default {
       return this.barHeight / this.beats;
     },
     blocksizeX () {
-      return this.collumnWidth;
+      return this.columnWidth;
     },
     blocksizeY () {
       return this.barHeight / this.beats;
     },
     canvasDimensions () {
       return {
-        x: this.collumnWidth * (this.collumnsLeft + this.collumnsRight) + 2 * this.canvasMarginLeft, 
-        y: this.barHeight * (this.bars + 0.5) + this.minHeight + this.innerCanvasMargin + this.outerCanvasMargin / 2 + 2 * (this.addRemoveHeight) + this.startBarOffset
+        x: this.columnWidth * (this.columnsLeft + this.columnsRight + 2) + 2 * this.canvasMarginLeft, 
+        y: this.barHeight * (this.bars + 0.5) + this.minHeight + this.innerCanvasMargin + this.outerCanvasMargin / 2 +  (this.addRemoveHeight) + this.startBarOffset
       };
     },
-    canvasDimNoPad () {
-      return {x: this.collumnWidth * (this.collumnsLeft + this.collumnsRight), y: this.barHeight * (this.bars + 0.5) + this.minHeight + this.startBarOffset};
+    innerCanvasDimFull () {
+      return {x: this.columnWidth * (this.columnsLeft + this.columnsRight + 2), y: this.barHeight * (this.bars + 0.5) + this.minHeight + this.startBarOffset};
+    },
+    innerCanvasDimRight () {
+      return {x: this.columnWidth * (this.columnsLeft + this.columnsRight + 1), y: this.barHeight * (this.bars + 0.5) + this.minHeight + this.startBarOffset};
+    },
+    innerCanvasDim () {
+      return {x: this.columnWidth * (this.columnsLeft + this.columnsRight), y: this.barHeight * (this.bars + 0.5) + this.minHeight + this.startBarOffset};
     },
     canvasMarginTop () {
-      return this.innerCanvasMargin + this.outerCanvasMargin / 2 + this.addRemoveHeight;
+      return this.innerCanvasMargin + this.outerCanvasMargin / 2;
     },
     canvasMarginLeft () {
-      return this.innerCanvasMargin + this.outerCanvasMargin + this.addRemoveHeight;
+      return this.innerCanvasMargin + this.outerCanvasMargin;
     },
     signsSelected () {
       if (this.selectedSigns.length == 0) {
@@ -112,50 +154,100 @@ export default {
     this.initInteractListeners();
   },
   methods: {
+    getScroll (event) {
+      if (this.canvasScroll.x != event.target.scrollLeft && this.columnHandlesActive) {
+        this.placeGridHandles({type: "col", x: this.selectedColumnTranslate.x + (this.canvasScroll.x - event.target.scrollLeft), y: this.selectedColumnTranslate.y - document.getElementById("canvasContainer").scrollTop - this.barHeight})
+      }
+      if (this.canvasScroll.y != event.target.scrollTop && this.barHandlesActive) {
+        this.placeGridHandles({type: "bar", x: this.selectedBarTranslate.x - (this.columnWidth - this.signWidth - 15), y: this.selectedBarTranslate.y + (this.canvasScroll.y - event.target.scrollTop)})
+      }
+      this.canvasScroll = {x: event.target.scrollLeft, y: event.target.scrollTop};
+    },
+    placeGridHandles(data) {
+      this.contextActive = false;
+      if (data.type == "col") {
+        this.columnHandlesActive = true;
+        this.selectedColumnTranslate = {x: data.x, y: (data.y + document.getElementById("canvasContainer").scrollTop + this.barHeight)};
+      } else {
+        //special case for bar 0 -> only add, topside
+        this.barHandlesActive = true;
+        this.selectedBarTranslate = {x: data.x + this.columnWidth - this.signWidth - 15, y: data.y};
+      }
+    },
+    updateSelectedColumn (data) {
+      this.selectedColumn = data;
+    },
+    updateSelectedBar (data) {
+      this.selectedBar = data;
+    },
     /**
-     * Method for adding a collumn on the chosen side in the vuex state
-     * @arg side the side to add a collumn to  
-     * @arg beforeIndex the index to insert the new collumn after
+     * Method for adding a column on the chosen side in the vuex state
+     * @arg side the side to add a column to  
+     * @arg beforeIndex the index to insert the new column after
      */
-    addCollumn(beforeIndex) {
+    addColumn(beforeIndex) {
       this.contextActive = false;
       this.contextSign = 0;
       let side = "right";
-      if (beforeIndex < 1) {
+      if (beforeIndex < 0) {
         side = "left";
+      }
+      if (side == "left" && beforeIndex > this.selectedColumn) {
+        this.updateSelectedColumn(this.selectedColumn - 1);
+      }
+      if (side == "right" && beforeIndex <= this.selectedColumn) {
+        this.updateSelectedColumn(this.selectedColumn + 1);
       }
       for (let elem of this.signs) {
         if (elem.signData.col >= beforeIndex) {
-          this.$emit("editSign", {type: "move", index: this.signs.indexOf(elem), data: {x: (elem.x + this.collumnWidth), y: elem.y}});
+          this.$emit("editSign", {type: "move", index: this.signs.indexOf(elem), data: {x: (elem.x + this.columnWidth), y: elem.y}});
+          if (side == "right") {
+            this.$emit("editSign", {type: "changeSignData", index: this.signs.indexOf(elem), data: {col: elem.signData.col + 1}});
+          }
+        }else if (elem.signData.col < beforeIndex) {
+          if (side == "left") {
+            this.$emit("editSign", {type: "changeSignData", index: this.signs.indexOf(elem), data: {col: elem.signData.col - 1}});
+          }
         }
       }
       
-      this.$store.dispatch('addCollumn',side);
+      this.$store.dispatch('addColumn',side);
+      this.initSignInteraction();
     },
     /**
-     * Method for removing a collumn on the chosen side in the vuex state
-     * @arg side the side to remove a collumn from
-     * @arg col the collumn to remove  
+     * Method for removing a column on the chosen side in the vuex state
+     * @arg col the column to remove  
      */
-    removeCollumn(side, col) {
+    removeColumn(col) {
       this.contextActive = false;
       this.contextSign = 0;
-      if ((side == "left" && this.collumnsLeft == 2) || (side == "right" && this.collumnsRight == 2)) {
+      let side = "left";
+      if (col >= 0) {
+        side = "right";
+      }
+      if ((side == "left" && this.columnsLeft == 2) || (side == "right" && this.columnsRight == 2)) {
         return false;
+      }
+      if (side == "left") {
+        this.updateSelectedColumn(col + 1)
+      } else {
+        this.updateSelectedColumn(col - 1)
       }
       let remove = [];
       for (let elem of this.signs) {
         if (elem.signData.col == col) {
+          
           remove.push(this.signs.indexOf(elem));
         }
         if (side == "left") {
-          this.$emit("editSign", {type: "move", index: this.signs.indexOf(elem), data: {x: (elem.x - this.collumnWidth), y: elem.y}});
+          this.$emit("editSign", {type: "move", index: this.signs.indexOf(elem), data: {x: (elem.x - this.columnWidth), y: elem.y}});
         }
       }
+      
       for (let last = remove.length - 1; last >= 0; last--) {
-        this.$emit("editSign", {type: "remove", index: remove[last]});
+        this.$emit("editSign", {type: "delete", index: remove[last]});
       }
-      this.$store.dispatch('removeCollumn',side);
+      this.$store.dispatch('removeColumn',side);
     },
 
     /**
@@ -188,7 +280,6 @@ export default {
       for (let elem of this.signs) {
         
         if (elem.signData.bar == bar) {
-          
           remove.push(this.signs.indexOf(elem));
         }  else if (elem.signData.bar < bar) {
           this.$emit("editSign", {type: "move", index: this.signs.indexOf(elem), data: {x: elem.x, y: (elem.y - this.barHeight)}});
@@ -197,7 +288,7 @@ export default {
         }
       }
       for (let last = remove.length - 1; last >= 0; last--) {
-        this.$emit("editSign", {type: "remove", index: remove[last]});
+        this.$emit("editSign", {type: "delete", index: remove[last]});
       }
       this.$store.dispatch('removeBar');
     },
@@ -206,13 +297,13 @@ export default {
      * @arg data the data from the grid
      */
     addSign (elem) {
-      let x = parseInt(elem.getAttribute("x")) + (this.collumnWidth - this.signWidth) / 2;
+      let x = parseInt(elem.getAttribute("x")) + (this.columnWidth - this.signWidth) / 2;
       let y = parseInt(elem.getAttribute("y"));
       let pos = {col: parseInt(elem.getAttribute("col")), bar: parseInt(elem.getAttribute("bar")), beat: parseInt(elem.getAttribute("beat"))}
       let signData = Object.assign(JSON.parse(JSON.stringify(this.curLibrarySign.signData)), pos);
       let newSign = {isSelected: true, canResize: true, width: this.signWidth, height: this.curLibrarySign.height, x: x, y: y, signData: signData};
       if (this.curLibrarySign.signData.baseType == "RelationshipBow") {
-        newSign.width = this.collumnWidth * 2;
+        newSign.width = this.columnWidth * 2;
         newSign.x = parseInt(elem.getAttribute("x"));
       }
       this.$emit("editSign", {type: "add", data: newSign});
@@ -295,6 +386,8 @@ export default {
       if (id >= 0) {
         this.$emit("editSign", {type: "changeSelection", index: id, data: {isSelected: true}});
         this.selectedSigns.push(id);
+        this.barHandlesActive = false;
+        this.columnHandlesActive = false;
       } else {
         this.selectedSigns = [];
         this.contextSign = 0;
@@ -340,16 +433,16 @@ export default {
         let move = this.getArrowKeyAction (event.which);
         for (let elem of this.signs) {
           if (elem.isSelected == true) {
-            //if the key id is odd -> left / right arrow key, move the sign(s) to the next collumn
+            //if the key id is odd -> left / right arrow key, move the sign(s) to the next column
             if (event.which % 2 == 1) {
-              if (elem.signData.col + move.collumn  >= -this.collumnsLeft && elem.signData.col + move.collumn < this.collumnsRight) {
-                this.$emit("editSign", {type: "changeSignData", index: this.signs.indexOf(elem), data: {col: (elem.signData.col + move.collumn)}});
+              if (elem.signData.col + move.column  >= -this.columnsLeft && elem.signData.col + move.column < this.columnsRight) {
+                this.$emit("editSign", {type: "changeSignData", index: this.signs.indexOf(elem), data: {col: (elem.signData.col + move.column)}});
                 if (elem.signData.col < 0) {
                   this.$emit("editSign", {type: "changeSignData", index: this.signs.indexOf(elem), data: {side: "left"}});
                 } else {
                   this.$emit("editSign", {type: "changeSignData", index: this.signs.indexOf(elem), data: {side: "right"}});
                 }
-                this.$emit("editSign", {type: "move", index: this.signs.indexOf(elem), data: {x: (elem.x + move.collumn * this.collumnWidth), y: elem.y}});
+                this.$emit("editSign", {type: "move", index: this.signs.indexOf(elem), data: {x: (elem.x + move.column * this.columnWidth), y: elem.y}});
               }
             //if the key id is even -> up / down arrow key, move the sign up or down one beat if possible 
             } else {
@@ -364,7 +457,7 @@ export default {
                 }
               } else {
                 let newY = elem.y + this.minHeight;
-                if (this.checkStartingPos(newY, elem.height) && newY + elem.height < this.canvasDimNoPad.y) {
+                if (this.checkStartingPos(newY, elem.height) && newY + elem.height < this.innerCanvasDimFull.y) {
                   //if start pos and moving up -> change to bar 1 beat 0
                   this.$emit("editSign", {type: "move", index: this.signs.indexOf(elem), data: {x: elem.x, y: (elem.y + elem.height + this.startBarOffset)}});
                   this.$emit("editSign", {type: "resize", index: this.signs.indexOf(elem), data: {height: (this.minHeight * 2)}});
@@ -393,17 +486,17 @@ export default {
      */
     getArrowKeyAction (keyNr) {
       let beat = 0;
-      let collumn = 0;
+      let column = 0;
       if (keyNr == 37) {
-        collumn = -1;
+        column = -1;
       } else if (keyNr == 38) {
         beat = 1;
       } else if (keyNr == 39) {
-        collumn = 1;
+        column = 1;
       } else {
         beat = -1;
       }
-      return {beat: beat, collumn: collumn};
+      return {beat: beat, column: column};
     },
 
 
@@ -461,7 +554,7 @@ export default {
           modifiers: [
             // minimum size
             interact.modifiers.restrictSize({
-              min: { width: this.collumnWidth * 2 + this.handleDiam*2, height: this.minHeight + this.handleDiam * 2 }
+              min: { width: this.columnWidth * 2 + this.handleDiam*2, height: this.minHeight + this.handleDiam * 2 }
             }),
             interact.modifiers.restrictEdges({
               outer: "parent",
@@ -506,21 +599,48 @@ export default {
      * Inititalizes the dragging and resizing settings and event listeners
      */
     initSignInteraction () {
-      interact(".sign-container").draggable({
+      interact(".sign-container.bound-inner").unset()
+      interact(".room-direction").unset();
+      interact(".path").unset();
+      interact(".sign-container.bound-inner").draggable({
         inertia: false,
         restrict: {
-          restriction: "parent",
-          elementRect: { top: 0, left: 0, bottom: 1, right: 1 }
+          restriction: this.$refs.boundingInner.getBoundingClientRect(),
+          elementRect: { top: 0, left: 0, bottom: 1, right: 1 },
         },
-        // enable autoScroll
         autoScroll: false,
 
-        // functions to call on 
+        // functions to call on event
         onstart: this.dragStart,
         onmove: this.dragMove,
         onend: this.dragEnd
       });
+      interact(".room-direction").draggable({
+        inertia: false,
+        restrict: {
+          restriction: this.$refs.boundingOuterLeft.getBoundingClientRect(),
+          elementRect: { top: 0, left: 0, bottom: 1, right: 1 },
+        },
+        autoScroll: false,
 
+        // functions to call on event
+        onstart: this.dragStart,
+        onmove: this.dragMove,
+        onend: this.dragEnd
+      });
+      interact(".path").draggable({
+        inertia: false,
+        restrict: {
+          restriction: this.$refs.boundingOuterRight.getBoundingClientRect(),
+          elementRect: { top: 0, left: 0, bottom: 1, right: 1 },
+        },
+        autoScroll: false,
+
+        // functions to call on event
+        onstart: this.dragStart,
+        onmove: this.dragMove,
+        onend: this.dragEnd
+      });
     },
 
     
@@ -565,7 +685,7 @@ export default {
     },
 
     checkStartingPos(y, height) {
-      if (y + height > (this.canvasDimNoPad.y - this.minHeight - this.barHeight / this.beats * 2- this.startBarOffset)) {
+      if (y + height > (this.innerCanvasDimFull.y - this.minHeight - this.barHeight / this.beats * 2- this.startBarOffset)) {
         return true;
       } else {
         return false;
@@ -773,7 +893,7 @@ export default {
       if (actualX == 0 && this.signs[targetID].x != 0) {
         this.$emit("editSign", {type: "move", index: targetID, data: {x: 0, y: targetElem.y}});
       }
-      //calculate new collumn?
+      //calculate new column?
       this.removeSign(shadowID);
       target.classList.remove("dragging");
       this.selectSign(targetID);
@@ -829,26 +949,47 @@ export default {
       let targetElem = this.signs[targetID];
       this.$emit("editSign", {type: "resize", index: shadowID, data: {height: targetElem.height}});
       const isBow = (targetElem.signData.baseType == "RelationshipBow");
-
+      const isBodyPart = (targetElem.signData.baseType == "BodyPartSign");
+      const isPath = (targetElem.signData.baseType == "PathSign");
+      const isRoomSign = (this.signs[targetID].signData.baseType == "RoomDirectionSign");
+     
       //get the current position from the x and y chords
       let  x = (this.signs[targetID].x || 0) + event.dx;
       let  y = (this.signs[targetID].y || 0) + event.dy;
 
-      const collumnOffset = (this.collumnWidth - this.signWidth) / 2;
+      const columnOffset = (this.columnWidth - this.signWidth) / 2;
 
-      let actualX = Math.round(x / this.blocksizeX) * this.blocksizeX + collumnOffset;
+      let actualX = Math.round(x / this.blocksizeX) * this.blocksizeX + columnOffset;
       let actualY = Math.round(y / this.blocksizeY) * this.blocksizeY;
+      if (isRoomSign && actualX >= this.$refs.boundingOuterLeft.getBBox().x + this.$refs.boundingOuterLeft.getBBox().width) {
+        
+        actualX = actualX - this.columnWidth;
+      } else if (!isRoomSign && !isPath && actualX >= this.$refs.boundingOuterRight.getBBox().x) {
+        actualX = actualX - this.columnWidth;
+      } else if (isPath) {
+        
+        if (actualX >= this.$refs.boundingOuterRight.getBBox().x + this.$refs.boundingOuterRight.getBBox().width) {
+          actualX = actualX - this.columnWidth;
+        } else if (actualX < this.$refs.boundingOuterRight.getBBox().x) {
+
+          actualX = actualX + this.columnWidth;
+        }
+      } else
       if (isBow) {
-        actualX = actualX - collumnOffset;
+        actualX = actualX - columnOffset;
       }
       
       //check if the current position is above (below in actual browser) the starting line -> snap there
       if (this.checkStartingPos(actualY, this.signs[targetID].height)) {
-        if (isBow) {
-          actualY = this.canvasDimNoPad.y - this.minHeight - this.barHeight / this.beats * 2 + this.blocksizeY;
-        }else {
+        if (!this.signs[targetID].signData.resizable) {
+          actualY = this.innerCanvasDimFull.y - this.barHeight / this.beats * 2 - this.minHeight + this.blocksizeY;
+        } else if (isBow) {
+          actualY = this.innerCanvasDimFull.y - this.minHeight - this.barHeight / this.beats * 2 + this.blocksizeY;
+        } else if (isBodyPart) {
+          actualY = this.innerCanvasDimFull.y - this.minHeight - this.barHeight / this.beats * 2 + this.blocksizeY * 2;
+        } else {
           this.$emit("editSign", {type: "resize", index: shadowID, data: {height: (this.barHeight / this.beats * 2)}});
-          actualY = this.canvasDimNoPad.y - this.minHeight - this.barHeight / this.beats * 2;
+          actualY = this.innerCanvasDimFull.y - this.minHeight - this.barHeight / this.beats * 2;
         }
       }
 
@@ -870,6 +1011,10 @@ export default {
       const targetID = target.getAttribute("signID");
 
       const isBow = (this.signs[targetID].signData.baseType == "RelationshipBow");
+      const isBodyPart = (this.signs[targetID].signData.baseType == "BodyPartSign");
+      const isPath = (this.signs[targetID].signData.baseType == "PathSign");
+      const isRoomSign = (this.signs[targetID].signData.baseType == "RoomDirectionSign");
+      let bodyPartBelowScore = false;
 
       target.classList.remove("dragging");
 
@@ -877,21 +1022,35 @@ export default {
       let x = this.signs[targetID].x;
       let y = this.signs[targetID].y;
 
-      const collumnOffset = (this.collumnWidth - this.signWidth) / 2;
-      let screenX = Math.round(x / this.blocksizeX) * this.blocksizeX + collumnOffset;
+      const columnOffset = (this.columnWidth - this.signWidth) / 2;
+      let screenX = Math.round(x / this.blocksizeX) * this.blocksizeX + columnOffset;
       let screenY = Math.round(y /this.blocksizeY) * this.blocksizeY;
-      if (isBow) {
-        screenX = screenX - collumnOffset;
+      if (isRoomSign && screenX >= this.$refs.boundingOuterLeft.getBBox().x + this.$refs.boundingOuterLeft.getBBox().width) {
+        screenX = screenX - this.columnWidth;
+      } else if (!isRoomSign && !isPath && screenX >= this.$refs.boundingOuterRight.getBBox().x) {
+        screenX = screenX - this.columnWidth;
+      } else if (isPath) {
+        if (screenX >= this.$refs.boundingOuterRight.getBBox().width) {
+          screenX = screenX - this.columnWidth;
+        } else if (screenX < this.$refs.boundingOuterRight.getBBox().x) {
+
+          screenX = screenX + this.columnWidth;
+        }
+      } else if (isBow) {
+        screenX = screenX - columnOffset;
       }
       
       
       //check if the current position is above (below in actual browser) the starting line -> snap there
       if (this.checkStartingPos(screenY, this.signs[targetID].height)) {
-        if (isBow) {
-          screenY = this.canvasDimNoPad.y - this.barHeight / this.beats * 2 - this.minHeight + this.blocksizeY;
+        if (!this.signs[targetID].signData.resizable) {
+          screenY = this.innerCanvasDimFull.y - this.barHeight / this.beats * 2 - this.minHeight + this.blocksizeY;
+        } else if (isBodyPart) {
+          screenY = this.innerCanvasDimFull.y - this.minHeight - this.barHeight / this.beats * 2 + this.blocksizeY * 2;
+          bodyPartBelowScore = true;
         } else {
           this.$emit("editSign", {type: "resize", index: targetID, data: {height: (this.barHeight / this.beats * 2)}});
-          screenY = this.canvasDimNoPad.y - this.barHeight / this.beats * 2 - this.minHeight;
+          screenY = this.innerCanvasDimFull.y - this.barHeight / this.beats * 2 - this.minHeight;
           this.$emit("editSign", {type: "changeCanResize", index: targetID, data: {canResize: false}});
         }
       } else {
@@ -901,8 +1060,8 @@ export default {
       this.$emit("editSign", {type: "move", index: targetID, data: {x: screenX, y: screenY}});
       target.setAttribute("data-y", screenY);
 
-      let collumnsMoved = (parseFloat(target.getAttribute("start-x")) - this.signs[targetID].x) / -this.blocksizeX;
-      this.$emit("editSign", {type: "changeSignData", index: targetID, data: {col: (this.signs[targetID].signData.col + collumnsMoved)}});
+      let columnsMoved = (parseFloat(target.getAttribute("start-x")) - this.signs[targetID].x) / -this.blocksizeX;
+      this.$emit("editSign", {type: "changeSignData", index: targetID, data: {col: (this.signs[targetID].signData.col + columnsMoved)}});
       if (this.signs[targetID].signData.col >= 0 ) {
         this.$emit("editSign", {type: "changeSignData", index: targetID, data: {side: "right"}});
       } else {
@@ -910,11 +1069,12 @@ export default {
       }
 
       this.calcBeatMove(targetID, parseFloat(target.getAttribute("start-y")), parseFloat(target.getAttribute("start-h")), this.signs[targetID].y, this.signs[targetID].height);
-
+      if (isBodyPart && bodyPartBelowScore) {
+        this.$emit("editSign", {type: "changeSignData", index: targetID, data: {bar: -1, beat: 0}});
+      }
       const shadowID = this.signs.length - 1;
       this.removeSign(shadowID);
       this.selectSign(targetID);
-
       if (this.contextWasActive) {
         this.openContextMenu(event, screenX - x, screenY - y - this.handleDiam);
         this.contextWasActive = false;
@@ -967,5 +1127,52 @@ svg text {
 
 .margin-box {
   margin: 10px;
+}
+
+.column-handles {
+  width: 135px;
+  height: 30px;
+  position: absolute;
+  display: flex;
+  align-items: center;
+  transform: translateX(-20px);
+  z-index: 1;
+}
+
+.bar-handles {
+  width: 30px;
+  height: var(--barHeight);
+  position: absolute;
+  z-index: 1;
+}
+
+.column-handles > .add-remove-container {
+  width: 30px;
+  height: 30px;
+  border-radius: 30px;
+  margin: 10px 5px;
+  box-sizing: border-box;
+  background: white;
+  border: 3px solid white;
+}
+
+.bar-handles > .add-remove-container {
+  width: 30px;
+  height: 30px;
+  border-radius: 30px;
+  transform: translateY(-15px);
+  margin: 0 0 calc(var(--barHeight) / 3 + 3px) 0;
+  box-sizing: border-box;
+  background: white;
+  display: block;
+  border: 3px solid white;
+}
+
+.add-remove-container.green {
+  border-color:#48c96e;
+}
+
+.add-remove-container.red {
+  border-color:#dd5f5f;
 }
 </style>

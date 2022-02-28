@@ -6,11 +6,7 @@
       <RadioOption v-show="signData.limb && signData.canBeLimb" :optionText="'Side Surface'" :options="surfaceSides" :initState="signData.surface" @switchState="this.changeSideSurface"/>
       <div v-if="signData.signType == 'Fingers'">
         <SliderOption :optionText="'Digit'" :initState="signData.digit" :stops="5" @switchState="changeDigit" :id="'body-part-finger-slider-0'"/>
-        <SliderOption :optionText="'Finger'" :initState="signData.finger" :stops="5" @switchState="changeFinger" :id="'body-part-finger-slider-1'"/>
-      </div>
-      <div v-if="signData.signType == 'Toes'">
-        <SliderOption :optionText="'Digit'" :initState="signData.digit" :stops="4" @switchState="changeDigit" :id="'body-part-toe-slider-0'"/>
-        <SliderOption :optionText="'Toe'" :initState="signData.toe" :stops="5" @switchState="changeToe" :id="'body-part-toe-slider-1'"/>
+        <SliderOption :optionText="'Joint'" :initState="signData.joint" :stops="signData.signType == 'Fingers' ? 5 : 4" @switchState="changeJoint" :id="'body-part-finger-slider-1'"/>
       </div>
       <DeleteOption @delete="emitDelete"/>
     </div>
@@ -73,20 +69,11 @@ export default {
     changeSurface() {
       this.newSignData ({surface: this.surfaceTop + " " + this.surfaceSide});
     },
-    changeFinger (data) {
-      if (this.isActive) {
-        this.newSignData({finger: data.data});
-      }
-    },
-    changeToe (data) {
-      if (this.isActive) {
-        this.newSignData({toe: data.data});
-      }
+    changeJoint (data) {
+      this.newSignData({joint: data.data});
     },
     changeDigit (data) {
-      if (this.isActive) {
-        this.newSignData({digit: data.data});
-      }
+      this.newSignData({digit: data.data});
     },
     /**
      * The function that sends the updated sign data back to the score
