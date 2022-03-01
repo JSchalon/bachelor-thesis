@@ -1,0 +1,98 @@
+image: node:14-alpine
+
+stages:
+  - build
+  - deploydocker
+
+cache:
+  paths:
+    - node_modules/
+
+.build_artifacts:
+  stage: build
+  script:
+    - rm package-lock.json
+    - npm install
+    - npm run build
+  artifacts:
+    paths:
+      - VERSION
+      - DOCKERTAG
+      - dist/
+      - Dockerfile
+      - nginx.conf
+
+build_release:
+  extends: .build_artifacts
+  before_script:
+    - echo latest > DOCKERTAG
+    - apk add --update jq gawk git
+    - CURRENTVERSION=$(echo $CI_COMMIT_TAG | sed 's/[A-Za-z]//g')
+    - echo $CURRENTVERSION > VERSION
+    - jq ".version = \"${CURRENTVERSION}\"" package.json > package.json.tmp && mv package.json.tmp package.json
+  after_script:
+    - 'which ssh-agent || apk add --update openssh-client'
+    - eval $(ssh-agent -s) && echo "$SSH_PRIVATE_KEY" > sshprivatekey.tmp && chmod 600 sshprivatekey.tmp && ssh-add sshprivatekey.tmp && rm -f sshprivatekey.tmp && mkdir -p ~/.ssh
+    - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
+    - git config --global user.email 'noreply@git.itm.uniluebeck.de'
+    - git config --global user.name 'GitLab CI'
+    - GITPROJ="git@git.itm.uni-luebeck.de:$CI_PROJECT_PATH.git"
+    - git remote set-url origin $GITPROJ
+    - git remote show origin
+    - source semver.sh
+    - git checkout -- package.json src/config.js
+    - git checkout develop
+    # Increasing the patch of the currentversion
+    - NEXTVERSION=$(cat VERSION | awk -F. -v OFS=. 'NF==1{print ++$NF}; NF>1{if(length($NF+1)>length($NF))$(NF-1)++; $NF=sprintf("%0*d", length($NF), ($NF+1)%(10^length($NF))); print}')
+    - SNAPSHOTVERSION=$(jq -r .version package.json)
+    # Push the version increment only to develop, if the new version is greater than the old one
+    - semverLT $SNAPSHOTVERSION $NEXTVERSION-SNAPSHOT && ( jq ".version = \"$NEXTVERSION-SNAPSHOT\"" package.json > package.json.tmp && mv package.json.tmp package.json ) && git add package.json &&  git commit -m "[ci-skip][Release] Preparing next snapshot" && git push
+  only:
+    - tags
+
+build_snapshot:
+  extends: .build_artifacts
+  before_script:
+    - apk add --update jq
+    - rm -rf /var/cache/apk/*
+    - echo nightly > DOCKERTAG
+    - jq -r .version package.json > VERSION
+  only:
+    - master
+    - develop
+
+deploy_docker:
+  image: docker:latest
+  stage: deploydocker
+  services:
+    - name: docker:dind
+      command: [ "--experimental" ]
+  variables:
+    GIT_STRATEGY: none
+    CONTAINER_IMAGE: $CI_REGISTRY/$CI_REGISTRY_IMAGE
+    DOCKER_CLI_EXPERIMENTAL: enabled
+    DOCKER_BUILDKIT: 1
+    DOCKER_DRIVER: overlay2
+  before_script:
+    # enable experimental docker features
+    - mkdir -p $HOME/.docker
+    - "echo -e '{\n  \"experimental\": \"enabled\",\n    \"storage-driver\": \"overlay2\"\n}' | tee $HOME/.docker/config.json"
+    # install docker buildx
+    - docker build --platform=local -o . git://github.com/docker/buildx
+    - mkdir -p ~/.docker/cli-plugins/
+    - mv buildx ~/.docker/cli-plugins/docker-buildx
+    # login to itm docker repository
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+    # setup docker buildx to build multiarch images
+    - docker run --rm --privileged docker/binfmt:a7996909642ee92942dcd6cff44b9b95f08dad64
+    - docker buildx create --use --name qemubuilder
+    - docker buildx inspect --bootstrap
+  script:
+    - CURRENTVERSION=$(cat VERSION)
+    - DOCKERTAG=$(cat DOCKERTAG)
+    - docker pull $CONTAINER_IMAGE:$DOCKERTAG || true
+    - docker buildx build --cache-from "$CONTAINER_IMAGE":latest --tag "$CONTAINER_IMAGE":$CURRENTVERSION --tag "$CONTAINER_IMAGE":$DOCKERTAG --platform=linux/arm,linux/arm64,linux/amd64 . --push
+  only:
+    - tags
+    - master
+    - develop

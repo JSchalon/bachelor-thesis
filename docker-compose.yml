@@ -1,0 +1,9 @@
+version: "3.3"
+services:
+
+  editor:
+    image: docker.itm.uni-luebeck.de/labanotation/interactioneditor:nightly
+    container_name: editor 
+    ports:
+      - "5000:80"
+
