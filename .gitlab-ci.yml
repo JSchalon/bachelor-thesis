@@ -58,7 +58,7 @@ build_snapshot:
     - echo nightly > DOCKERTAG
     - jq -r .version package.json > VERSION
   only:
-    - master
+    - main
     - develop
 
 deploy_docker:
@@ -94,5 +94,5 @@ deploy_docker:
     - docker buildx build --cache-from "$CONTAINER_IMAGE":latest --tag "$CONTAINER_IMAGE":$CURRENTVERSION --tag "$CONTAINER_IMAGE":$DOCKERTAG --platform=linux/arm,linux/arm64,linux/amd64 . --push
   only:
     - tags
-    - master
+    - main
     - develop
