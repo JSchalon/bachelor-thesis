@@ -1,6 +1,6 @@
 <template>
-    <div class="context-menu">
-      <SignCategoryContainer :optionText="'Type'" :category="'body-part-signs'" @updateSignData="newSignData"/>
+    <div>
+      <SignCategoryContainer :optionText="'Type'" :category="'body-part-signs'" :parentY="y" @updateSignData="newSignData"/>
       <OnOffOption v-show="signData.canBeLimb" :optionText="'Limb'" :initState="signData.limb" @switchState="changeLimb"/>
       <RadioOption v-show="signData.limb && signData.canBeLimb" :optionText="'Top Surface'" :options="surfaceInnerOuter" :initState="signData.surface" @switchState="this.changeTopSurface"/>
       <RadioOption v-show="signData.limb && signData.canBeLimb" :optionText="'Side Surface'" :options="surfaceSides" :initState="signData.surface" @switchState="this.changeSideSurface"/>
@@ -25,7 +25,8 @@ export default {
   props: {
     signData: Object,
     isActive: Boolean,
-    signIndex: [Number, String]
+    signIndex: [Number, String],
+    y: Number,
   },
   emits: ["updateSignData", "delete"],
   data() {

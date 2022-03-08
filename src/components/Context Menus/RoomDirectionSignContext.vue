@@ -1,5 +1,5 @@
 <template>
-    <div class="context-menu">
+    <div>
       <SliderOption :optionText="'Angle'" :initState="signData.degree" :stops="7" @switchState="changeAngle" :id="'room-direction-slider-' + signIndex"/>
       <DeleteOption @delete="emitDelete"/>
     </div>

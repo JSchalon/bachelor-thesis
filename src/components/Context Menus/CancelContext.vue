@@ -1,5 +1,5 @@
 <template>
-    <div class="context-menu">
+    <div >
       <RadioOption 
         :options="types" 
         :initState="signData.signType"

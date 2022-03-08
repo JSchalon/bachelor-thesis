@@ -1,6 +1,6 @@
 <template>
-    <div class="context-menu">
-      <SignCategoryContainer :optionText="'Type'" :category="'direction-signs'" @updateSignData="changeType"/>
+    <div>
+      <SignCategoryContainer :optionText="'Type'" :category="'direction-signs'" :parentY="y" @updateSignData="changeType"/>
       <OnOffOption :optionText="'Hold'" :initState="signData.holding" @switchState="changeHolding"/>
       <RadioOption 
         :options="dimensions" 
@@ -22,7 +22,7 @@
           :optionText="'Pin Dimension'"
           @switchState="changeDefinitionPin"
         />
-        <SignCategoryContainer :optionText="'Angle'" :category="'pins-low'" @updateSignData="changeType"/>
+        <SignCategoryContainer :optionText="'Angle'" :category="'pins-low'" :parentY="y" @updateSignData="changeType"/>
       </div>
       <!--
         Todo: 
@@ -53,7 +53,8 @@ export default {
   props: {
     signData: Object,
     isActive: Boolean,
-    signIndex: [Number, String]
+    signIndex: [Number, String],
+    y: Number,
   },
   emits: ["updateSignData", "delete"],
   data() {

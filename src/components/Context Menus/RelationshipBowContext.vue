@@ -1,6 +1,6 @@
 <template>
-    <div class="context-menu">
-      <SignCategoryContainer :optionText="'Type'" :category="'relationship-bows'" @updateSignData="changeType"/>
+    <div >
+      <SignCategoryContainer :optionText="'Type'" :category="'relationship-bows'" :parentY="y" @updateSignData="changeType"/>
       <OnOffOption :optionText="'Passing'" :initState="signData.passing" @switchState="changePassing"/>
       <OnOffOption :optionText="'Grasping'" :initState="signData.grasping" @switchState="changeGrasping"/>
       <DeleteOption :mIndex="1" @delete="emitDelete"/>
@@ -20,7 +20,8 @@ export default {
   props: {
     signData: Object,
     isActive: Boolean,
-    signIndex: [Number, String]
+    signIndex: [Number, String],
+    y: Number
   },
   emits: ["updateSignData", "delete"],
   data() {

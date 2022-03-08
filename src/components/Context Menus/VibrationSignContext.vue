@@ -1,5 +1,5 @@
 <template>
-    <div class="context-menu">
+    <div>
       <OnOffOption :optionText="'Pins'" :initState="displayPinOptions" @switchState="changePins"/>
       <div v-if="displayPinOptions">
         <RadioOption 

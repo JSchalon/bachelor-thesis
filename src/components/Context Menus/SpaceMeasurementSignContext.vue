@@ -1,6 +1,6 @@
 <template>
-    <div class="context-menu">
-      <SignCategoryContainer :optionText="'Type'" :category="'space-measurement-signs'" @updateSignData="newSignData"/>
+    <div>
+      <SignCategoryContainer :optionText="'Type'" :category="'space-measurement-signs'" :parentY="y" @updateSignData="newSignData"/>
       <SliderOption v-if="signData.signType != 'Unfolding' && signData.signType != 'NeitherOr'" :optionText="'Degree'" :initState="signData.degree" :stops="5" @switchState="changeDegree" :id="'space-measurement-slider-' + signIndex + '-0'"/>
       <DeleteOption @delete="emitDelete"/>
     </div>
@@ -19,7 +19,8 @@ export default {
   props: {
     signData: Object,
     isActive: Boolean,
-    signIndex: [Number, String]
+    signIndex: [Number, String],
+    y: Number,
   },
   emits: ["updateSignData", "delete"],
   data() {

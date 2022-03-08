@@ -1,6 +1,6 @@
 <template>
     <div class="context-menu" id="context-menu" :style="'top: ' + y + 'px; left: ' + x + 'px'" :class="isActive ? 'active' : 'inactive'" >
-      <component :is="signData.baseType + 'Context'" :signData="signData" :signIndex="signIndex" :isActive="isActive" @updateSignData="updateSignData" @delete="emitDelete"/>
+      <component :is="signData.baseType + 'Context'" :signData="signData" :signIndex="signIndex" :isActive="isActive" :y="y" @updateSignData="updateSignData" @delete="emitDelete"/>
     </div>
 </template>
 

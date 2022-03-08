@@ -1,5 +1,5 @@
 <template>
-    <div class="context-menu">
+    <div>
       <!--
         Todo: 
           - hodl
@@ -37,7 +37,7 @@
         <SliderOption :optionText="'Angle'" :initState="signData.definition.degree" :stops="8" @switchState="changeDefinitionPinAngle" :id="'direction-definition-slider-' + signIndex"/>
       </div>
       <div v-else-if="signData.definition && signData.definition.baseType == 'SpaceMeasurementSign'">
-        <SignCategoryContainer :optionText="'Space Measurement Sign'" :category="'space-measurement-signs'" @updateSignData="changeDefinitionSpace"/>
+        <SignCategoryContainer :optionText="'Space Measurement Sign'" :category="'space-measurement-signs'" :parentY="y" @updateSignData="changeDefinitionSpace"/>
         <SliderOption :optionText="'Angle'" :initState="signData.definition.degree" :stops="5" @switchState="changeDefinitionSpaceDegree" :id="'direction-definition-slider-' + signIndex"/>
       </div>
       <DeleteOption :mIndex="0" @delete="emitDelete"/>
@@ -57,7 +57,8 @@ export default {
   props: {
     signData: Object,
     isActive: Boolean,
-    signIndex: [Number, String]
+    signIndex: [Number, String],
+    y: Number
   },
   emits: ["updateSignData", "delete"],
   data() {

@@ -67,7 +67,7 @@ import interact from "interactjs";
 
 export default {
   name: 'Score',
-  inject: ["signWidth", "barHeight", "columnWidth", "handleDiam", "innerCanvasMargin", "outerCanvasMargin", "borderWidth", "addRemoveHeight", "startBarOffset",],
+  inject: ["signWidth", "barHeight", "columnWidth", "handleDiam", "innerCanvasMargin", "outerCanvasMargin", "borderWidth", "addRemoveHeight", "startBarOffset","contextMenuWidth"],
   props: {
     signs: Array
   },
@@ -212,7 +212,7 @@ export default {
       }
       
       this.$store.dispatch('addColumn',side);
-      this.initSignInteraction();
+      setTimeout(function () {this.initSignInteraction()}.bind(this), 0);
     },
     /**
      * Method for removing a column on the chosen side in the vuex state
@@ -248,6 +248,7 @@ export default {
         this.$emit("editSign", {type: "delete", index: remove[last]});
       }
       this.$store.dispatch('removeColumn',side);
+      setTimeout(function () {this.initSignInteraction()}.bind(this), 0);
     },
 
     /**
@@ -265,6 +266,7 @@ export default {
         }
       }
       this.$store.dispatch('addBar');
+      setTimeout(function () {this.initSignInteraction()}.bind(this), 0);
     },
     /**
      * Method for removing a bar in the vuex state
@@ -291,6 +293,7 @@ export default {
         this.$emit("editSign", {type: "delete", index: remove[last]});
       }
       this.$store.dispatch('removeBar');
+      setTimeout(function () {this.initSignInteraction()}.bind(this), 0);
     },
     /**
      * Method for adding a sign to the score
@@ -319,7 +322,6 @@ export default {
       if (newSign.height > (this.barHeight / this.beats)) {
         this.calcBeatMove(this.signs.length-1, y, newSign.height, y + newSign.height - this.barHeight / this.beats, newSign.height);
       }
-      console.log(this.signs)
     },
     /**
      * Method for removing a sign from the score
@@ -586,25 +588,33 @@ export default {
       event.preventDefault();
       this.contextActive = false;
       this.contextSign = 0;
-      this.openContext(event, additionalX,additionalY);
-    },
-    openContext(event, additionalX = 0, additionalY = 0) {
       let target = event.target;
       const targetID = target.getAttribute("signID");
       this.contextSign = targetID;
       let boundingRect = this.getSignRect(targetID);
 
       this.placeSignOnTop(targetID);
-
       this.contextPos.x = boundingRect.right + additionalX;
+      if (this.contextPos.x + this.contextMenuWidth >= window.innerWidth) {
+        this.contextPos.x = boundingRect.x + additionalX - this.contextMenuWidth - 5; 
+      }
       if (this.signs[targetID].isSelected) {
         this.contextPos.y = boundingRect.top + additionalY;
       } else {
         this.contextPos.y = boundingRect.top;
       }
       
+      
       this.selectSign(targetID);
       this.contextActive = true;
+
+      setTimeout(function () {this.moveContextIntoView()}.bind(this), 0);
+    },
+
+    moveContextIntoView () {
+      if (this.contextPos.y + document.getElementById("context-menu").offsetHeight >= window.innerHeight) {
+        this.contextPos.y = this.contextPos.y - (this.contextPos.y + document.getElementById("context-menu").offsetHeight - window.innerHeight);
+      }
     },
 
     /**
