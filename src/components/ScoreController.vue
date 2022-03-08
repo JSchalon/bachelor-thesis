@@ -84,7 +84,7 @@ export default {
       this.signs.push(data);
       this.$store.dispatch('changeCurSign',false);
       //add new sign to xml
-      //distinguish between <column def> and <movement> (column def -> sign.bar: -1)
+      //distinguish between <column def> and <movement> and <bow> (column def -> sign.bar: -1 and bow -> signType)
     },
     moveSign (index, data) {
       this.signs[index].x = data.x;
@@ -203,7 +203,7 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
   #interactionBox {
-    width: 84%;
+    width: calc(100% - 250px);
     float: right;
   }
 </style>

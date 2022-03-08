@@ -1,7 +1,7 @@
 <template>
     <div id="canvasContainer" @scroll="getScroll">
       <div class="margin-box">
-        <svg preserveAspectRatio="xMinYMax meet" ref="canvas" id="canvas" :width="canvasDimensions.x" :height="canvasDimensions.y" fill="white">
+        <svg preserveAspectRatio="xMinYMax meet" ref="canvas" id="canvas" :width="canvasDimensions.x" :height="canvasDimensions.y" fill="white" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg">
           <defs>
             <pattern id="direction-high-left" width="10" height="10" patternTransform="rotate(-45 0 0)" patternUnits="userSpaceOnUse">
               <rect x="0" y="0" width="10" height="10" fill="white"/>
@@ -156,7 +156,7 @@ export default {
   methods: {
     getScroll (event) {
       if (this.canvasScroll.x != event.target.scrollLeft && this.columnHandlesActive) {
-        this.placeGridHandles({type: "col", x: this.selectedColumnTranslate.x + (this.canvasScroll.x - event.target.scrollLeft), y: this.selectedColumnTranslate.y - document.getElementById("canvasContainer").scrollTop - this.barHeight})
+        this.placeGridHandles({type: "col", x: this.selectedColumnTranslate.x + (this.canvasScroll.x - event.target.scrollLeft), y: this.selectedColumnTranslate.y - document.getElementById("canvasContainer").scrollTop - (this.barHeight / 2 - 15)})
       }
       if (this.canvasScroll.y != event.target.scrollTop && this.barHandlesActive) {
         this.placeGridHandles({type: "bar", x: this.selectedBarTranslate.x - (this.columnWidth - this.signWidth - 15), y: this.selectedBarTranslate.y + (this.canvasScroll.y - event.target.scrollTop)})
@@ -167,7 +167,7 @@ export default {
       this.contextActive = false;
       if (data.type == "col") {
         this.columnHandlesActive = true;
-        this.selectedColumnTranslate = {x: data.x, y: (data.y + document.getElementById("canvasContainer").scrollTop + this.barHeight)};
+        this.selectedColumnTranslate = {x: data.x, y: (data.y + document.getElementById("canvasContainer").scrollTop) + this.barHeight / 2 - 15};
       } else {
         //special case for bar 0 -> only add, topside
         this.barHandlesActive = true;
@@ -294,21 +294,32 @@ export default {
     },
     /**
      * Method for adding a sign to the score
-     * @arg data the data from the grid
+     * @arg elem the beat on the grid, where the sign is to be placed
      */
     addSign (elem) {
       let x = parseInt(elem.getAttribute("x")) + (this.columnWidth - this.signWidth) / 2;
       let y = parseInt(elem.getAttribute("y"));
-      let pos = {col: parseInt(elem.getAttribute("col")), bar: parseInt(elem.getAttribute("bar")), beat: parseInt(elem.getAttribute("beat"))}
-      let signData = Object.assign(JSON.parse(JSON.stringify(this.curLibrarySign.signData)), pos);
+      let signData = {};
+      
+      for (const [key, value] of Object.entries(this.curLibrarySign.signData)) {
+        signData[key] = value;
+      }
+      
+      signData.col = parseInt(elem.getAttribute("col"));
+      signData.bar = parseInt(elem.getAttribute("bar"));
+      signData.beat = parseInt(elem.getAttribute("beat"));
       let newSign = {isSelected: true, canResize: true, width: this.signWidth, height: this.curLibrarySign.height, x: x, y: y, signData: signData};
       if (this.curLibrarySign.signData.baseType == "RelationshipBow") {
         newSign.width = this.columnWidth * 2;
         newSign.x = parseInt(elem.getAttribute("x"));
       }
+      
       this.$emit("editSign", {type: "add", data: newSign});
       //the grid element beat/bar is at the y of the new sign, not y + height -> "move it" downwards after placing
-      this.calcBeatMove((this.signs.length-1), (y+this.curLibrarySign.height), this.curLibrarySign.height, y, this.curLibrarySign.height);
+      if (newSign.height > (this.barHeight / this.beats)) {
+        this.calcBeatMove(this.signs.length-1, y, newSign.height, y + newSign.height - this.barHeight / this.beats, newSign.height);
+      }
+      console.log(this.signs)
     },
     /**
      * Method for removing a sign from the score
@@ -334,6 +345,7 @@ export default {
      * @arg endH the height of the element after moving
      */
     calcBeatMove(index, startY, startH, endY, endH) {
+
       let beatsMoved = ((endY + endH) - (startY + startH)) / -this.blocksizeY;
       let elem = this.signs[index];
       if (beatsMoved != 0) {

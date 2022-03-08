@@ -15,6 +15,7 @@ export default createStore({
     //sign data
     curSign: false,
     signs: [{}],
+    libraryActive: true,
     //editor settings
     seenIntro: false, 
     language: "eng", 

@@ -112,7 +112,6 @@ export default {
   },
   methods: {
     colHighlightAfterAddRemove() {
-      console.log(this.selectedColumn + " " + this.columnsLeft)
       if (!(this.selectedColumn === false)) {
         this.highlight();
         if (this.selectedColumn < -this.columnsLeft) {

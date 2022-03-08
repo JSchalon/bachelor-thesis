@@ -1,0 +1,70 @@
+{
+  "catName": "High Pins",
+  "catHeight": 50,
+  "baseHeight": 50,
+  "general": [
+    {
+      "isSelected": false,
+      "canResize": false,
+      "height": 50,
+      "x": 0,
+      "y": 0
+    }
+  ],
+  "signData": [
+    {
+      "baseType": "Pin",
+      "degree": 315,
+      "signType": "High",
+      "resizable": false
+    },
+    {
+      "baseType": "Pin",
+      "degree": 0,
+      "signType": "High",
+      "resizable": false
+    },
+    {
+      "baseType": "Pin",
+      "degree": 45,
+      "signType": "High",
+      "resizable": false
+    },
+    {
+      "baseType": "Pin",
+      "degree": 270,
+      "signType": "High",
+      "resizable": false
+    },
+    {
+      "baseType": "Pin",
+      "degree": -1,
+      "signType": "High",
+      "resizable": false
+    },
+    {
+      "baseType": "Pin",
+      "degree": 90,
+      "signType": "High",
+      "resizable": false
+    },
+    {
+      "baseType": "Pin",
+      "degree": 225,
+      "signType": "High",
+      "resizable": false
+    },
+    {
+      "baseType": "Pin",
+      "degree": 180,
+      "signType": "High",
+      "resizable": false
+    },
+    {
+      "baseType": "Pin",
+      "degree": 135,
+      "signType": "High",
+      "resizable": false
+    }
+  ]
+}

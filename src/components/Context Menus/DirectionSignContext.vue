@@ -22,7 +22,7 @@
           :optionText="'Pin Dimension'"
           @switchState="changeDefinitionPin"
         />
-        <SliderOption :optionText="'Angle'" :initState="signData.definition.degree" :stops="8" @switchState="changeDefinitionAngle" :id="'direction-definition-slider-' + signIndex"/>
+        <SignCategoryContainer :optionText="'Angle'" :category="'pins-low'" @updateSignData="changeType"/>
       </div>
       <!--
         Todo: 
