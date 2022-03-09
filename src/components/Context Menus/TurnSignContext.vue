@@ -19,27 +19,32 @@
         :options="types" 
         :initState="signData.signType"
         :optionText="'Type'"
+        :active="true"
         @switchState="changeType"
       />
       <RadioOption 
         :options="definitionTypes" 
         :initState="signData.definition ? signData.definition.baseType : signData.definition"
         :optionText="'Turn definition'"
+        :active="true"
         @switchState="changeDefinition"
       />
-      <div v-if="signData.definition && signData.definition.baseType == 'Pin'">
+
         <RadioOption 
           :options="definitions" 
-          :initState="signData.definition.signType"
+          :initState="signData.definition ? signData.definition.signType : false"
           :optionText="'Pin Dimension'"
+          :active="signData.definition && signData.definition.baseType == 'Pin'"
           @switchState="changeDefinitionPin"
         />
-        <SliderOption :optionText="'Angle'" :initState="signData.definition.degree" :stops="8" @switchState="changeDefinitionPinAngle" :id="'direction-definition-slider-' + signIndex"/>
-      </div>
-      <div v-else-if="signData.definition && signData.definition.baseType == 'SpaceMeasurementSign'">
-        <SignCategoryContainer :optionText="'Space Measurement Sign'" :category="'space-measurement-signs'" :parentY="y" @updateSignData="changeDefinitionSpace"/>
-        <SliderOption :optionText="'Angle'" :initState="signData.definition.degree" :stops="5" @switchState="changeDefinitionSpaceDegree" :id="'direction-definition-slider-' + signIndex"/>
-      </div>
+        <SignCategoryContainer v-if="!signData.definition || signData.definition.baseType == 'SpaceMeasurementSign'" :optionText="'Angle'" category="pins-low" :parentY="y" :active="signData.definition && signData.definition.baseType != 'SpaceMeasurementSign' ? true : false" @updateSignData="changeType"/>
+        <SignCategoryContainer v-if="signData.definition && signData.definition.signType == 'Low'" :optionText="'Angle'" category="pins-low" :parentY="y" :active="signData.definition ? true : false" @updateSignData="changeDefinitionPinAngle"/>
+        <SignCategoryContainer v-else-if="signData.definition && signData.definition.signType == 'Middle'" :optionText="'Angle'" category="pins-middle" :parentY="y" :active="signData.definition ? true : false" @updateSignData="changeDefinitionPinAngle"/>
+        <SignCategoryContainer v-else-if="signData.definition && signData.definition.signType == 'High'" :optionText="'Angle'" category="pins-high" :parentY="y" :active="signData.definition ? true : false" @updateSignData="changeDefinitionPinAngle"/>
+
+        <SignCategoryContainer :optionText="'Space Measurement Sign'" :category="'space-measurement-signs'" :parentY="y" :active="signData.definition && signData.definition.baseType == 'SpaceMeasurementSign'" @updateSignData="changeDefinitionSpace"/>
+        <SliderOption :optionText="'Angle'" :initState="signData.definition ? signData.definition.degree : 0" :stops="5" :active="signData.definition && signData.definition.baseType == 'SpaceMeasurementSign'" @switchState="changeDefinitionSpaceDegree" :id="'direction-definition-slider-' + signIndex"/>
+
       <DeleteOption :mIndex="0" @delete="emitDelete"/>
     </div>
 </template>
@@ -101,17 +106,14 @@ export default {
       }
     },
     changeDefinitionPin (data) {
-      let obj = JSON.parse(JSON.stringify(this.signData.definition)) || {baseType: "Pin", signType: "Low", degree: 0, bgVisible: true};
+      let obj = JSON.parse(JSON.stringify(this.signData.definition)) || {baseType: "Pin", signType: "Low", degree: 0, bgVisible: false};
       obj.signType = data.text;
       this.newSignData ({definition: obj});
     },
     changeDefinitionPinAngle (data) {
       if (this.isActive) {
-        let degree = data.data * 45;
-        if (data.data > 7) {
-          degree = -1;
-        }
-        let obj = JSON.parse(JSON.stringify(this.signData.definition)) || {baseType: "Pin", signType: "Low", degree: 0, bgVisible: true};
+        let degree = data.degree;
+        let obj = JSON.parse(JSON.stringify(this.signData.definition)) || {baseType: "Pin", signType: "Low", degree: 0, bgVisible: false};
         obj.degree = degree;
         this.newSignData ({definition: obj});
       }

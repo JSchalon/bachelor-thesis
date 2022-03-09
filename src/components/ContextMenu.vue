@@ -65,6 +65,8 @@ export default {
     box-sizing: border-box;
   }
 
+
+
     .context-menu-item {
       width: var(--contextMenuWidth);
       background-color: white;
@@ -101,4 +103,14 @@ export default {
       width: calc(var(--contextItemImageSize) / 1.5);
       height: calc(var(--contextItemImageSize) / 1.5);
     }
+
+  .unusable {
+    opacity: 0.3;
+  }
+
+  .blocker {
+    width: var(--contextMenuWidth);
+    position: absolute;
+    transform: translateY(-100%);
+  }
 </style>

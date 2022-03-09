@@ -1,8 +1,8 @@
 <template>
     <div >
-      <SignCategoryContainer :optionText="'Type'" :category="'relationship-bows'" :parentY="y" @updateSignData="changeType"/>
-      <OnOffOption :optionText="'Passing'" :initState="signData.passing" @switchState="changePassing"/>
-      <OnOffOption :optionText="'Grasping'" :initState="signData.grasping" @switchState="changeGrasping"/>
+      <SignCategoryContainer :optionText="'Type'" :category="'relationship-bows'" :parentY="y" :active="true" @updateSignData="changeType"/>
+      <OnOffOption :optionText="'Passing'" :initState="signData.passing" :active="true" @switchState="changePassing"/>
+      <OnOffOption :optionText="'Grasping'" :initState="signData.grasping" :active="true" @switchState="changeGrasping"/>
       <DeleteOption :mIndex="1" @delete="emitDelete"/>
     </div>
 </template>

@@ -1,14 +1,17 @@
 <template>
-    <div class="context-menu-item" ref="container" @mouseenter="getTop()" @mouseleave="getTop()">
-      <div class="center-vertically">
-        <p class="context-item-text">{{optionText}}</p>
-      </div>
-      <div class="center-vertically context-item-interact-box">
-          <img class="context-item-interact-img smaller" src="@/assets/images/context-images/triangle-left.svg" alt="triangle"/>
+    <div class="context-menu-item" ref="container" @mouseenter="getTop()" @mouseleave="getTop()" :class="{unusable: !active}">
+      <div class="hover-target">
+        <div class="center-vertically">
+          <p class="context-item-text">{{optionText}}</p>
+        </div>
+        <div class="center-vertically context-item-interact-box">
+            <img class="context-item-interact-img smaller" src="@/assets/images/context-images/triangle-left.svg" alt="triangle"/>
+        </div>
       </div>
       <div class="category" :class="{left: side == 'left'}" :style="'top: ' + top + 'px; left: ' + xOffset + 'px'">
         <LibraryItem :active="true" :category="category" :catIndex="0" :selected="selected" :offset="itemOffset"  @selectSign="selectSign"/>
       </div>
+      <div v-if="!active" class="blocker" :style="'height: ' + itemHeight + 'px'"/>
     </div>
     
 </template>
@@ -25,6 +28,7 @@ export default {
     optionText: String,
     category: String,
     parentY: Number,
+    active: Boolean,
   },
   data() {
     return {
@@ -33,6 +37,7 @@ export default {
       selected: -1,
       top: 0,
       xOffset: 0,
+      itemHeight: 0,
     };
   },
   computed: {
@@ -41,6 +46,7 @@ export default {
     this.itemOffset = this.getWidth();
     this.getTop();
     this.xOffset = this.getXPos();
+    this.itemHeight = this.$refs.container.getBoundingClientRect().height;
   },
   methods: {
     getWidth() {
@@ -73,9 +79,10 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-  .context-menu-item:hover .category {
+  .hover-target:hover + .category {
     display: block;
   }
+  
   .category {
     position: absolute;
     display: none;
@@ -85,5 +92,7 @@ export default {
     background: white;
   }
 
-  
+  .category:hover {
+    display: block;
+  }  
 </style>

@@ -1,13 +1,14 @@
 <template>
     <div>
-      <SignCategoryContainer :optionText="'Type'" :category="'body-part-signs'" :parentY="y" @updateSignData="newSignData"/>
-      <OnOffOption v-show="signData.canBeLimb" :optionText="'Limb'" :initState="signData.limb" @switchState="changeLimb"/>
-      <RadioOption v-show="signData.limb && signData.canBeLimb" :optionText="'Top Surface'" :options="surfaceInnerOuter" :initState="signData.surface" @switchState="this.changeTopSurface"/>
-      <RadioOption v-show="signData.limb && signData.canBeLimb" :optionText="'Side Surface'" :options="surfaceSides" :initState="signData.surface" @switchState="this.changeSideSurface"/>
-      <div v-if="signData.signType == 'Fingers'">
-        <SliderOption :optionText="'Digit'" :initState="signData.digit" :stops="5" @switchState="changeDigit" :id="'body-part-finger-slider-0'"/>
-        <SliderOption :optionText="'Joint'" :initState="signData.joint" :stops="signData.signType == 'Fingers' ? 5 : 4" @switchState="changeJoint" :id="'body-part-finger-slider-1'"/>
-      </div>
+      <SignCategoryContainer :optionText="'Type'" :category="'body-part-signs'" :parentY="y" :active="true" @updateSignData="newSignData"/>
+      <OnOffOption :optionText="'Limb'" :initState="signData.limb" :active="signData.canBeLimb" @switchState="changeLimb"/>
+      <RadioOption :optionText="'Top Surface'" :options="surfaceInnerOuter" :initState="signData.surface" :active="signData.limb && signData.canBeLimb" @switchState="this.changeTopSurface"/>
+      <RadioOption :optionText="'Side Surface'" :options="surfaceSides" :initState="signData.surface" :active="signData.limb && signData.canBeLimb" @switchState="this.changeSideSurface"/>
+      <OnOffOption :optionText="'Finger/Toe Definition'" :initState="signData.digit && signData.digit >= 1" :active="signData.signType == 'Fingers' || signData.signType == 'Toes'" @switchState="changeJointDefined"/>
+      <SignCategoryContainer v-if="signData.signType != 'Toes'" :optionText="'Digit'" :category="'finger-digits'" :parentY="y" :active="(signData.signType == 'Fingers' || signData.signType == 'Toes') && jointDefined" @updateSignData="changeDigit"/>
+      <SignCategoryContainer v-else :optionText="'Digit'" :category="'toe-digits'" :parentY="y" :active="(signData.signType == 'Fingers' || signData.signType == 'Toes') && jointDefined" @updateSignData="changeDigit"/>
+      <SignCategoryContainer v-if="signData.signType != 'Toes'" :optionText="'Joint'" :category="'finger-joints'" :parentY="y" :active="(signData.signType == 'Fingers' || signData.signType == 'Toes') && jointDefined" @updateSignData="changeJoint"/>
+      <SignCategoryContainer v-else :optionText="'Joint'" :category="'toe-joints'" :parentY="y" :active="(signData.signType == 'Fingers' || signData.signType == 'Toes') && jointDefined" @updateSignData="changeJoint"/>
       <DeleteOption @delete="emitDelete"/>
     </div>
 </template>
@@ -43,6 +44,7 @@ export default {
       ],
       surfaceTop: "",
       surfaceSide: "",
+      jointDefined: false,
     };
   },
   computed: {
@@ -70,11 +72,23 @@ export default {
     changeSurface() {
       this.newSignData ({surface: this.surfaceTop + " " + this.surfaceSide});
     },
+    changeJointDefined (data) {
+      let joint = 5;
+      if (data && !this.signData.digit && !this.signData.joint) {
+        if (this.signData.signType == "Toes") {
+          joint = 4;
+        }
+        this.newSignData ({digit: 1, joint: joint});
+      } else if (!data) {
+        this.newSignData ({digit: false, joint: false});
+      }
+      this.jointDefined = data;
+    },
     changeJoint (data) {
-      this.newSignData({joint: data.data});
+      this.newSignData({joint: data.joint});
     },
     changeDigit (data) {
-      this.newSignData({digit: data.data});
+      this.newSignData({digit: data.digit});
     },
     /**
      * The function that sends the updated sign data back to the score
@@ -107,6 +121,7 @@ export default {
   .context-menu {
     width: auto;
     position: absolute;
+    background-color: white;
     border: 2px solid black;
     box-sizing: border-box;
   }

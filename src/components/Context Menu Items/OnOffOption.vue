@@ -1,5 +1,5 @@
 <template>
-    <div  class="context-menu-item">
+    <div class="context-menu-item" :class="{unusable: !active}" ref="container">
       <div class="center-vertically">
         <p class="context-item-text">{{optionText}}</p>
       </div>
@@ -8,6 +8,7 @@
           <div class="inner-on-off" :class="initState ? 'on' : 'off'"/>
         </div>
       </div>
+      <div v-if="!active" class="blocker" :style="'height: ' + itemHeight + 'px'"/>
     </div>
 </template>
 
@@ -23,10 +24,12 @@ export default {
   props: {
     optionText: String,
     initState: Boolean,
+    active: Boolean,
   },
   emits: ["switchState"],
   data() {
     return {
+      itemHeight: 0,
     };
   },
   computed: {
@@ -40,6 +43,7 @@ export default {
      */
     changeState() {
       this.$emit("switchState", !this.initState);
+      this.itemHeight = this.$refs.container.getBoundingClientRect().height;
     }
   },
   

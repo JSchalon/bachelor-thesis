@@ -1,7 +1,12 @@
 <template>
     <div>
-      <SignCategoryContainer :optionText="'Type'" :category="'space-measurement-signs'" :parentY="y" @updateSignData="newSignData"/>
-      <SliderOption v-if="signData.signType != 'Unfolding' && signData.signType != 'NeitherOr'" :optionText="'Degree'" :initState="signData.degree" :stops="5" @switchState="changeDegree" :id="'space-measurement-slider-' + signIndex + '-0'"/>
+      <SignCategoryContainer :optionText="'Type'" :category="'space-measurement-signs'" :parentY="y" :active="true" @updateSignData="newSignData"/>
+      <SignCategoryContainer v-if="signData.signType == 'Unfolding' || signData.signType == 'NeitherOr'" :optionText="'Degree'" :category="'wide-signs'" :parentY="y" :active="false" @updateSignData="newSignData"/>
+      <SignCategoryContainer v-if="signData.signType == 'Narrow'" :optionText="'Degree'" :category="'narrow-signs'" :parentY="y" :active="true" @updateSignData="newSignData"/>
+      <SignCategoryContainer v-if="signData.signType == 'Wide'" :optionText="'Degree'" :category="'wide-signs'" :parentY="y" :active="true" @updateSignData="newSignData"/>
+      <SignCategoryContainer v-if="signData.signType == 'Joining'" :optionText="'Degree'" :category="'joining-signs'" :parentY="y" :active="true" @updateSignData="newSignData"/>
+      <SignCategoryContainer v-if="signData.signType == 'Spreading'" :optionText="'Degree'" :category="'spreading-signs'" :parentY="y" :active="true" @updateSignData="newSignData"/>
+      <SignCategoryContainer v-if="signData.signType == 'Folding'" :optionText="'Degree'" :category="'folding-signs'" :parentY="y" :active="true" @updateSignData="newSignData"/>
       <DeleteOption @delete="emitDelete"/>
     </div>
 </template>

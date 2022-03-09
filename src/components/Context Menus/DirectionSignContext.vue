@@ -1,29 +1,33 @@
 <template>
     <div>
-      <SignCategoryContainer :optionText="'Type'" :category="'direction-signs'" :parentY="y" @updateSignData="changeType"/>
-      <OnOffOption :optionText="'Hold'" :initState="signData.holding" @switchState="changeHolding"/>
+      <SignCategoryContainer :optionText="'Type'" :category="'direction-signs'" :parentY="y" :active="true" @updateSignData="changeType"/>
+      <OnOffOption :optionText="'Hold'" :initState="signData.holding" :active="true" @switchState="changeHolding"/>
       <RadioOption 
         :options="dimensions" 
         :initState="signData.dimension"
         :optionText="'Dimension'"
+        :active="true"
         @switchState="this.changeDimension"
       />
       <RadioOption 
         :options="positions" 
         :initState="signData.position"
         :optionText="'Position'"
+        :active="true"
         @switchState="this.changePosition"
       />
-      <OnOffOption :optionText="'Angle Definition'" :initState="definitionActive" @switchState="changeDefinition"/>
-      <div v-if="definitionActive">
-        <RadioOption 
-          :options="definitions" 
-          :initState="signData.definition.signType"
-          :optionText="'Pin Dimension'"
-          @switchState="changeDefinitionPin"
-        />
-        <SignCategoryContainer :optionText="'Angle'" :category="'pins-low'" :parentY="y" @updateSignData="changeType"/>
-      </div>
+      <OnOffOption :optionText="'Angle Definition'" :initState="definitionActive" :active="true" @switchState="changeDefinition"/>
+      <RadioOption 
+        :options="definitions" 
+        :initState="signData.definition ? signData.definition.signType : false"
+        :optionText="'Pin Dimension'"
+        :active="signData.definition ? true : false"
+        @switchState="changeDefinitionPin"
+      />
+      <SignCategoryContainer v-if="!signData.definition" :optionText="'Angle'" category="pins-low" :parentY="y" :active="signData.definition ? true : false" @updateSignData="changeType"/>
+      <SignCategoryContainer v-if="signData.definition && signData.definition.signType == 'Low'" :optionText="'Angle'" category="pins-low" :parentY="y" :active="signData.definition ? true : false" @updateSignData="changeDefinitionAngle"/>
+      <SignCategoryContainer v-else-if="signData.definition && signData.definition.signType == 'Middle'" :optionText="'Angle'" category="pins-middle" :parentY="y" :active="signData.definition ? true : false" @updateSignData="changeDefinitionAngle"/>
+      <SignCategoryContainer v-else-if="signData.definition && signData.definition.signType == 'High'" :optionText="'Angle'" category="pins-high" :parentY="y" :active="signData.definition ? true : false" @updateSignData="changeDefinitionAngle"/>
       <!--
         Todo: 
           - hodl (on/off)
@@ -112,17 +116,15 @@ export default {
       }
     },
     changeDefinitionPin (data) {
-      let obj = JSON.parse(JSON.stringify(this.signData.definition)) || {signType: "Low", degree: 0, bgVisible: true};
+      
+      let obj = JSON.parse(JSON.stringify(this.signData.definition)) || {signType: "Low", degree: 0, bgVisible: false};
       obj.signType = data.text;
       this.newSignData ({definition: obj});
     },
     changeDefinitionAngle (data) {
       if (this.isActive) {
-        let degree = data.data * 45;
-        if (data.data > 7) {
-          degree = -1;
-        }
-        let obj = JSON.parse(JSON.stringify(this.signData.definition)) || {signType: "Low", degree: 0, bgVisible: true};
+        let degree = data.degree;
+        let obj = JSON.parse(JSON.stringify(this.signData.definition)) || {signType: "Low", degree: 0, bgVisible: false};
         obj.degree = degree;
         this.newSignData ({definition: obj});
       }

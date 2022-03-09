@@ -1,5 +1,5 @@
 <template>
-    <div class="context-menu-item" ref="container">
+    <div class="context-menu-item" ref="container" :class="{unusable: !active}">
       <div class="center-vertically">
         <p class="context-item-text">{{optionText}}</p>
       </div>
@@ -8,6 +8,7 @@
           <div class="slider" :id="id" :style="'width: ' + sliderWidth + 'px;'"/>
         </div>
       </div>
+      <div v-if="!active" class="blocker" :style="'height: ' + itemHeight + 'px'"/>
     </div>
 </template>
 
@@ -27,15 +28,18 @@ export default {
     stops: Number,
     initState: [Number, Boolean],
     id: String,
+    active: Boolean,
   },
   emits: ["switchState"],
   data() {
     return {
       sliderWidth: 0,
+      itemHeight: 0,
     };
   },
   mounted () {
     this.sliderWidth = this.getSliderWidth();
+    this.itemHeight = this.$refs.container.getBoundingClientRect().height;
     interact('#' + this.id).draggable({ 
       origin: 'self',
       inertia: false,

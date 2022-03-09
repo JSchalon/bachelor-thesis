@@ -4,6 +4,7 @@
         :options="types" 
         :initState="signData.signType"
         :optionText="'Type'"
+        :active="true"
         @switchState="this.changeType"
       />
       <DeleteOption @delete="emitDelete"/>

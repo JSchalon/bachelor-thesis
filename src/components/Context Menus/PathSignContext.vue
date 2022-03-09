@@ -1,6 +1,6 @@
 <template>
     <div>
-      <SignCategoryContainer :optionText="'Type'" :category="'path-signs'" :parentY="y" @updateSignData="changeType"/>
+      <SignCategoryContainer :optionText="'Type'" :category="'path-signs'" :parentY="y" :active="true" @updateSignData="changeType"/>
       <DeleteOption :mIndex="1" @delete="emitDelete"/>
     </div>
 </template>
