@@ -17,6 +17,7 @@
             <rect x="0" y="0" :width="columnWidth" :height="innerCanvasDimFull.y" ref="boundingOuterLeft" />
             <rect :x="columnWidth * (columnsLeft + 1 + columnsRight)" y="0" :width="columnWidth" :height="innerCanvasDimRight.y" ref="boundingOuterRight" />
             <rect :x="columnWidth" y="0" :width="innerCanvasDim.x" :height="innerCanvasDim.y" ref="boundingInner" />
+            <rect :x="columnWidth" :y="innerCanvasDim.y - minHeight" :width="innerCanvasDim.x" :height="minHeight" ref="boundinColumnDef" />
             <Grid 
               @unselect="selectSign(-1)" 
               @selectColumn="updateSelectedColumn" 
@@ -319,8 +320,10 @@ export default {
       
       this.$emit("editSign", {type: "add", data: newSign});
       //the grid element beat/bar is at the y of the new sign, not y + height -> "move it" downwards after placing
-      if (newSign.height > (this.barHeight / this.beats)) {
-        this.calcBeatMove(this.signs.length-1, y, newSign.height, y + newSign.height - this.barHeight / this.beats, newSign.height);
+      if (signData.bar == 1 && signData.beat == 0 && newSign.height > this.minHeight) {
+        newSign.y = y - (newSign.height - this.minHeight);
+      } else if (newSign.height > this.minHeight) {
+        this.calcBeatMove(this.signs.length-1, y, newSign.height, y + newSign.height - this.minHeight, newSign.height);
       }
     },
     /**
@@ -434,6 +437,9 @@ export default {
       if (!this.keyCommandsEnabled) {
         return false;
       }
+      if (event.key == "e") {
+        console.log(this.signs)
+      }
       //delete sign on x or del
       if (event.key == "x" || event.key == "Delete") {
         let sortedSelected = this.selectedSigns.sort();
@@ -449,7 +455,7 @@ export default {
           if (elem.isSelected == true) {
             //if the key id is odd -> left / right arrow key, move the sign(s) to the next column
             if (event.which % 2 == 1) {
-              if (elem.signData.col + move.column  >= -this.columnsLeft && elem.signData.col + move.column < this.columnsRight) {
+              if (elem.signData.col + move.column  >= -this.columnsLeft && elem.signData.col + move.column < this.columnsRight && elem.signData.baseType != "RoomDirectionSign" && elem.signData.baseType != "PathSign") {
                 this.$emit("editSign", {type: "changeSignData", index: this.signs.indexOf(elem), data: {col: (elem.signData.col + move.column)}});
                 if (elem.signData.col < 0) {
                   this.$emit("editSign", {type: "changeSignData", index: this.signs.indexOf(elem), data: {side: "left"}});
@@ -459,7 +465,7 @@ export default {
                 this.$emit("editSign", {type: "move", index: this.signs.indexOf(elem), data: {x: (elem.x + move.column * this.columnWidth), y: elem.y}});
               }
             //if the key id is even -> up / down arrow key, move the sign up or down one beat if possible 
-            } else {
+            } else if (elem.signData.baseType != "BodyPartSign") {
               let startY = elem.y;
               let startH = elem.height;
               if (move.beat > 0) {
@@ -474,7 +480,11 @@ export default {
                 if (this.checkStartingPos(newY, elem.height) && newY + elem.height < this.innerCanvasDimFull.y) {
                   //if start pos and moving up -> change to bar 1 beat 0
                   this.$emit("editSign", {type: "move", index: this.signs.indexOf(elem), data: {x: elem.x, y: (elem.y + elem.height + this.startBarOffset)}});
-                  this.$emit("editSign", {type: "resize", index: this.signs.indexOf(elem), data: {height: (this.minHeight * 2)}});
+                  if (elem.signData.resizable) {
+                    this.$emit("editSign", {type: "resize", index: this.signs.indexOf(elem), data: {height: (this.minHeight * 2)}});
+                  } else {
+                    this.$emit("editSign", {type: "move", index: this.signs.indexOf(elem), data: {x: elem.x, y: elem.y + this.minHeight}});
+                  }
                 } else if (!this.checkStartingPos(newY, elem.height)) {
                   this.$emit("editSign", {type: "move", index: this.signs.indexOf(elem), data: {x: elem.x, y: (elem.y + this.minHeight)}});
                 }
@@ -523,6 +533,7 @@ export default {
       this.initSignClick();
     },
     initSignListeners (elem) {
+      interact(elem).unset();
       elem.addEventListener("contextmenu", this.openContextMenu, false);
       ["touchstart", "touchmove", "touchend"].forEach((et) => elem.addEventListener(et, this.ignoreTouch));
       if (elem.classList.contains("normal")) {
@@ -568,7 +579,7 @@ export default {
           modifiers: [
             // minimum size
             interact.modifiers.restrictSize({
-              min: { width: this.columnWidth * 2 + this.handleDiam*2, height: this.minHeight + this.handleDiam * 2 }
+              min: { width: this.columnWidth * 2 + this.handleDiam*2, height: this.minHeight}
             }),
             interact.modifiers.restrictEdges({
               outer: "parent",
@@ -654,6 +665,19 @@ export default {
         inertia: false,
         restrict: {
           restriction: this.$refs.boundingOuterRight.getBoundingClientRect(),
+          elementRect: { top: 0, left: 0, bottom: 1, right: 1 },
+        },
+        autoScroll: false,
+
+        // functions to call on event
+        onstart: this.dragStart,
+        onmove: this.dragMove,
+        onend: this.dragEnd
+      });
+      interact(".body-part").draggable({
+        inertia: false,
+        restrict: {
+          restriction: this.$refs.boundinColumnDef.getBoundingClientRect(),
           elementRect: { top: 0, left: 0, bottom: 1, right: 1 },
         },
         autoScroll: false,
@@ -1003,12 +1027,12 @@ export default {
       
       //check if the current position is above (below in actual browser) the starting line -> snap there
       if (this.checkStartingPos(actualY, this.signs[targetID].height)) {
-        if (!this.signs[targetID].signData.resizable) {
-          actualY = this.innerCanvasDimFull.y - this.barHeight / this.beats * 2 - this.minHeight + this.blocksizeY;
-        } else if (isBow) {
+        if (isBow) {
           actualY = this.innerCanvasDimFull.y - this.minHeight - this.barHeight / this.beats * 2 + this.blocksizeY;
         } else if (isBodyPart) {
           actualY = this.innerCanvasDimFull.y - this.minHeight - this.barHeight / this.beats * 2 + this.blocksizeY * 2;
+        } else if (!this.signs[targetID].signData.resizable) {
+          actualY = this.innerCanvasDimFull.y - this.barHeight / this.beats * 2 - this.minHeight + this.blocksizeY;
         } else {
           this.$emit("editSign", {type: "resize", index: shadowID, data: {height: (this.barHeight / this.beats * 2)}});
           actualY = this.innerCanvasDimFull.y - this.minHeight - this.barHeight / this.beats * 2;
@@ -1052,10 +1076,9 @@ export default {
       } else if (!isRoomSign && !isPath && screenX >= this.$refs.boundingOuterRight.getBBox().x) {
         screenX = screenX - this.columnWidth;
       } else if (isPath) {
-        if (screenX >= this.$refs.boundingOuterRight.getBBox().width) {
+        if (screenX >= this.$refs.boundingOuterRight.getBBox().x + this.$refs.boundingOuterRight.getBBox().width) {
           screenX = screenX - this.columnWidth;
         } else if (screenX < this.$refs.boundingOuterRight.getBBox().x) {
-
           screenX = screenX + this.columnWidth;
         }
       } else if (isBow) {
@@ -1065,11 +1088,11 @@ export default {
       
       //check if the current position is above (below in actual browser) the starting line -> snap there
       if (this.checkStartingPos(screenY, this.signs[targetID].height)) {
-        if (!this.signs[targetID].signData.resizable) {
-          screenY = this.innerCanvasDimFull.y - this.barHeight / this.beats * 2 - this.minHeight + this.blocksizeY;
-        } else if (isBodyPart) {
+        if (isBodyPart) {
           screenY = this.innerCanvasDimFull.y - this.minHeight - this.barHeight / this.beats * 2 + this.blocksizeY * 2;
           bodyPartBelowScore = true;
+        } else if (!this.signs[targetID].signData.resizable) {
+          screenY = this.innerCanvasDimFull.y - this.barHeight / this.beats * 2 - this.minHeight + this.blocksizeY;
         } else {
           this.$emit("editSign", {type: "resize", index: targetID, data: {height: (this.barHeight / this.beats * 2)}});
           screenY = this.innerCanvasDimFull.y - this.barHeight / this.beats * 2 - this.minHeight;
@@ -1145,10 +1168,6 @@ svg text {
   stroke-width: 2;
   stroke: rgb(0,0,0);
   
-}
-
-.margin-box {
-  margin: 10px;
 }
 
 .column-handles {
