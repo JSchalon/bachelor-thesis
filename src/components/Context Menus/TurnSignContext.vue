@@ -1,5 +1,5 @@
 <template>
-    <div class="context-menu">
+    <div>
       <!--
         Todo: 
           - hodl
@@ -15,31 +15,36 @@
               type (cat)
               degree (slider 0-5)
       -->
-      <RadioOption 
-        :options="types" 
-        :initState="signData.signType"
-        :optionText="'Type'"
-        @switchState="changeType"
-      />
+      <SignCategoryContainer :optionText="'Type'" :category="'turn-signs'" :parentY="y" :active="true" @updateSignData="newSignData"/>
+      <OnOffOption :optionText="'Hold'" :initState="signData.holding" :active="true" @switchState="changeHolding"/>
       <RadioOption 
         :options="definitionTypes" 
         :initState="signData.definition ? signData.definition.baseType : signData.definition"
-        :optionText="'Turn definition'"
+        :optionText="'Definition'"
+        :active="true"
         @switchState="changeDefinition"
       />
-      <div v-if="signData.definition && signData.definition.baseType == 'Pin'">
+
         <RadioOption 
           :options="definitions" 
-          :initState="signData.definition.signType"
+          :initState="signData.definition ? signData.definition.signType : false"
           :optionText="'Pin Dimension'"
+          :active="signData.definition && signData.definition.baseType == 'Pin'"
           @switchState="changeDefinitionPin"
         />
-        <SliderOption :optionText="'Angle'" :initState="signData.definition.degree" :stops="8" @switchState="changeDefinitionPinAngle" :id="'direction-definition-slider-' + signIndex"/>
-      </div>
-      <div v-else-if="signData.definition && signData.definition.baseType == 'SpaceMeasurementSign'">
-        <SignCategoryContainer :optionText="'Space Measurement Sign'" :category="'space-measurement-signs'" @updateSignData="changeDefinitionSpace"/>
-        <SliderOption :optionText="'Angle'" :initState="signData.definition.degree" :stops="5" @switchState="changeDefinitionSpaceDegree" :id="'direction-definition-slider-' + signIndex"/>
-      </div>
+        <SignCategoryContainer v-if="!signData.definition || signData.definition.baseType == 'SpaceMeasurementSign'" :optionText="'Angle'" category="pins-low" :parentY="y" :active="signData.definition && signData.definition.baseType != 'SpaceMeasurementSign' ? true : false" @updateSignData="changeType"/>
+        <SignCategoryContainer v-if="signData.definition && signData.definition.signType == 'Low'" :optionText="'Angle'" category="pins-low" :parentY="y" :active="signData.definition ? true : false" @updateSignData="changeDefinitionPinAngle"/>
+        <SignCategoryContainer v-else-if="signData.definition && signData.definition.signType == 'Middle'" :optionText="'Angle'" category="pins-middle" :parentY="y" :active="signData.definition ? true : false" @updateSignData="changeDefinitionPinAngle"/>
+        <SignCategoryContainer v-else-if="signData.definition && signData.definition.signType == 'High'" :optionText="'Angle'" category="pins-high" :parentY="y" :active="signData.definition ? true : false" @updateSignData="changeDefinitionPinAngle"/>
+
+        <SignCategoryContainer :optionText="'Space Measurement Sign'" :category="'space-measurement-signs'" :parentY="y" :active="signData.definition && signData.definition.baseType == 'SpaceMeasurementSign'" @updateSignData="changeDefinitionSpace"/>
+        <SignCategoryContainer v-if="!signData.definition || signData.definition.baseType == 'Pin' || signData.definition.signType == 'Unfolding' || signData.definition.signType == 'NeitherOr'" :optionText="'Degree'" :category="'wide-signs'" :parentY="y" :active="false" @updateSignData="changeDefinitionSpaceDegree"/>
+        <SignCategoryContainer v-if="signData.definition && signData.definition.signType == 'Narrow'" :optionText="'Degree'" :category="'narrow-signs'" :parentY="y" :active="true" @updateSignData="changeDefinitionSpaceDegree"/>
+        <SignCategoryContainer v-if="signData.definition && signData.definition.signType == 'Wide'" :optionText="'Degree'" :category="'wide-signs'" :parentY="y" :active="true" @updateSignData="changeDefinitionSpaceDegree"/>
+        <SignCategoryContainer v-if="signData.definition && signData.definition.signType == 'Joining'" :optionText="'Degree'" :category="'joining-signs'" :parentY="y" :active="true" @updateSignData="changeDefinitionSpaceDegree"/>
+        <SignCategoryContainer v-if="signData.definition && signData.definition.signType == 'Spreading'" :optionText="'Degree'" :category="'spreading-signs'" :parentY="y" :active="true" @updateSignData="changeDefinitionSpaceDegree"/>
+        <SignCategoryContainer v-if="signData.definition && signData.definition.signType == 'Folding'" :optionText="'Degree'" :category="'folding-signs'" :parentY="y" :active="true" @updateSignData="changeDefinitionSpaceDegree"/>
+
       <DeleteOption :mIndex="0" @delete="emitDelete"/>
     </div>
 </template>
@@ -57,7 +62,8 @@ export default {
   props: {
     signData: Object,
     isActive: Boolean,
-    signIndex: [Number, String]
+    signIndex: [Number, String],
+    y: Number
   },
   emits: ["updateSignData", "delete"],
   data() {
@@ -75,7 +81,7 @@ export default {
       definitionTypes: [
         {text: '---', img: false},
         {text: 'Pin', img:  false},
-        {text: 'SpaceMeasurementSign', img:  false}
+        {text: 'Space Measurement', img:  false}
       ],
     };
   },
@@ -87,6 +93,9 @@ export default {
   methods: {
     changeType(data) {
       this.newSignData ({signType: data.text});
+    },
+    changeHolding (data) {
+      this.newSignData({holding: data})
     },
     changeDefinition (data) {
       if (data.text != "---") {
@@ -100,17 +109,14 @@ export default {
       }
     },
     changeDefinitionPin (data) {
-      let obj = JSON.parse(JSON.stringify(this.signData.definition)) || {baseType: "Pin", signType: "Low", degree: 0, bgVisible: true};
+      let obj = JSON.parse(JSON.stringify(this.signData.definition)) || {baseType: "Pin", signType: "Low", degree: 0, bgVisible: false};
       obj.signType = data.text;
       this.newSignData ({definition: obj});
     },
     changeDefinitionPinAngle (data) {
       if (this.isActive) {
-        let degree = data.data * 45;
-        if (data.data > 7) {
-          degree = -1;
-        }
-        let obj = JSON.parse(JSON.stringify(this.signData.definition)) || {baseType: "Pin", signType: "Low", degree: 0, bgVisible: true};
+        let degree = data.degree;
+        let obj = JSON.parse(JSON.stringify(this.signData.definition)) || {baseType: "Pin", signType: "Low", degree: 0, bgVisible: false};
         obj.degree = degree;
         this.newSignData ({definition: obj});
       }
@@ -120,7 +126,7 @@ export default {
     },
     changeDefinitionSpaceDegree (data) {
       if (this.isActive) {
-        let degree = data.data + 1;
+        let degree = data.degree;
         let obj = JSON.parse(JSON.stringify(this.signData.definition));
         obj.degree = degree;
         this.newSignData ({definition: obj});

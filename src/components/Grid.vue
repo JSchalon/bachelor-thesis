@@ -112,7 +112,6 @@ export default {
   },
   methods: {
     colHighlightAfterAddRemove() {
-      console.log(this.selectedColumn + " " + this.columnsLeft)
       if (!(this.selectedColumn === false)) {
         this.highlight();
         if (this.selectedColumn < -this.columnsLeft) {
@@ -169,7 +168,7 @@ export default {
           this.highlightCol(parseInt(event.target.getAttribute("col")), false);
           this.highlight(parseInt(event.target.getAttribute("bar")));
           this.$emit("selectBar", parseInt(event.target.getAttribute("bar")));
-          if (parseInt(event.target.getAttribute("bar")) > 0) {
+          if (parseInt(event.target.getAttribute("bar")) > -1) {
             this.$emit("getGridHandles", {type: "bar", x: event.target.getBoundingClientRect().x, y: event.target.parentElement.querySelector(".beat-rect.ba" + event.target.getAttribute("bar")).getBoundingClientRect().y});
           }
           this.barSelected = true;
@@ -250,6 +249,6 @@ export default {
   }
 
   .highlighted {
-    fill: #22ee99;
+    fill: #ecbc1e;
   }
 </style>

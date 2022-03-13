@@ -1,11 +1,6 @@
 <template>
   <div>
-    <Header/>
-    <SignLibrary/>
-    <div id="interactionBox">
-      <InteractionMenu/>
-      <Score :signs="signs" @editSign="editSigns"/>
-    </div>
+    
   </div>
 </template>
 
@@ -23,11 +18,6 @@ export default {
   },
   data() {
     return {
-      //instead of here, save in vuex -> better accessebility for views
-      signs: [
-        {isSelected: false, height: 0, x: 0, y: 0, purpose: "dummy sign", signData: {baseType: "GenericSign", signType: "In place"}},
-        {isSelected: false, canResize: true, height: 50, x: 100, y: 350, signData: {baseType: "SpaceMeasurementSign", signType: "Narrow", degree: 1, side: "left", col: -3, bar: 1, beat: 0, resizable: true}},
-      ],
       xmlScore: null,
     };
   },
@@ -84,7 +74,7 @@ export default {
       this.signs.push(data);
       this.$store.dispatch('changeCurSign',false);
       //add new sign to xml
-      //distinguish between <column def> and <movement> (column def -> sign.bar: -1)
+      //distinguish between <column def> and <movement> and <bow> (column def -> sign.bar: -1 and bow -> signType)
     },
     moveSign (index, data) {
       this.signs[index].x = data.x;
@@ -202,8 +192,5 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-  #interactionBox {
-    width: 84%;
-    float: right;
-  }
+  
 </style>

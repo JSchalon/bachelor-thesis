@@ -1,6 +1,6 @@
 <template>
-    <div class="context-menu">
-      <SliderOption :optionText="'Angle'" :initState="signData.degree" :stops="7" @switchState="changeAngle" :id="'room-direction-slider-' + signIndex"/>
+    <div>
+      <SignCategoryContainer :optionText="'Angle'" :initState="signData.degree" category="pins-middle" :parentY="y" :active="true" @updateSignData="changeAngle"/>
       <DeleteOption @delete="emitDelete"/>
     </div>
 </template>
@@ -18,7 +18,8 @@ export default {
   props: {
     signData: Object,
     isActive: Boolean,
-    signIndex: [Number, String]
+    signIndex: [Number, String],
+    y: Number
   },
   emits: ["updateSignData", "delete"],
   data() {
@@ -33,9 +34,8 @@ export default {
   },
   methods: {
     changeAngle (data) {
-      console.log(data)
       if (this.isActive){
-        this.newSignData ({degree: data.data * 45});
+        this.newSignData ({degree: data.degree});
       } 
     },
     /**

@@ -1,7 +1,13 @@
 <template>
-    <div class="context-menu">
-      <SignCategoryContainer :optionText="'Type'" :category="'space-measurement-signs'" @updateSignData="newSignData"/>
-      <SliderOption v-if="signData.signType != 'Unfolding' && signData.signType != 'NeitherOr'" :optionText="'Degree'" :initState="signData.degree" :stops="5" @switchState="changeDegree" :id="'space-measurement-slider-' + signIndex + '-0'"/>
+    <div>
+      <SignCategoryContainer :optionText="'Type'" :category="'space-measurement-signs'" :parentY="y" :active="true" @updateSignData="newSignData"/>
+      <SignCategoryContainer v-if="signData.signType == 'Unfolding' || signData.signType == 'NeitherOr'" :optionText="'Degree'" :category="'wide-signs'" :parentY="y" :active="false" @updateSignData="newSignData"/>
+      <SignCategoryContainer v-if="signData.signType == 'Narrow'" :optionText="'Degree'" :category="'narrow-signs'" :parentY="y" :active="true" @updateSignData="newSignData"/>
+      <SignCategoryContainer v-if="signData.signType == 'Wide'" :optionText="'Degree'" :category="'wide-signs'" :parentY="y" :active="true" @updateSignData="newSignData"/>
+      <SignCategoryContainer v-if="signData.signType == 'Joining'" :optionText="'Degree'" :category="'joining-signs'" :parentY="y" :active="true" @updateSignData="newSignData"/>
+      <SignCategoryContainer v-if="signData.signType == 'Spreading'" :optionText="'Degree'" :category="'spreading-signs'" :parentY="y" :active="true" @updateSignData="newSignData"/>
+      <SignCategoryContainer v-if="signData.signType == 'Folding'" :optionText="'Degree'" :category="'folding-signs'" :parentY="y" :active="true" @updateSignData="newSignData"/>
+      <OnOffOption :optionText="'Hold'" :initState="signData.holding" :active="true" @switchState="changeHolding"/>
       <DeleteOption @delete="emitDelete"/>
     </div>
 </template>
@@ -19,7 +25,8 @@ export default {
   props: {
     signData: Object,
     isActive: Boolean,
-    signIndex: [Number, String]
+    signIndex: [Number, String],
+    y: Number,
   },
   emits: ["updateSignData", "delete"],
   data() {
@@ -37,6 +44,9 @@ export default {
       if (this.isActive) {
         this.newSignData ({degree: (data.data + 1)});
       }
+    },
+    changeHolding (data) {
+      this.newSignData({holding: data})
     },
     /**
      * The function that sends the updated sign data back to the score

@@ -1,11 +1,17 @@
 <template>
   <main class="main">
-    <ScoreController/>
+    <div>
+      <Header/>
+      <SignLibrary/>
+      <div id="interactionBox">
+        <InteractionMenu/>
+        <Score/>
+      </div>
+    </div>
   </main>
 </template>
 
 <script>
-import ScoreController from "../components/ScoreController.vue";
 
 /**
  * The main editor view
@@ -14,12 +20,12 @@ import ScoreController from "../components/ScoreController.vue";
  */
 export default {
   name: 'Main',
-  components: {
-    ScoreController,
-  }
 }
 </script>
 
 <style>
-
+  #interactionBox {
+    width: calc(100% - 250px);
+    float: right;
+  }
 </style>

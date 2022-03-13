@@ -21,6 +21,7 @@
     <g :transform="'translate(0, ' + (height / 2 - 25) + ')'" v-else-if="signData.definition && signData.definition.baseType == 'SpaceMeasurementSign'">
       <SpaceMeasurementSign :isSelected="isSelected" :id="id" :signData="signData.definition" :height="50"/>
     </g>
+    <circle v-if="signData.holding" :cx="signWidth / 2" :cy="5" r="5" class="draggable actual-sign" :class="{active: isSelected}" stroke="black" :stroke-width="isSelected ? borderWidth + 1: borderWidth" :signID="id"/>
   </g>
 </template>
 
@@ -56,6 +57,9 @@ export default {
       ];
       
       let anyPoints = "0,0 " + this.signWidth + "," + (this.beatHeight / 3) + " " + this.signWidth + "," + this.height + " 0," + (this.height - this.beatHeight / 3);
+      if (this.signData.holding) {
+        anyPoints = "0,10 " + this.signWidth + "," + (this.beatHeight / 3 + 10) + " " + this.signWidth + "," + this.height + " 0," + (this.height - this.beatHeight / 3);
+      }
       baseSigns[0].points = anyPoints;
 
       return baseSigns;

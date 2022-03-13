@@ -12,58 +12,12 @@
     }
   ],
   "signData": [
-    { 
-      "baseType": "BodyPartSign",
-      "signType": "Ankle",
-      "surface": false,
-      "limb": false,
-      "resizable": false,
-      "canBeLimb": true
-    },
-    {
-      "baseType": "BodyPartSign",
-      "signType": "Chest",
-      "resizable": false,
-      "canBeLimb": false
-    },
-    {
-      "baseType": "BodyPartSign",
-      "signType": "Elbow",
-      "surface": false,
-      "limb": false,
-      "resizable": false,
-      "canBeLimb": true
-    },
-    {
-      "baseType": "BodyPartSign",
-      "signType": "Fingers",
-      "surface": false,
-      "limb": false,
-      "digit": false,
-      "joint":false,
-      "resizable": false,
-      "canBeLimb": true
-    },
-    {
-      "baseType": "BodyPartSign",
-      "signType": "Foot",
-      "surface": false,
-      "limb": false,
-      "resizable": false,
-      "canBeLimb": true
-    },
-    {
-      "baseType": "BodyPartSign",
-      "signType": "Hand",
-      "surface": false,
-      "limb": false,
-      "resizable": false,
-      "canBeLimb": true
-    },
     {
       "baseType": "BodyPartSign",
       "signType": "Head",
       "resizable": false,
+      "digit": false,
+      "joint": false,
       "canBeLimb": false
     },
     {
@@ -71,8 +25,28 @@
       "signType": "Hip",
       "surface": false,
       "limb": false,
+      "digit": false,
+      "joint": false,
       "resizable": false,
       "canBeLimb": true
+    },
+    {
+      "baseType": "BodyPartSign",
+      "signType": "Shoulder",
+      "surface": false,
+      "limb": false,
+      "digit": false,
+      "joint": false,
+      "resizable": false,
+      "canBeLimb": true
+    },
+    {
+      "baseType": "BodyPartSign",
+      "signType": "Chest",
+      "resizable": false,
+      "digit": false,
+      "joint": false,
+      "canBeLimb": false
     },
     {
       "baseType": "BodyPartSign",
@@ -84,17 +58,77 @@
     },
     {
       "baseType": "BodyPartSign",
-      "signType": "Pelvis",
+      "signType": "Elbow",
+      "surface": false,
+      "limb": false,
+      "digit": false,
+      "joint": false,
+      "resizable": false,
+      "canBeLimb": true
+    },
+    {
+      "baseType": "BodyPartSign",
+      "signType": "Waist",
+      "digit": false,
+      "joint": false,
       "resizable": false,
       "canBeLimb": false
     },
     {
       "baseType": "BodyPartSign",
-      "signType": "Shoulder",
+      "signType": "Ankle",
       "surface": false,
       "limb": false,
+      "digit": false,
+      "joint": false,
       "resizable": false,
       "canBeLimb": true
+    },
+    {
+      "baseType": "BodyPartSign",
+      "signType": "Wrist",
+      "surface": false,
+      "limb": false,
+      "digit": false,
+      "joint": false,
+      "resizable": false,
+      "canBeLimb": true
+    },
+    {
+      "baseType": "BodyPartSign",
+      "signType": "Pelvis",
+      "digit": false,
+      "joint": false,
+      "resizable": false,
+      "canBeLimb": false
+    },
+    {
+      "baseType": "BodyPartSign",
+      "signType": "Foot",
+      "surface": false,
+      "limb": false,
+      "digit": false,
+      "joint": false,
+      "resizable": false,
+      "canBeLimb": true
+    },
+    {
+      "baseType": "BodyPartSign",
+      "signType": "Hand",
+      "surface": false,
+      "limb": false,
+      "digit": false,
+      "joint": false,
+      "resizable": false,
+      "canBeLimb": true
+    },
+    {
+      "baseType": "BodyPartSign",
+      "signType": "Torso",
+      "digit": false,
+      "joint": false,
+      "resizable": false,
+      "canBeLimb": false
     },
     {
       "baseType": "BodyPartSign",
@@ -102,27 +136,18 @@
       "surface": false,
       "limb": false,
       "digit": false,
-      "joint":false,
+      "joint": false,
       "resizable": false,
       "canBeLimb": true
     },
     {
       "baseType": "BodyPartSign",
-      "signType": "Torso",
-      "resizable": false,
-      "canBeLimb": false
-    },
-    {
-      "baseType": "BodyPartSign",
-      "signType": "Waist",
-      "resizable": false,
-      "canBeLimb": false
-    },
-    {
-      "baseType": "BodyPartSign",
-      "signType": "Wrist",
+      "signType": "Fingers",
       "surface": false,
       "limb": false,
+      "digit": false,
+      "joint": false,
+      
       "resizable": false,
       "canBeLimb": true
     }

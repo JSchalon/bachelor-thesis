@@ -1,22 +1,28 @@
 <template>
-    <div class="context-menu">
-      <OnOffOption :optionText="'Pins'" :initState="displayPinOptions" @switchState="changePins"/>
-      <div v-if="displayPinOptions">
-        <RadioOption 
-        :options="pinType" 
-        :initState="signData.firstPin.signType"
-        :optionText="'First Pin'"
-        @switchState="this.changeFirstPin"
+    <div>
+      <OnOffOption :optionText="'Pins'" :initState="displayPinOptions" :active="true" @switchState="changePins"/>
+      <RadioOption 
+      :options="pinType" 
+      :initState="signData.firstPin.signType"
+      :optionText="'First Pin'"
+      :active="displayPinOptions"
+      @switchState="this.changeFirstPin"
       />
-      <SliderOption :optionText="'First Pin Angle'" :initState="signData.firstPin.degree" :stops="8" @switchState="changeFirstPinAngle" :id="'vibration-pin-slider-0-' + signIndex"/>
+      <SignCategoryContainer v-if="!signData.firstPin" :optionText="'Angle'" category="pins-low" :parentY="y" :active="signData.firstPin ? true : false" @updateSignData="changeFirstPinAngle"/>
+      <SignCategoryContainer v-if="signData.firstPin && signData.firstPin.signType == 'Low'" :optionText="'Angle'" category="pins-low" :parentY="y" :active="signData.firstPin ? true : false" @updateSignData="changeFirstPinAngle"/>
+      <SignCategoryContainer v-else-if="signData.firstPin && signData.firstPin.signType == 'Middle'" :optionText="'Angle'" category="pins-middle" :parentY="y" :active="signData.firstPin ? true : false" @updateSignData="changeFirstPinAngle"/>
+      <SignCategoryContainer v-else-if="signData.firstPin && signData.firstPin.signType == 'High'" :optionText="'Angle'" category="pins-high" :parentY="y" :active="signData.firstPin ? true : false" @updateSignData="changeFirstPinAngle"/>
       <RadioOption 
         :options="pinType" 
         :initState="signData.secondPin.signType"
         :optionText="'Second Pin'"
+        :active="displayPinOptions"
         @switchState="this.changeSecondPin"
       />
-      <SliderOption :optionText="'Second Pin Angle'" :initState="signData.secondPin.degree" :stops="8" @switchState="changeSecondPinAngle" :id="'vibration-pin-slider-1-' + signIndex"/>
-      </div>
+      <SignCategoryContainer v-if="!signData.firstPin" :optionText="'Angle'" category="pins-low" :parentY="y" :active="signData.firstPin ? true : false" @updateSignData="changeSecondPinAngle"/>
+      <SignCategoryContainer v-if="signData.firstPin && signData.firstPin.signType == 'Low'" :optionText="'Angle'" category="pins-low" :parentY="y" :active="signData.firstPin ? true : false" @updateSignData="changeSecondPinAngle"/>
+      <SignCategoryContainer v-else-if="signData.firstPin && signData.firstPin.signType == 'Middle'" :optionText="'Angle'" category="pins-middle" :parentY="y" :active="signData.firstPin ? true : false" @updateSignData="changeSecondPinAngle"/>
+      <SignCategoryContainer v-else-if="signData.firstPin && signData.firstPin.signType == 'High'" :optionText="'Angle'" category="pins-high" :parentY="y" :active="signData.firstPin ? true : false" @updateSignData="changeSecondPinAngle"/>
       <DeleteOption :mIndex="1" @delete="emitDelete"/>
     </div>
 </template>
@@ -34,7 +40,8 @@ export default {
   props: {
     signData: Object,
     isActive: Boolean,
-    signIndex: [Number, String]
+    signIndex: [Number, String],
+    y: Number
   },
   emits: ["updateSignData", "delete"],
   data() {
@@ -70,10 +77,7 @@ export default {
     },
     changeFirstPinAngle (data) {
       if (this.isActive) {
-        let degree = data.data * 45;
-        if (data.data > 7) {
-          degree = -1;
-        }
+        let degree = data.degree;
         let obj = JSON.parse(JSON.stringify(this.signData.firstPin)) || {signType: "Low", degree: 0};
         obj.degree = degree;
         this.newSignData ({firstPin: obj});
@@ -86,10 +90,7 @@ export default {
     },
     changeSecondPinAngle (data) {
       if (this.isActive) {
-        let degree = data.data * 45;
-        if (data.data > 7) {
-          degree = -1;
-        }
+        let degree = data.degree;
         let obj = JSON.parse(JSON.stringify(this.signData.secondPin)) || {signType: "Low", degree: 0};
         obj.degree = degree;
         this.newSignData ({secondPin: obj});

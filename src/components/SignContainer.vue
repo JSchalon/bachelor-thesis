@@ -4,7 +4,8 @@
         signData.baseType == 'RelationshipBow' ? 'bow' : 'normal', 
         signData.baseType == 'RoomDirectionSign' ? 'room-direction' : '',
         signData.baseType == 'PathSign' ? 'path' : '',
-        signData.baseType != 'PathSign' && signData.baseType != 'RoomDirectionSign' ? 'bound-inner' : ''
+        signData.baseType == 'BodyPartSign' ? 'body-part' : '',
+        signData.baseType != 'PathSign' && signData.baseType != 'RoomDirectionSign' && signData.baseType != 'BodyPartSign' ? 'bound-inner' : ''
       ]" 
       :x="x" :y="y" 
       :data-y="y" 

@@ -1,0 +1,52 @@
+{
+  "catName": "Spreading Signs",
+  "catHeight": 50,
+  "baseHeight": 50,
+  "general": [
+    {
+      "isSelected": false,
+      "canResize": false,
+      "height": 50,
+      "x": 0,
+      "y": 0
+    }
+  ],
+  "signData": [
+    {
+      "baseType": "SpaceMeasurementSign",
+      "signType": "Spreading",
+      "degree": 1,
+      "resizable": true
+    },
+    {
+      "baseType": "SpaceMeasurementSign",
+      "signType": "Spreading",
+      "degree": 2,
+      "resizable": true
+    },
+    {
+      "baseType": "SpaceMeasurementSign",
+      "signType": "Spreading",
+      "degree": 3,
+      "resizable": true
+    },
+    {
+      "baseType": "SpaceMeasurementSign",
+      "signType": "Spreading",
+      "degree": 4,
+      "resizable": true
+    },
+    {
+      "baseType": "SpaceMeasurementSign",
+      "signType": "Spreading",
+      "degree": 5,
+      "resizable": true
+    },
+    {
+      "baseType": "SpaceMeasurementSign",
+      "signType": "Spreading",
+      "degree": 6,
+      "resizable": true
+    }
+  ]
+}

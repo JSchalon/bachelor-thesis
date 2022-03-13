@@ -5,8 +5,9 @@
   "general": [
     {
       "isSelected": false,
-      "canResize": false,
+      "canResize": true,
       "height": 50,
+      "width": 160,
       "x": 0,
       "y": 0
     }
@@ -24,7 +25,8 @@
       "signType": "Address",
       "passing": false, 
       "grasping": false,
-      "resizable": true
+      "resizable": true,
+      "addressing": "right"
     },
     {
       "baseType": "RelationshipBow",

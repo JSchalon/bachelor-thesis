@@ -1,0 +1,70 @@
+{
+  "catName": "Middle Pins",
+  "catHeight": 50,
+  "baseHeight": 50,
+  "general": [
+    {
+      "isSelected": false,
+      "canResize": false,
+      "height": 50,
+      "x": 0,
+      "y": 0
+    }
+  ],
+  "signData": [
+    {
+      "baseType": "Pin",
+      "degree": 315,
+      "signType": "Low",
+      "resizable": false
+    },
+    {
+      "baseType": "Pin",
+      "degree": 0,
+      "signType": "Low",
+      "resizable": false
+    },
+    {
+      "baseType": "Pin",
+      "degree": 45,
+      "signType": "Low",
+      "resizable": false
+    },
+    {
+      "baseType": "Pin",
+      "degree": 270,
+      "signType": "Low",
+      "resizable": false
+    },
+    {
+      "baseType": "Pin",
+      "degree": -1,
+      "signType": "Low",
+      "resizable": false
+    },
+    {
+      "baseType": "Pin",
+      "degree": 90,
+      "signType": "Low",
+      "resizable": false
+    },
+    {
+      "baseType": "Pin",
+      "degree": 225,
+      "signType": "Low",
+      "resizable": false
+    },
+    {
+      "baseType": "Pin",
+      "degree": 180,
+      "signType": "Low",
+      "resizable": false
+    },
+    {
+      "baseType": "Pin",
+      "degree": 135,
+      "signType": "Low",
+      "resizable": false
+    }
+  ]
+}

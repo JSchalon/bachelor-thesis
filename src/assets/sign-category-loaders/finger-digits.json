@@ -1,0 +1,66 @@
+{
+  "catName": "Finger Digits",
+  "catHeight": 50,
+  "baseHeight": 50,
+  "general": [
+    {
+      "isSelected": false,
+      "canResize": false,
+      "height": 50,
+      "x": 0,
+      "y": 0
+    }
+  ],
+  "signData": [
+    { 
+      "baseType": "BodyPartSign",
+      "signType": "Fingers",
+      "surface": false,
+      "limb": false,
+      "digit": 1,
+      "joint": 5,
+      "resizable": false,
+      "canBeLimb": true
+    },
+    { 
+      "baseType": "BodyPartSign",
+      "signType": "Fingers",
+      "surface": false,
+      "limb": false,
+      "digit": 2,
+      "joint": 5,
+      "resizable": false,
+      "canBeLimb": true
+    },
+    { 
+      "baseType": "BodyPartSign",
+      "signType": "Fingers",
+      "surface": false,
+      "limb": false,
+      "digit": 3,
+      "joint": 5,
+      "resizable": false,
+      "canBeLimb": true
+    },
+    { 
+      "baseType": "BodyPartSign",
+      "signType": "Fingers",
+      "surface": false,
+      "limb": false,
+      "digit": 4,
+      "joint": 5,
+      "resizable": false,
+      "canBeLimb": true
+    },
+    { 
+      "baseType": "BodyPartSign",
+      "signType": "Fingers",
+      "surface": false,
+      "limb": false,
+      "digit": 5,
+      "joint": 5,
+      "resizable": false,
+      "canBeLimb": true
+    }
+  ]
+}

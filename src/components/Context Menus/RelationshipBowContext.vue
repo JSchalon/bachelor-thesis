@@ -1,8 +1,16 @@
 <template>
-    <div class="context-menu">
-      <SignCategoryContainer :optionText="'Type'" :category="'relationship-bows'" @updateSignData="changeType"/>
-      <OnOffOption :optionText="'Passing'" :initState="signData.passing" @switchState="changePassing"/>
-      <OnOffOption :optionText="'Grasping'" :initState="signData.grasping" @switchState="changeGrasping"/>
+    <div >
+      <SignCategoryContainer :optionText="'Type'" :category="'relationship-bows'" :parentY="y" :active="true" @updateSignData="changeType"/>
+      <RadioOption 
+        :options="addressingTypes" 
+        :initState="getAddressInitState()"
+        :optionText="'Definition'"
+        :active="signData.signType == 'Address'"
+        @switchState="changeAdressing"
+      />
+      <OnOffOption :optionText="'Hold'" :initState="signData.holding" :active="true" @switchState="changeHolding"/>
+      <OnOffOption :optionText="'Passing'" :initState="signData.passing" :active="true" @switchState="changePassing"/>
+      <OnOffOption :optionText="'Grasping'" :initState="signData.grasping" :active="true" @switchState="changeGrasping"/>
       <DeleteOption :mIndex="1" @delete="emitDelete"/>
     </div>
 </template>
@@ -20,11 +28,17 @@ export default {
   props: {
     signData: Object,
     isActive: Boolean,
-    signIndex: [Number, String]
+    signIndex: [Number, String],
+    y: Number
   },
   emits: ["updateSignData", "delete"],
   data() {
     return {
+      addressingTypes: [
+        {text: 'Right', img: false},
+        {text: 'Left', img:  false},
+        {text: 'Both', img:  false}
+      ]
     };
   },
   computed: {
@@ -36,6 +50,18 @@ export default {
   methods: {
     changeType (data) {
       this.newSignData({signType: data.signType})
+    },
+    changeAdressing (data) {
+      if (data.text == "Right") {
+        this.newSignData({addressing: "right"})
+      } else if (data.text == "Left") {
+        this.newSignData({addressing: "left"})
+      } else {
+        this.newSignData({addressing: "both"})
+      }
+    },
+    changeHolding (data) {
+      this.newSignData({holding: data})
     },
     changePassing(data) {
       this.newSignData ({passing: data});
@@ -52,6 +78,15 @@ export default {
     },
     emitDelete() {
       this.$emit("delete", parseInt(this.signIndex))
+    },
+    getAddressInitState () {
+      if (this.signData.addressing == "right") {
+        return "Right";
+      } if (this.signData.addressing == "left") {
+        return "Left";
+      } else {
+        return "Both";
+      }
     }
   },
 };

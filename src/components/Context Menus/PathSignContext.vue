@@ -1,6 +1,6 @@
 <template>
-    <div class="context-menu">
-      <SignCategoryContainer :optionText="'Type'" :category="'path-signs'" @updateSignData="changeType"/>
+    <div>
+      <SignCategoryContainer :optionText="'Type'" :category="'path-signs'" :parentY="y" :active="true" @updateSignData="changeType"/>
       <DeleteOption :mIndex="1" @delete="emitDelete"/>
     </div>
 </template>
@@ -18,7 +18,8 @@ export default {
   props: {
     signData: Object,
     isActive: Boolean,
-    signIndex: [Number, String]
+    signIndex: [Number, String],
+    y: Number,
   },
   emits: ["updateSignData", "delete"],
   data() {

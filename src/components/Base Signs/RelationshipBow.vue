@@ -52,6 +52,7 @@
       fill="#ffffff00"
       :signID="id"
     />
+    <circle v-if="signData.holding" :cx="width / 2" :cy="5" r="5" :class="{active: isSelected}" stroke="black" :stroke-width="isSelected ? borderWidth + 1: borderWidth" :signID="id"/>
   </g>
 </template>
 
@@ -87,6 +88,11 @@ export default {
         path = "M 40,10 Q " + (this.width / 2) + ",40," + (this.width - 40) + ",10";
       } else if (type == "Address") {
         path = "M 40,10 H " + (this.width - 80) + " Q " + (this.width - 60) + ",40," + (this.width - 40) + ",10";
+        if (this.signData.addressing == "left") {
+          path = "M 40,10 Q 60,40,80,10 H " + (this.width - 40) ;
+        } else if (this.signData.addressing == "both") {
+          path = " M 40,10 Q 60,40,80,10 H " + (this.width - 80) + " Q " + (this.width - 60) + ",40," + (this.width - 40) + ",10";
+        }
       } else if (type == "Near") {
         path = "M 40,10 Q " + (this.width / 2) + ",40," + (this.width - 40) + ",10";
       } else if (type == "Support") {

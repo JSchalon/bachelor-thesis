@@ -1,5 +1,5 @@
 <template>
-    <div class="context-menu-item">
+    <div class="context-menu-item" ref="container" :class="{unusable: !active}">
       <div class="center-vertically">
         <p class="context-item-text">{{optionText + ": " + options[selectedID].text}}</p>
       </div>
@@ -11,6 +11,7 @@
           </div>
         </div>
       </div>
+      <div v-if="!active" class="blocker" :style="'height: ' + itemHeight + 'px'"/>
     </div>
 </template>
 
@@ -27,19 +28,21 @@ export default {
     options: Array,
     optionText: String,
     initState: [String, Boolean],
+    active: Boolean,
   },
   emits: ["switchState"],
   data() {
     return {
       selectedID: 1,
+      itemHeight: 0,
     };
   },
   mounted () {
     this.selectedID = this.options.findIndex(obj => obj.text.includes(this.initState));
+    this.itemHeight = this.$refs.container.getBoundingClientRect().height;
     if (this.selectedID == -1) {
       this.selectedID = 0;
     }
-    
   },
   methods: {
     /**

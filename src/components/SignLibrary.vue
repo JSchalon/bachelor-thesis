@@ -1,7 +1,8 @@
 <template>
-    <div id="library">
-      <div id="cur-sign-container"><p class="cur-sign-text">Current Sign: {{curSign}}</p></div>
-      <LibraryItemContainer :active="item.active" :selected="item.selected" :category="item.category" :catIndex="index" :key="index" v-for="(item, index) of categories" @expand="selectCategory" @selectSign="updateCurSign"/>
+  <div id="library" :style="libraryActive ? 'width: 250px;' : 'width: 0;'">
+    <div></div>
+    <div id="cur-sign-container"><p class="cur-sign-text">Current Sign: {{curSign}}</p></div>
+    <LibraryItemContainer :active="item.active" :selected="item.selected" :category="item.category" :catIndex="index" :key="index" v-for="(item, index) of categories" @expand="selectCategory" @selectSign="updateCurSign"/>
   </div>
 </template>
 
@@ -32,6 +33,9 @@ export default {
   computed: {
     storedSign () {
       return this.$store.state["curSign"];
+    },
+    libraryActive () {
+      return this.$store.state["libraryActive"];
     }
   },
   mounted () {
@@ -85,19 +89,23 @@ export default {
 
 <style>
 #library {
-  width: 16%;
   height: 92vh;
-  background-color: #c1c1c1;
+  overflow: auto;
+  
   float: left;
   position: relative;
   z-index: 5;
 }
 #cur-sign-container {
   border-bottom: 1px solid #a1a1a1;
+  background-color: #c1c1c1;
   min-height: 5vh;
   box-sizing: border-box;
   display: flex;
   align-items: center;
+  position: sticky;
+  top: 0;
+  z-index: 5;
 }
 
 .cur-sign-text {
@@ -125,6 +133,7 @@ export default {
   justify-content: center;
   align-items: center;
   box-sizing: border-box;
+  cursor: pointer;
 }
 
 .library-category-name {
