@@ -16,7 +16,16 @@ export default createStore({
     curSign: false,
     signs: [
       {isSelected: false, height: 0, x: 0, y: 0, purpose: "dummy sign", signData: {baseType: "GenericSign", signType: "In place"}},
-      {isSelected: false, canResize: true, height: 50, x: 100, y: 350, signData: {baseType: "SpaceMeasurementSign", signType: "Narrow", degree: 1, side: "left", col: -3, bar: 1, beat: 0, resizable: true, holding: true}},
+      {canResize: true, height: 100, isSelected: false, signData: {bar: 0, baseType: "DirectionSign", beat: 0, col: -1, dimension: "Middle", holding: false, resizable: true, side: "left", signType: "In place"}, width: 40, x: 260, y: 405},
+      {canResize: true, height: 100, isSelected: false, signData: {bar: 0, baseType: "DirectionSign", beat: 0, col: 0, dimension: "Middle", holding: false, resizable: true, side: "right", signType: "In place"}, width: 40, x: 340, y: 405},
+      {canResize: true, height: 50, isSelected: false, signData: {bar: 1, baseType: "DirectionSign", beat: 3, col: 0, dimension: "Middle", holding: true, resizable: true, side: "right", signType: "Forward direction"}, width: 40, x: 340, y: 200},
+      {canResize: true, height: 150, isSelected: false, signData: {bar: 0, baseType: "DirectionSign", beat: 0, col: -1, dimension: "Middle", holding: true, position: "Behind", resizable: true, side: "left", signType: "Right direction"}, width: 40, x: 260, y: 250},
+      {canResize: true, height: 50, isSelected: false, signData: {bar: 0, baseType: "RoomDirectionSign", beat: 0, col: -4, degree: 0, resizable: false, side: "left", signType: "RoomDirectionSign"}, width: 40, x: 20, y: 455},
+      {canResize: true, height: 50, isSelected: false, signData: {bar: 1, baseType: "RoomDirectionSign", beat: 3, col: -4, degree: 45, resizable: false, side: "left", signType: "RoomDirectionSign"}, width: 40, x: 20, y: 200},
+      {canResize: true, height: 40, isSelected: false, signData: {bar: -1, baseType: "BodyPartSign", beat: 0, col: 2, digit: false, joint: false, limb: true, resizable: false, side: "right", signType: "Hand", surface: false}, width: 40, x: 500, y: 505},
+      {canResize: true, height: 200, isSelected: false, signData: {bar: 1, baseType: "VibrationSign", beat: 0, col: 2, firstPin: {degree: 0, signType: "High"}, resizable: true, secondPin: {degree: 0, signType: "Low"}, side: "right", signType: "VibrationSign"}, width: 40, x: 500, y: 200},
+      {canResize: true, height: 40, isSelected: false, signData: {bar: -1, baseType: "BodyPartSign", beat: 0, col: -2, digit: false, joint: false, limb: false, resizable: false, side: "left", signType: "Hip", surface: false}, width: 40, x: 180, y: 505},
+      {canResize: true, height: 200, isSelected: false, signData: {bar: 2, baseType: "SpaceMeasurementSign", beat: 0, col: -2, degree: 2, holding: false, resizable: true, side: "left", signType: "Folding"}, width: 40, x: 180, y: 0},
     ],
     libraryActive: true,
     //editor settings

@@ -434,6 +434,7 @@ export default {
       if (!selectMultiple) {
         for (let elem of this.signs) {
           this.$store.dispatch("editSign", {type: "changeSelection", index: this.signs.indexOf(elem), data: {isSelected: false}});
+          this.selectedSigns = [];
         }
       }
       if (id >= 0) {
