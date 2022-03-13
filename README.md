@@ -13,4 +13,5 @@ Git Repo zur Bachelorarbeit zur Entwicklung eines webbasierten Interaktionsedito
 
 ### Version 0.3.10
 - Added the score for the formative evaluation
+- Organized better body part signs in sign library
 - Fixed a bug where the selected signs array was not getting cleared on a new selection
