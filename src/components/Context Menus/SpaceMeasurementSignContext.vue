@@ -7,6 +7,7 @@
       <SignCategoryContainer v-if="signData.signType == 'Joining'" :optionText="'Degree'" :category="'joining-signs'" :parentY="y" :active="true" @updateSignData="newSignData"/>
       <SignCategoryContainer v-if="signData.signType == 'Spreading'" :optionText="'Degree'" :category="'spreading-signs'" :parentY="y" :active="true" @updateSignData="newSignData"/>
       <SignCategoryContainer v-if="signData.signType == 'Folding'" :optionText="'Degree'" :category="'folding-signs'" :parentY="y" :active="true" @updateSignData="newSignData"/>
+      <OnOffOption :optionText="'Hold'" :initState="signData.holding" :active="true" @switchState="changeHolding"/>
       <DeleteOption @delete="emitDelete"/>
     </div>
 </template>
@@ -43,6 +44,9 @@ export default {
       if (this.isActive) {
         this.newSignData ({degree: (data.data + 1)});
       }
+    },
+    changeHolding (data) {
+      this.newSignData({holding: data})
     },
     /**
      * The function that sends the updated sign data back to the score

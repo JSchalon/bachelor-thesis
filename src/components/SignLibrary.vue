@@ -133,6 +133,7 @@ export default {
   justify-content: center;
   align-items: center;
   box-sizing: border-box;
+  cursor: pointer;
 }
 
 .library-category-name {

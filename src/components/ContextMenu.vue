@@ -90,6 +90,8 @@ export default {
     }
     .context-item-interact-box.full {
       float:initial;
+      display: flex;
+      justify-content: right;
       margin-right: var(--contextItemMargin);
     }
 
@@ -97,6 +99,7 @@ export default {
       width: var(--contextItemImageSize);
       height: var(--contextItemImageSize);
       transition: transform 0.3s ease;
+      cursor: pointer;
     }
 
     .context-item-interact-img.smaller {

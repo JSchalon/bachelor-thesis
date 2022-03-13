@@ -14,7 +14,10 @@ export default createStore({
     beatDuration: 1,
     //sign data
     curSign: false,
-    signs: [{}],
+    signs: [
+      {isSelected: false, height: 0, x: 0, y: 0, purpose: "dummy sign", signData: {baseType: "GenericSign", signType: "In place"}},
+      {isSelected: false, canResize: true, height: 50, x: 100, y: 350, signData: {baseType: "SpaceMeasurementSign", signType: "Narrow", degree: 1, side: "left", col: -3, bar: 1, beat: 0, resizable: true, holding: true}},
+    ],
     libraryActive: true,
     //editor settings
     seenIntro: false, 
@@ -38,6 +41,44 @@ export default createStore({
     },
     removeCurSign (state) {
       state["curSign"] = false;
+    },
+    addSign(state, data) {
+      state["signs"].push(data);
+    },
+    moveSign (state, obj) {
+      const index = obj.index;
+      const data = obj.data;
+      state["signs"][index].x = data.x;
+      state["signs"][index].y = data.y;
+    },
+    resizeSign (state, obj) {
+      const index = obj.index;
+      const data = obj.data;
+      if (data.height && data.height >= 0 ) {
+        state["signs"][index].height = data.height;
+      } else if (data.width) {
+        state["signs"][index].width = data.width;
+      }
+    },
+    changeSelect (state, obj) {
+      const index = obj.index;
+      const data = obj.data;
+      state["signs"][index].isSelected = data.isSelected;
+    },
+    changeCanResize (state, obj) {
+      const index = obj.index;
+      const data = obj.data;
+      state["signs"][index].canResize = data.canResize;
+    },
+    changeSignData (state, obj) {
+      const index = obj.index;
+      const signData = obj.data;
+      for (const [key, value] of Object.entries(signData)) {
+        state["signs"][index].signData[key] = value;
+      }
+    },
+    deleteSign(state, index) {
+      state["signs"].splice(index, 1);
     }
   },
   actions: {
@@ -62,6 +103,24 @@ export default createStore({
         context.commit('setCurSign', sign);
       } else {
         context.commit('removeCurSign');
+      }
+    },
+    editSign (context, obj) {
+      if (obj.type == "add") {
+        context.commit("addSign", obj.data);
+        context.commit('removeCurSign');
+      } else if (obj.type == "move") {
+        context.commit("moveSign", {index: obj.index, data: obj.data});
+      } else if (obj.type == "resize") {
+        context.commit("resizeSign", {index: obj.index, data: obj.data});
+      } else if (obj.type == "changeSelection") {
+        context.commit("changeSelect", {index: obj.index, data: obj.data});
+      } else if (obj.type == "changeCanResize") {
+        context.commit("changeCanResize", {index: obj.index, data: obj.data});
+      } else if (obj.type == "changeSignData") {
+        context.commit("changeSignData", {index: obj.index, data: obj.data});
+      } else if (obj.type == "delete") {
+        context.commit("deleteSign", obj.index);
       }
     }
   },

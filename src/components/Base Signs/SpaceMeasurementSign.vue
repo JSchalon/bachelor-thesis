@@ -2,6 +2,10 @@
   <g>
     <rect class="no-save" opacity="0" x="0" y="0" :width="signWidth" :height="height" :signID="id"/>
     <line stroke="black" stroke-width="2" :x1="signWidth / 2" :x2="signWidth / 2" y1="0" :y2="height - signWidth - 10" :signID="id"/>
+    <g v-if="signData.holding">
+      <rect  :x="signWidth / 2 - 5" y="1" :width="10" :height="15" :signID="id"/>
+      <circle  :cx="signWidth / 2" :cy="5" r="5" :class="{active: isSelected}" stroke="black" :stroke-width="isSelected ? borderWidth + 1: borderWidth" :signID="id"/>
+    </g>
     <g :transform="signData.squish == true ? 'translate(0, 20 ) scale(1,0.5)' : ''">
       <g :transform="'translate(' + getTranslate() + ') scale(0.7)'">
         <g :transform="'translate(0,' + (height - 40) + ') '">

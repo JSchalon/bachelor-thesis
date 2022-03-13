@@ -1,9 +1,9 @@
 <template>
   <g>
-    <rect :x="signWidth / 2 - 12" :y="(this.height / 2 - 18)" :width="24" :height="30" :opacity="signData.bgVisible ? 1 : 0" :signID="id"/>
+    <rect :x="signWidth / 2 - 12" :y="(this.height / 2 - 18)" :width="24" :height="30" opacity="0" :signID="id"/>
     <path 
       class="actual-sign draggable"
-      stroke="black" 
+      :stroke="inverted ? 'white' : 'black'"  
       :class="{active: isSelected}" 
       :stroke-width="isSelected ? borderWidth + 1: borderWidth" 
       :d="calculateStick.path" 
@@ -11,10 +11,10 @@
       :signID="id"
     />
     <circle 
-      stroke="black" 
-      class="actual-sign draggable"
-      v-if="signData.signType != 'Middle'" 
-      :fill="signData.signType == 'Low' ? 'black' : 'white'"
+      :stroke="inverted ? 'white' : 'black'" 
+      class="actual-sign draggable" 
+       v-if="signData.signType != 'Middle'" 
+      :fill="getCircleFill()"
       :cx="signWidth / 2" 
       :cy="height/2" r="5" 
       :signID="id"
@@ -22,9 +22,9 @@
       :stroke-width="isSelected ? borderWidth + 1: borderWidth"
     />
     <path 
-      v-else 
+      v-else
       class="actual-sign draggable"
-      stroke="black" 
+      :stroke="inverted ? 'white' : 'black'" 
       :d="calculateHorizontal" 
       :transform="calculateStick.transform" 
       :signID="id"
@@ -48,6 +48,10 @@ export default {
     id: Number,
     signData: Object,
     height: Number,
+    inverted: {
+      type: Boolean,
+      default: false
+    }
   },
   inject: ["signWidth","borderWidth", "barHeight"],
   data() {
@@ -86,8 +90,26 @@ export default {
     
   },
   methods: {
-    
+    getCircleFill () {
+      let value = false;
+      if (this.inverted) {
+        value = true;
+      }
+      if (this.signData.signType == 'High') {
+        value = !value;
+      }
+      if (!value) {
+        return 'black';
+      } else {
+        return 'white';
+      }
+    },
   },
+  watch: {
+    inverted (value) {
+      console.log("inverted: " + value)
+    }
+  }
 }
 </script>
 

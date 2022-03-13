@@ -25,7 +25,8 @@
       "signType": "Address",
       "passing": false, 
       "grasping": false,
-      "resizable": true
+      "resizable": true,
+      "addressing": "right"
     },
     {
       "baseType": "RelationshipBow",
