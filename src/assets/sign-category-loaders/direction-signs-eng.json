@@ -3,41 +3,40 @@
   "names": [
     {
       "name": "Left forward direction",
-      "signType": "Left forward direction"
+      "signType": "left-forward"
     },
     {
       "name": "Forward direction",
-      "signType": "Forward direction",
-      "side": "left"
+      "signType": "forward"
     },
     {
       "name": "Right forward direction",
-      "signType": "Right forward direction"
+      "signType": "right-forward"
     },
     {
       "name": "Left direction",
-      "signType": "Left direction"
+      "signType": "left"
     },
     {
       "name": "In place",
-      "signType": "In place"
+      "signType": "place"
     },
     {
       "name": "Right direction",
-      "signType": "Right direction"
+      "signType": "right"
     },
     {
       "name": "Left backward direction",
-      "signType": "Left backward direction"
+      "signType": "left-backward"
     },
     {
       "name": "Backward direction",
-      "signType": "Backward direction",
+      "signType": "backward",
       "side": "left"
     },
     {
       "name": "Right backward direction",
-      "signType": "Right backward direction"
+      "signType": "right-backward"
     }
   ]
 }

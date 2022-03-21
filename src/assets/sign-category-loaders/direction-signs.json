@@ -14,57 +14,57 @@
   "signData": [
     {
       "baseType": "DirectionSign",
-      "signType": "Left forward direction",
+      "signType": "left-forward",
       "dimension": "Middle",
       "resizable": true
     },
     {
       "baseType": "DirectionSign",
-      "signType": "Forward direction",
-      "dimension": "Middle",
-      "side": "left",
-      "resizable": true
-    },
-    {
-      "baseType": "DirectionSign",
-      "signType": "Right forward direction",
-      "dimension": "Middle",
-      "resizable": true
-    },
-    {
-      "baseType": "DirectionSign",
-      "signType": "Left direction",
-      "dimension": "Middle",
-      "resizable": true
-    },
-    {
-      "baseType": "DirectionSign",
-      "signType": "In place",
-      "dimension": "Middle",
-      "resizable": true
-    },
-    {
-      "baseType": "DirectionSign",
-      "signType": "Right direction",
-      "dimension": "Middle",
-      "resizable": true
-    },
-    {
-      "baseType": "DirectionSign",
-      "signType": "Left backward direction",
-      "dimension": "Middle",
-      "resizable": true
-    },
-    {
-      "baseType": "DirectionSign",
-      "signType": "Backward direction",
+      "signType": "forward",
       "dimension": "Middle",
       "side": "left",
       "resizable": true
     },
     {
       "baseType": "DirectionSign",
-      "signType": "Right backward direction",
+      "signType": "right-forward",
+      "dimension": "Middle",
+      "resizable": true
+    },
+    {
+      "baseType": "DirectionSign",
+      "signType": "left",
+      "dimension": "Middle",
+      "resizable": true
+    },
+    {
+      "baseType": "DirectionSign",
+      "signType": "place",
+      "dimension": "Middle",
+      "resizable": true
+    },
+    {
+      "baseType": "DirectionSign",
+      "signType": "right",
+      "dimension": "Middle",
+      "resizable": true
+    },
+    {
+      "baseType": "DirectionSign",
+      "signType": "left-backward",
+      "dimension": "Middle",
+      "resizable": true
+    },
+    {
+      "baseType": "DirectionSign",
+      "signType": "backward",
+      "dimension": "Middle",
+      "side": "left",
+      "resizable": true
+    },
+    {
+      "baseType": "DirectionSign",
+      "signType": "right-backward",
       "dimension": "Middle",
       "resizable": true
     }

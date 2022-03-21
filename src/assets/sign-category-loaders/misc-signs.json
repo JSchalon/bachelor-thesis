@@ -20,20 +20,21 @@
     },
     {
       "baseType": "Cancel",
-      "signType": "BackToNormal",
+      "signType": "back-normal",
       "resizable": false
     },
     {
       "baseType": "Cancel",
-      "signType": "ReleaseContact",
+      "signType": "release-contact",
       "resizable": false
     },
     {
       "baseType": "VibrationSign",
       "signType": "VibrationSign",
       "resizable": true,
-      "firstPin": false,
-      "secondPin": false
+      "upperPin": {"signType": "Low", "degree": -1},
+      "lowerPin": {"signType": "Low", "degree": -1},
+      "beatHeight": 2
     }
   ]
 }

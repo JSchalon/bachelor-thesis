@@ -1,28 +1,27 @@
 <template>
     <div>
-      <OnOffOption :optionText="'Pins'" :initState="displayPinOptions" :active="true" @switchState="changePins"/>
       <RadioOption 
       :options="pinType" 
-      :initState="signData.firstPin.signType"
+      :initState="signData.upperPin.signType"
       :optionText="'First Pin'"
       :active="displayPinOptions"
-      @switchState="this.changeFirstPin"
+      @switchState="this.changeupperPin"
       />
-      <SignCategoryContainer v-if="!signData.firstPin" :optionText="'Angle'" category="pins-low" :parentY="y" :active="signData.firstPin ? true : false" @updateSignData="changeFirstPinAngle"/>
-      <SignCategoryContainer v-if="signData.firstPin && signData.firstPin.signType == 'Low'" :optionText="'Angle'" category="pins-low" :parentY="y" :active="signData.firstPin ? true : false" @updateSignData="changeFirstPinAngle"/>
-      <SignCategoryContainer v-else-if="signData.firstPin && signData.firstPin.signType == 'Middle'" :optionText="'Angle'" category="pins-middle" :parentY="y" :active="signData.firstPin ? true : false" @updateSignData="changeFirstPinAngle"/>
-      <SignCategoryContainer v-else-if="signData.firstPin && signData.firstPin.signType == 'High'" :optionText="'Angle'" category="pins-high" :parentY="y" :active="signData.firstPin ? true : false" @updateSignData="changeFirstPinAngle"/>
+      <SignCategoryContainer v-if="!signData.upperPin" :optionText="'Angle'" category="pins-low" :parentY="y" :active="signData.upperPin ? true : false" @updateSignData="changeupperPinAngle"/>
+      <SignCategoryContainer v-if="signData.upperPin && signData.upperPin.signType == 'Low'" :optionText="'Angle'" category="pins-low" :parentY="y" :active="signData.upperPin ? true : false" @updateSignData="changeupperPinAngle"/>
+      <SignCategoryContainer v-else-if="signData.upperPin && signData.upperPin.signType == 'Middle'" :optionText="'Angle'" category="pins-middle" :parentY="y" :active="signData.upperPin ? true : false" @updateSignData="changeupperPinAngle"/>
+      <SignCategoryContainer v-else-if="signData.upperPin && signData.upperPin.signType == 'High'" :optionText="'Angle'" category="pins-high" :parentY="y" :active="signData.upperPin ? true : false" @updateSignData="changeupperPinAngle"/>
       <RadioOption 
         :options="pinType" 
-        :initState="signData.secondPin.signType"
+        :initState="signData.lowerPin.signType"
         :optionText="'Second Pin'"
         :active="displayPinOptions"
-        @switchState="this.changeSecondPin"
+        @switchState="this.changelowerPin"
       />
-      <SignCategoryContainer v-if="!signData.firstPin" :optionText="'Angle'" category="pins-low" :parentY="y" :active="signData.firstPin ? true : false" @updateSignData="changeSecondPinAngle"/>
-      <SignCategoryContainer v-if="signData.firstPin && signData.firstPin.signType == 'Low'" :optionText="'Angle'" category="pins-low" :parentY="y" :active="signData.firstPin ? true : false" @updateSignData="changeSecondPinAngle"/>
-      <SignCategoryContainer v-else-if="signData.firstPin && signData.firstPin.signType == 'Middle'" :optionText="'Angle'" category="pins-middle" :parentY="y" :active="signData.firstPin ? true : false" @updateSignData="changeSecondPinAngle"/>
-      <SignCategoryContainer v-else-if="signData.firstPin && signData.firstPin.signType == 'High'" :optionText="'Angle'" category="pins-high" :parentY="y" :active="signData.firstPin ? true : false" @updateSignData="changeSecondPinAngle"/>
+      <SignCategoryContainer v-if="!signData.lowerPin" :optionText="'Angle'" category="pins-low" :parentY="y" :active="signData.lowerPin ? true : false" @updateSignData="changelowerPinAngle"/>
+      <SignCategoryContainer v-if="signData.lowerPin && signData.lowerPin.signType == 'Low'" :optionText="'Angle'" category="pins-low" :parentY="y" :active="signData.lowerPin ? true : false" @updateSignData="changelowerPinAngle"/>
+      <SignCategoryContainer v-else-if="signData.lowerPin && signData.lowerPin.signType == 'Middle'" :optionText="'Angle'" category="pins-middle" :parentY="y" :active="signData.lowerPin ? true : false" @updateSignData="changelowerPinAngle"/>
+      <SignCategoryContainer v-else-if="signData.lowerPin && signData.lowerPin.signType == 'High'" :optionText="'Angle'" category="pins-high" :parentY="y" :active="signData.lowerPin ? true : false" @updateSignData="changelowerPinAngle"/>
       <DeleteOption :mIndex="1" @delete="emitDelete"/>
     </div>
 </template>
@@ -58,42 +57,42 @@ export default {
     
   },
   mounted () {
-    this.displayPinOptions = (typeof this.signData.firstPin == "object" || typeof this.signData.secondPin == "object");
+    this.displayPinOptions = (typeof this.signData.upperPin == "object" || typeof this.signData.lowerPin == "object");
   },
   methods: {
     changePins (data) {
       this.displayPinOptions = data;
       if (!data) {
-        this.newSignData ({firstPin: false, secondPin: false});
+        this.newSignData ({upperPin: false, lowerPin: false});
       } else {
-        this.newSignData ({firstPin: {signType: "Low", degree: 0}, secondPin: {signType: "Low", degree: 0}});
+        this.newSignData ({upperPin: {signType: "Low", degree: 0}, lowerPin: {signType: "Low", degree: 0}});
       }
       
     },
-    changeFirstPin (data) {
-      let obj = JSON.parse(JSON.stringify(this.signData.firstPin)) || {signType: "Low", degree: 0};
+    changeupperPin (data) {
+      let obj = JSON.parse(JSON.stringify(this.signData.upperPin)) || {signType: "Low", degree: 0};
       obj.signType = data.text;
-      this.newSignData ({firstPin: obj});
+      this.newSignData ({upperPin: obj});
     },
-    changeFirstPinAngle (data) {
+    changeupperPinAngle (data) {
       if (this.isActive) {
         let degree = data.degree;
-        let obj = JSON.parse(JSON.stringify(this.signData.firstPin)) || {signType: "Low", degree: 0};
+        let obj = JSON.parse(JSON.stringify(this.signData.upperPin)) || {signType: "Low", degree: 0};
         obj.degree = degree;
-        this.newSignData ({firstPin: obj});
+        this.newSignData ({upperPin: obj});
       }
     },
-    changeSecondPin (data) {
-      let obj = JSON.parse(JSON.stringify(this.signData.secondPin)) || {signType: "Low", degree: 0};
+    changelowerPin (data) {
+      let obj = JSON.parse(JSON.stringify(this.signData.lowerPin)) || {signType: "Low", degree: 0};
       obj.signType = data.text;
-      this.newSignData ({secondPin: obj});
+      this.newSignData ({lowerPin: obj});
     },
-    changeSecondPinAngle (data) {
+    changelowerPinAngle (data) {
       if (this.isActive) {
         let degree = data.degree;
-        let obj = JSON.parse(JSON.stringify(this.signData.secondPin)) || {signType: "Low", degree: 0};
+        let obj = JSON.parse(JSON.stringify(this.signData.lowerPin)) || {signType: "Low", degree: 0};
         obj.degree = degree;
-        this.newSignData ({secondPin: obj});
+        this.newSignData ({lowerPin: obj});
       }
     },
     /**

@@ -9,7 +9,7 @@
       :signID="id" 
       :d=" 'M ' + (signWidth /2) + ', 5 V ' + (height - 5)"
     />
-    <g :transform="signData.signType == 'Circular right' ? 'scale(-1,1) translate(-40, 0)' : ''">
+    <g :transform="signData.signType == 'circularRight' ? 'scale(-1,1) translate(-40, 0)' : ''">
       <path class="draggable actual-sign"  :class="{active: isSelected}" stroke="black" :stroke-width="isSelected ? borderWidth + 1: borderWidth" :signID="id" :d="pathHead(true)"/>
       <path class="draggable actual-sign"  :class="{active: isSelected}" stroke="black" :stroke-width="isSelected ? borderWidth + 1: borderWidth" :signID="id" :d="pathHead(false)" />
     </g>
@@ -49,9 +49,9 @@ export default {
         yPos = this.height - 5;
       }
       let path = "M " + (this.signWidth/2 - 15) +"," + yPos + " H " + (this.signWidth/2 + 15);
-      if (this.signData.signType.includes("Circular")) {
+      if (this.signData.signType.includes("circular")) {
         path = "M " + (this.signWidth/2 - 15) +"," + (yPos - 5) + " L " + (this.signWidth/2 + 15) + "," + (yPos + 5);
-      } else if (this.signData.signType == "Any") {
+      } else if (this.signData.signType == "any") {
         path = 
           "M " + (this.signWidth/2 - 15) +"," + yPos + 
           "Q" + (this.signWidth/2 - 7.5) + "," + (yPos - 10) + "," + (this.signWidth/2) + "," + yPos +

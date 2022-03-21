@@ -3,19 +3,19 @@
   "names": [
     {
       "name": "Touching",
-      "signType": "Touch"
+      "signType": "touch"
     },
     {
-      "name": "Adressing",
-      "signType": "Address"
+      "name": "Addressing",
+      "signType": "address"
     },
     {
       "name": "Near",
-      "signType": "Near"
+      "signType": "near"
     },
     {
       "name": "Supporting",
-      "signType": "Support"
+      "signType": "support"
     }
   ]
 }

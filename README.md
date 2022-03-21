@@ -11,7 +11,8 @@ Git Repo zur Bachelorarbeit zur Entwicklung eines webbasierten Interaktionsedito
 
 ## Versions
 
-### Version 0.3.10
-- Added the score for the formative evaluation
-- Organized better body part signs in sign library
-- Fixed a bug where the selected signs array was not getting cleared on a new selection
+### Version 0.3.11
+- Implemented js signs to xml-score conversion
+- Implemented xml score reader with js signs conversion
+- Implemented rudimentary xml-score saving (ctrl + s)
+- Fixed bugs pertaining to the xml generation and incorrect sign manipulation

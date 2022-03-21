@@ -12,9 +12,9 @@
     />
     <g :transform="'translate(0,' + (this.height - 20) + ')'">
       <g :transform="'translate(0,' + -22 + ')'">
-        <Pin v-if="signData.firstPin" :isSelected="isSelected" :id="id" :signData="signData.firstPin" :height="30"/>
+        <Pin v-if="signData.upperPin" :isSelected="isSelected" :id="id" :signData="signData.upperPin" :height="30"/>
       </g>
-      <Pin v-if="signData.secondPin" :isSelected="isSelected" :id="id" :signData="signData.secondPin" :height="30"/>
+      <Pin v-if="signData.lowerPin" :isSelected="isSelected" :id="id" :signData="signData.lowerPin" :height="30"/>
     </g>
   </g>
 </template>
@@ -53,7 +53,7 @@ export default {
     makeSquiggle() {
       // Adjust step so that there are a whole number of steps along the path
       let height = this.height;
-      if (this.signData.firstPin || this.signData.secondPin) {
+      if (this.signData.upperPin || this.signData.lowerPin) {
         height = this.height - 45;
       }
       let numSteps = Math.round(height / this.squiggleStep);

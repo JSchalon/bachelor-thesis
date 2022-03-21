@@ -7,11 +7,11 @@
     },
     {
       "name": "Back to normal",
-      "signType": "BackToNormal"
+      "signType": "back-normal"
     },
     {
       "name": "Release contact",
-      "signType": "ReleaseContact"
+      "signType": "release-contact"
     },
     {
       "name": "Vibration",

@@ -15,32 +15,36 @@
   "signData": [
     {
       "baseType": "RelationshipBow",
-      "signType": "Touch",
-      "passing": false, 
-      "grasping": false,
-      "resizable": true
-    },
-    {
-      "baseType": "RelationshipBow",
-      "signType": "Address",
+      "signType": "touch",
       "passing": false, 
       "grasping": false,
       "resizable": true,
-      "addressing": "right"
+      "holding": false
     },
     {
       "baseType": "RelationshipBow",
-      "signType": "Near",
+      "signType": "address",
       "passing": false, 
       "grasping": false,
-      "resizable": true
+      "resizable": true,
+      "addressing": "right",
+      "holding": false
     },
     {
       "baseType": "RelationshipBow",
-      "signType": "Support",
+      "signType": "near",
       "passing": false, 
       "grasping": false,
-      "resizable": true
+      "resizable": true,
+      "holding": false
+    },
+    {
+      "baseType": "RelationshipBow",
+      "signType": "support",
+      "passing": false, 
+      "grasping": false,
+      "resizable": true,
+      "holding": false
     }
   ]
 }

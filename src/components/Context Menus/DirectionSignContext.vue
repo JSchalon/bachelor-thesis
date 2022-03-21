@@ -105,7 +105,11 @@ export default {
       this.newSignData({holding: data})
     },
     changePosition (data) {
-      this.newSignData({position: data.text})
+      if (data.text != "---") {
+        this.newSignData({position: data.text})
+      } else {
+        this.newSignData({position: false})
+      }
     },
     changeDefinition (data) {
       this.definitionActive = data;

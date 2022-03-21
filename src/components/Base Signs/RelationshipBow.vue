@@ -17,7 +17,7 @@
       :class="{active: isSelected}"
       :stroke-width="isSelected ? borderWidth + 1: borderWidth"
       stroke="black" 
-      :stroke-dasharray="signData.signType == 'Near' ? 4 : ''"
+      :stroke-dasharray="signData.signType == 'near' ? 4 : ''"
       fill="#ffffff00"
       :signID="id"
     />
@@ -29,7 +29,7 @@
       :class="{active: isSelected}"
       :stroke-width="isSelected ? borderWidth + 1: borderWidth"
       stroke="black" 
-      :stroke-dasharray="signData.signType == 'Near' ? 4 : ''"
+      :stroke-dasharray="signData.signType == 'near' ? 4 : ''"
       fill="#ffffff00"
       :signID="id"
     />
@@ -84,18 +84,18 @@ export default {
     path () {
       const type = this.signData.signType;
       let path = "";
-      if (type == "Touch") {
+      if (type == "touch") {
         path = "M 40,10 Q " + (this.width / 2) + ",40," + (this.width - 40) + ",10";
-      } else if (type == "Address") {
+      } else if (type == "address") {
         path = "M 40,10 H " + (this.width - 80) + " Q " + (this.width - 60) + ",40," + (this.width - 40) + ",10";
         if (this.signData.addressing == "left") {
           path = "M 40,10 Q 60,40,80,10 H " + (this.width - 40) ;
         } else if (this.signData.addressing == "both") {
           path = " M 40,10 Q 60,40,80,10 H " + (this.width - 80) + " Q " + (this.width - 60) + ",40," + (this.width - 40) + ",10";
         }
-      } else if (type == "Near") {
+      } else if (type == "near") {
         path = "M 40,10 Q " + (this.width / 2) + ",40," + (this.width - 40) + ",10";
-      } else if (type == "Support") {
+      } else if (type == "support") {
         path = "M 40,10 L 70, 30 H " + (this.width - 70) + " L " + (this.width - 40) + ",10";
       }
       return path; 

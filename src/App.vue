@@ -70,11 +70,12 @@ export default {
     }
     if (settingsObj == null) {
       //create settings cookie
-      let testObj = {seenIntro: false, language: "eng", showHelpLines: true};
-      document.cookie = "settings=" + JSON.stringify(testObj) + "; expires=" + d.toUTCString() + "; path=/";
+      let newCookie = {seenIntro: false, language: "eng", showHelpLines: true};
+      document.cookie = "settings=" + JSON.stringify(newCookie) + "; expires=" + d.toUTCString() + "; path=/";
     } else {
-      //store action set settings
+      this.$store.dispatch("changeSettings", settingsObj);
     }
+    this.$store.dispatch("newScore", "blank-score");
     this.isPhone = window.matchMedia("only screen and (max-width: 760px)").matches;
     this.isTablet = window.matchMedia("only screen and (max-width: 1024px)").matches;
     document.documentElement.style.setProperty('--contextMenuWidth', this.contextMenuWidth + "px");
@@ -87,7 +88,7 @@ export default {
     getSettingsCookie () {
       const settings =  document.cookie.match('(^|;)\\s*' + "settings" + '\\s*=\\s*([^;]+)')?.pop() || '';
       return settings;
-    }
+    },
   }
 };
 </script>

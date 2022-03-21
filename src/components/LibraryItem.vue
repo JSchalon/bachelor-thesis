@@ -1,10 +1,10 @@
 <template>
   <div v-show="active" class="library-item-container">
     <div class="library-item" :key="index" v-for="(elem, index) of signs" @click="selectSign(index)">
-      <svg width="100%" :height="height + 2" fill="white">
+      <svg width="100%" :height="'beatHeight' in elem.signData ? elem.signData.beatHeight * minHeight + 2: height + 2" fill="white">
         <g :transform="'translate('+ offset + ',1)'">
           <g :transform="elem.signData.baseType == 'RelationshipBow' ? 'translate(-60,0)' : ''">
-              <component :is="elem.signData.baseType" :isSelected="index == selected" :height="elem.height" :signData="elem.signData"/>
+              <component :is="elem.signData.baseType" :isSelected="index == selected" :height="'beatHeight' in elem.signData ? elem.signData.beatHeight * minHeight : elem.height" :signData="elem.signData"/>
           </g>
         </g>
       </svg>
@@ -20,7 +20,7 @@
 export default {
   name: 'LibraryItem',
   inject: ["barHeight"],
-  emits: ["expand", "selectSign"],
+  emits: ["expand", "selectSign", "barHeight"],
   props: {
     active: Boolean,
     category: String,
@@ -41,6 +41,9 @@ export default {
       let json = require('@/assets/sign-category-loaders/' + this.category + '-' + lang + '.json');
       let obj = JSON.parse(JSON.stringify(json));
       return obj;
+    },
+    minHeight () {
+      return this.barHeight / this.$store.state["beatsPerBar"];
     }
   },
   mounted () {

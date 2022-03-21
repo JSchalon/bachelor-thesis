@@ -14,24 +14,24 @@
   "signData": [
     {
       "baseType": "PathSign",
-      "signType": "Straight",
+      "signType": "straight",
       "resizable": true
     },
     {
       "baseType": "PathSign",
-      "signType": "Circular left",
+      "signType": "circularLeft",
       "direction": "left",
       "resizable": true
     },
     {
       "baseType": "PathSign",
-      "signType": "Circular right",
+      "signType": "circularRight",
       "direction": "right",
       "resizable": true
     },
     {
       "baseType": "PathSign",
-      "signType": "Any",
+      "signType": "any",
       "resizable": true
     }
   ]

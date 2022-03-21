@@ -30,8 +30,8 @@ export default {
   data() {
     return {
       types: [
-        {text: 'BackToNormal', img: false},
-        {text: 'ReleaseContact', img: false},
+        {text: 'Back To Normal', img: false},
+        {text: 'Release Contact', img: false},
       ],
     };
   },
@@ -43,7 +43,11 @@ export default {
   },
   methods: {
     changeType(data) {
-      this.newSignData ({signType: data.text});
+      if (data.text == "Release Contact") {
+        this.newSignData ({signType: "release-contact"});
+      } else {
+        this.newSignData ({signType: "back-normal"});
+      }
     },
     /**
      * The function that sends the updated sign data back to the score

@@ -14,17 +14,17 @@
   "signData": [
     {
       "baseType": "TurnSign",
-      "signType": "Left turn",
+      "signType": "counterClockwise",
       "resizable": true
     },
     {
       "baseType": "TurnSign",
-      "signType": "Right turn",
+      "signType": "clockwise",
       "resizable": true
     },
     {
       "baseType": "TurnSign",
-      "signType": "Any turn",
+      "signType": "any",
       "resizable": true
     }
   ]

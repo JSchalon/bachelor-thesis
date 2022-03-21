@@ -70,7 +70,15 @@ export default {
       this.changeSurface();
     },
     changeSurface() {
-      this.newSignData ({surface: this.surfaceTop + " " + this.surfaceSide});
+      if ((this.surfaceTop != "" && this.surfaceTop != "---") && (this.surfaceSide != "" && this.surfaceSide != "---")) {
+        this.newSignData ({surface: this.surfaceTop + "-" + this.surfaceSide});
+      } else if (this.surfaceTop != "" && this.surfaceTop != "---") {
+        this.newSignData ({surface: this.surfaceTop});
+      } else if (this.surfaceSide != "" && this.surfaceSide != "---") {
+        this.newSignData ({surface: this.surfaceSide});
+      } else {
+        this.newSignData ({surface: false});
+      }
     },
     changeJointDefined (data) {
       let joint = 5;

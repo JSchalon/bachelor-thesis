@@ -42,18 +42,12 @@ export default {
   emits: ["requestListeners"],
   props: {
     id: Number,
-    isSelected: Boolean,
-    height: Number,
-    width: Number,
-    x: Number,
-    y: Number,
-    canResize: Boolean,
-    signData: Object
+    signData: Object,
+    localData: Object,
   },
-  inject: ["borderWidth", "signWidth"],
+  inject: ["borderWidth", "signWidth", "barHeight"],
   data() {
     return {
-      name: ""
     };
   },
   mounted () {
@@ -67,7 +61,52 @@ export default {
     
   },
   computed: {
-  }
+    beats () {
+      return this.$store.state["beatsPerBar"];
+    },
+    isSelected () {
+      let isSelected = false;
+      if (this.localData != undefined) {
+        isSelected = this.localData.isSelected;
+      }
+      return isSelected;
+    },
+    height () {
+      let height = this.barHeight / this.beats;
+      if (this.localData != undefined) {
+        height = this.localData.height;
+      }
+      return height;
+    },
+    width () {
+      let width = this.signWidth;
+      if (this.localData != undefined) {
+        width = this.localData.width;
+      }
+      return width;
+    },
+    x () {
+      let x = 0;
+      if (this.localData != undefined) {
+        x = this.localData.x;
+      }
+      return x;
+    },
+    y () {
+      let y = 0;
+      if (this.localData != undefined) {
+        y = this.localData.y;
+      }
+      return y;
+    },
+    canResize () {
+      let canResize = false;
+      if (this.localData != undefined) {
+        canResize = this.localData.canResize;
+      }
+      return canResize;
+    },
+  },
 };
 </script>
 
