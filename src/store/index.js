@@ -28,7 +28,8 @@ export default createStore({
     limbNames: {Head: "neck", Shoulder: "arm", Elbow: "upper_arm", Wrist: "lower_arm", Hip: "leg", Knee: "thigh", Ankle: "lower_leg"},
     fingerNames: ["thumb","indexFinger","middleFinger","ringFinger","littleFinger"],
     toeNames: ["bigToe","longToe","middleToe","ringToe","littleToe"],
-    xmlParts: ["Head", "Chest", "Waist", "Pelvis", "Torso"]
+    xmlParts: ["Head", "Chest", "Waist", "Pelvis", "Torso"],
+    commandStack: [],
   },
   mutations: {
     setColumns (state, data) {
@@ -523,7 +524,7 @@ export default createStore({
             sign.digit = state["toeNames"].indexOf(elemWrapper.children[0].innerHTML);
             sign.signType = "Toes";
             if (sign.digit < 0) {
-              sign.digit = state["toeNames"].indexOf(elemWrapper.children[0].innerHTML);
+              sign.digit = state["fingerNames"].indexOf(elemWrapper.children[0].innerHTML);
               sign.signType = "Fingers";
             }
             sign.digit = sign.digit + 1;
@@ -706,6 +707,10 @@ export default createStore({
       let xmlString = new XMLSerializer().serializeToString(state["signsXML"]);
       localStorage.setItem("score", xmlString);
     },
+    addCommandToStack(state, data) {
+      console.log(data);
+      console.log(state["commandStack"]);
+    }
   },
   actions: {
     addColumn (context, side) {
@@ -738,7 +743,6 @@ export default createStore({
           context.commit("addSignToXML", {obj: obj.data, index: -1});
           context.commit('removeCurSign');
         }
-        
       } else if (obj.type == "changeSignData") {
         context.commit("changeSignData", {index: obj.index, data: obj.data});
         context.commit("deleteSignFromXML", obj.index);
@@ -750,6 +754,7 @@ export default createStore({
         context.commit("deleteSignFromObj", obj.index);
       }
       context.commit("saveScoreToLocalStorage");
+      context.commit("addCommandToStack", obj);
     },
     editScoreParameters(context, data) {
       context.commit("editScoreParameters", data);

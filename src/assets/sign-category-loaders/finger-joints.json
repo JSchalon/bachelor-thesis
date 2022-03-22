@@ -18,6 +18,16 @@
       "surface": false,
       "limb": false,
       "digit": 1,
+      "joint": 0,
+      "resizable": false,
+      "canBeLimb": true
+    },
+    { 
+      "baseType": "BodyPartSign",
+      "signType": "Fingers",
+      "surface": false,
+      "limb": false,
+      "digit": 1,
       "joint": 1,
       "resizable": false,
       "canBeLimb": true
@@ -49,16 +59,6 @@
       "limb": false,
       "digit": 1,
       "joint": 4,
-      "resizable": false,
-      "canBeLimb": true
-    },
-    { 
-      "baseType": "BodyPartSign",
-      "signType": "Fingers",
-      "surface": false,
-      "limb": false,
-      "digit": 1,
-      "joint": 5,
       "resizable": false,
       "canBeLimb": true
     }

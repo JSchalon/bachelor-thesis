@@ -4,7 +4,7 @@
       <OnOffOption :optionText="'Limb'" :initState="signData.limb" :active="signData.canBeLimb" @switchState="changeLimb"/>
       <RadioOption :optionText="'Top Surface'" :options="surfaceInnerOuter" :initState="signData.surface" :active="signData.limb && signData.canBeLimb" @switchState="this.changeTopSurface"/>
       <RadioOption :optionText="'Side Surface'" :options="surfaceSides" :initState="signData.surface" :active="signData.limb && signData.canBeLimb" @switchState="this.changeSideSurface"/>
-      <OnOffOption :optionText="'Finger/Toe Definition'" :initState="signData.digit && signData.digit >= 1" :active="signData.signType == 'Fingers' || signData.signType == 'Toes'" @switchState="changeJointDefined"/>
+      <OnOffOption :optionText="'Finger/Toe Definition'" :initState="'digit' in signData && signData.digit >= 0 && signData.digit !== false" :active="signData.signType == 'Fingers' || signData.signType == 'Toes'" @switchState="changeJointDefined"/>
       <SignCategoryContainer v-if="signData.signType != 'Toes'" :optionText="'Digit'" :category="'finger-digits'" :parentY="y" :active="(signData.signType == 'Fingers' || signData.signType == 'Toes') && jointDefined" @updateSignData="changeDigit"/>
       <SignCategoryContainer v-else :optionText="'Digit'" :category="'toe-digits'" :parentY="y" :active="(signData.signType == 'Fingers' || signData.signType == 'Toes') && jointDefined" @updateSignData="changeDigit"/>
       <SignCategoryContainer v-if="signData.signType != 'Toes'" :optionText="'Joint'" :category="'finger-joints'" :parentY="y" :active="(signData.signType == 'Fingers' || signData.signType == 'Toes') && jointDefined" @updateSignData="changeJoint"/>
@@ -51,7 +51,9 @@ export default {
     
   },
   mounted () {
-    
+    if (this.signData.joint !== false) {
+      this.changeJointDefined(true);
+    }
   },
   methods: {
     /**
@@ -81,11 +83,8 @@ export default {
       }
     },
     changeJointDefined (data) {
-      let joint = 5;
+      let joint = 0;
       if (data && !this.signData.digit && !this.signData.joint) {
-        if (this.signData.signType == "Toes") {
-          joint = 4;
-        }
         this.newSignData ({digit: 1, joint: joint});
       } else if (!data) {
         this.newSignData ({digit: false, joint: false});

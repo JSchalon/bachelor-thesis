@@ -18,7 +18,7 @@
       "surface": false,
       "limb": false,
       "digit": 1,
-      "joint": 4,
+      "joint": 0,
       "resizable": false,
       "canBeLimb": true
     },
@@ -28,7 +28,7 @@
       "surface": false,
       "limb": false,
       "digit": 2,
-      "joint": 4,
+      "joint": 0,
       "resizable": false,
       "canBeLimb": true
     },
@@ -38,7 +38,7 @@
       "surface": false,
       "limb": false,
       "digit": 3,
-      "joint": 4,
+      "joint": 0,
       "resizable": false,
       "canBeLimb": true
     },
@@ -48,7 +48,7 @@
       "surface": false,
       "limb": false,
       "digit": 4,
-      "joint": 4,
+      "joint": 0,
       "resizable": false,
       "canBeLimb": true
     },
@@ -58,7 +58,7 @@
       "surface": false,
       "limb": false,
       "digit": 5,
-      "joint": 4,
+      "joint": 0,
       "resizable": false,
       "canBeLimb": true
     }

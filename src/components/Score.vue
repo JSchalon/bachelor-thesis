@@ -317,6 +317,11 @@ export default {
           } else if (elem.col < col) {
             this.$store.dispatch("editSign", {type: "changeSignData", index: this.signs.indexOf(elem), data: {col: (elem.col + 1)}});
           }
+        } else {
+          if (elem.col > col) {
+            this.localSignData[this.signs.indexOf(elem)].x = (this.localSignData[this.signs.indexOf(elem)].x - this.columnWidth);
+            this.$store.dispatch("editSign", {type: "changeSignData", index: this.signs.indexOf(elem), data: {col: (elem.col - 1)}});
+          }
         }
       }
       
@@ -357,19 +362,26 @@ export default {
       this.contextSign = 0;
       let remove = [];
       for (let elem of this.signs) {
-        if (elem.bar == bar) {
-          remove.push(this.signs.indexOf(elem));
-        }  else if (elem.bar < bar) {
-          const offset = Math.abs(elem.y - this.barHeight);
-          if ((elem.y - this.barHeight) >= this.outerCanvasMargin) {
-            this.localSignData[this.signs.indexOf(elem)].y = this.localSignData[this.signs.indexOf(elem)].y - this.barHeight;
+        const index = this.signs.indexOf(elem);
+        if (elem.baseType != "GenericSign") {
+          if (elem.bar == bar) {
+            remove.push(this.signs.indexOf(elem));
+          } else if (elem.bar < bar) {
+            
+            const offset = Math.abs(this.localSignData[index].y - this.barHeight);
+            if ((this.localSignData[index].y - this.barHeight) >= this.outerCanvasMargin) {
+              this.localSignData[index].y = this.localSignData[index].y - this.barHeight;
+            } else {
+              console.log(index)
+              console.log(this.localSignData[index]);
+              this.localSignData[index].y = this.localSignData[index].y + offset - this.barHeight;
+              this.localSignData[index].height = this.localSignData[index].height - offset;
+              
+              this.$store.dispatch("editSign", {type: "changeSignData", index: index, data: {beatHeight: (this.localSignData[index].height / this.minHeight)}});
+            }
           } else {
-            this.localSignData[this.signs.indexOf(elem)].y = this.localSignData[this.signs.indexOf(elem)].y + offset - this.barHeight;
-            this.localSignData[this.signs.indexOf(elem)].height = this.localSignData[this.signs.indexOf(elem)].height - offset;
-            this.$store.dispatch("editSign", {type: "changeSignData", index: this.signs.indexOf(elem), data: {beatHeight: (this.localSignData[this.signs.indexOf(elem)].height / this.minHeight)}});
+            this.$store.dispatch("editSign", {type: "changeSignData", index: index, data: {bar: elem.bar -1, beat: elem.beat}});
           }
-        } else {
-          this.$store.dispatch("editSign", {type: "changeSignData", index: this.signs.indexOf(elem), data: {bar: elem.bar -1, beat: elem.beat}});
         }
       }
       for (let last = remove.length - 1; last >= 0; last--) {
@@ -470,10 +482,8 @@ export default {
     },
 
     calcColumnMove(index, startX, startW, endX, endW) {
-      console.log("index: " + index + " startX: " + startX + " startW: " + startW + " endX: " + endX + " endW: " + endW);
       let movedRight = Math.round(((endX + endW) - (startX + startW)) / this.blocksizeX);
       let movedLeft = Math.round((endX - startX)/this.blocksizeX);
-      console.log(movedLeft + " " + movedRight)
       const elem = this.signs[index];
       this.$store.dispatch("editSign", {type: "changeSignData", index: index, data: {col: (elem.col + movedLeft), colRight: (elem.colRight + movedRight)}});
     },

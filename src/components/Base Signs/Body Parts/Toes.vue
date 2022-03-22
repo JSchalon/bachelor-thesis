@@ -18,7 +18,7 @@
     <g v-if="signData.joint >= 1 && signData.joint < 4">
       <circle fill="black" :cx="18.5 - (index * 4)" :cy="10 + (signData.digit - 1) * 5" r="2" :key="index" v-for="index of (signData.joint)"/>
     </g>
-    <circle v-if="signData.joint && signData.joint == 4" fill="black" :cx="18.5 - 3 * 4" :cy="10 + (signData.digit - 1) * 5" r="2" />
+    <circle v-if="signData.joint === 0" fill="black" :cx="18.5 - 3 * 4" :cy="10 + (signData.digit - 1) * 5" r="2" />
   </g>
 </template>
 

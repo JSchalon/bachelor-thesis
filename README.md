@@ -11,7 +11,7 @@ Git Repo zur Bachelorarbeit zur Entwicklung eines webbasierten Interaktionsedito
 
 ## Versions
 
-### Version 0.4.0
-- Implemented saving and loading scores to the localStorage
-- Properly implemented relationship bow resizing
-- Fixed some issues pertaining to the conversion of xml- to js-scores
+### Version 0.4.1
+- Started implementing command stack
+- Further fixed bugs with and inconsistencies between xml and js scores
+- Fixed incorrect placements of right-sided signs after a column deletion
