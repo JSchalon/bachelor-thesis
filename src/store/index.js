@@ -41,6 +41,7 @@ export default createStore({
     },
     setBars (state, number) {
       state["bars"] = state["bars"] + number;
+      state["signsXML"].getElementsByTagName("laban:measures")[0].innerHTML = state["bars"];
     },
     setCurSign(state, data) {
       state["curSign"] = data;
@@ -289,7 +290,7 @@ export default createStore({
             valueContainer.innerHTML = data.signType;
             turn.appendChild(valueContainer);
             //degree (optional)
-            if ("definition" in data) {
+            if ("definition" in data && data.definition) {
               innerContainer = state["signsXML"].createElement("laban:degree");
               let degree = null;
               if (data.definition.baseType == "Pin") {
@@ -353,7 +354,7 @@ export default createStore({
             valueContainer.innerHTML = data.signType;
             innerContainer.appendChild(valueContainer);
             
-            if ("definition" in data) {
+            if ("definition" in data && data.definition) {
               let modification = state["signsXML"].createElement("laban:modificationPin");
               valueContainer = state["signsXML"].createElement("laban:vertical");
               valueContainer.innerHTML = data.definition.signType.toLowerCase();
@@ -363,7 +364,7 @@ export default createStore({
               modification.appendChild(valueContainer);
               innerContainer.appendChild(modification);
             }
-            if ("position" in data && data.position != "---") {
+            if ("position" in data && data.position && data.position != "---") {
               let position = state["signsXML"].createElement("laban:relationshipPin");
               valueContainer = state["signsXML"].createElement("laban:vertical");
               valueContainer.innerHTML = "low";
@@ -377,7 +378,7 @@ export default createStore({
               position.appendChild(valueContainer);
               innerContainer.appendChild(position);
             }
-            if ("spaceMeasurement" in data) {
+            if ("spaceMeasurement" in data && data.spaceMeasurement) {
               let space = state["signsXML"].createElement("laban:spaceMeasurement");
               valueContainer = state["signsXML"].createElement("laban:vertical");
               valueContainer.innerHTML = data.spaceMeasurement.signType.toLowerCase();
@@ -458,22 +459,23 @@ export default createStore({
       } if ("timeUnit" in data) {
         state["timeUnit"] = data.timeUnit;
         state["signsXML"].getElementsByTagName("laban:timeUnit")[0].innerHTML = data.timeUnit;
-      } if ("bars" in data) {
-        state["bars"] = data.bars;
-        state["signsXML"].getElementsByTagName("laban:measures")[0].innerHTML = data.bars;
       } if ("beatDuration" in data) {
         state["beatDuration"] = data.beatDuration;
         state["signsXML"].getElementsByTagName("laban:beatDuration")[0].innerHTML = data.beatDuration;
       } if ("beatsPerBar" in data) {
-        state["beatsPerBar"] = data.beatsPerBar
-        state["signsXML"].getElementsByTagName("laban:beatsPerBar")[0].innerHTML = data.beatsPerBar;
+        state["beatsPerBar"] = data.beatsPerBar;
+        state["signsXML"].getElementsByTagName("laban:beats")[0].innerHTML = data.beatsPerBar;
       }
     },
     loadScoreFromTemplate(state, template) {
-      
-      let data = require("@/assets/score-templates/" + template + ".xml")
-      if (!template) {
+      let data = require("@/assets/score-templates/blank-score.xml")
+      if (!template || ((template == "local-storage" && !localStorage.getItem("score")))) {
         data = require("@/assets/score-templates/blank-score.xml")
+      } else if (template == "local-storage" && localStorage.getItem("score")) {
+        data = {};
+        data.default = localStorage.getItem("score");
+      } else {
+        data = require("@/assets/score-templates/" + template + ".xml")
       }
       const parser = new DOMParser();
       let xml = parser.parseFromString(data.default,"text/xml");
@@ -507,7 +509,6 @@ export default createStore({
             }
           }
           let elemWrapper = elem.getElementsByTagName("laban:bodyPart")[0].children[0];
-          console.log(elemWrapper)
           if (elemWrapper.nodeName == "laban:part") {
             if (elemWrapper.innerHTML == "head") {
               sign.canBeLimb = true;
@@ -570,7 +571,7 @@ export default createStore({
           sign.beat = parseInt(elem.getElementsByTagName("laban:beat")[0].innerHTML);
           sign.beatHeight = 1;
           sign.degree = parseInt(elem.getElementsByTagName("laban:horizontal")[0].innerHTML);
-          sign.col = -state["columnsLeft"];
+          sign.col = -state["columnsLeft"] - 1;
           sign.resizable = false;
         } else if (elem.nodeName == "laban:relationship") {
           sign.baseType = "RelationshipBow";
@@ -677,7 +678,19 @@ export default createStore({
             } else {
               sign.position = false;
             }
+            sign.resizable = true;
           }
+        }
+        if (sign.col < -state["columnsLeft"] && sign.baseType != "RoomDirectionSign") {
+          state["columnsLeft"] = Math.abs(sign.col);
+        } else if (sign.col > state["columnsRight"] - 1) {
+          state["columnsRight"] = sign.col + 1;
+        }
+        if (sign.beat >= state["beatsPerBar"]) {
+          state["beatsPerBar"] = sign.beat + 1;
+        }
+        if (sign.bar > state["bars"]) {
+          state["bars"] = sign.bar;
         }
         state["signs"].push(sign);
       }
@@ -688,11 +701,11 @@ export default createStore({
           elem.col == -state["columnsLeft"] - 1;
         }
       }
-      //get movements
-      //get max bar in movements -> set
-      //get min and max columns ->
-      /* IMPORTANT: AFTER SETTING MAX COLUMNS MOVE PATH AND ROOM DIRECTION SIGN COLUMNS ACCORDINGLY CUS THAT WILL BREAK */
-    }
+    },
+    saveScoreToLocalStorage (state) {
+      let xmlString = new XMLSerializer().serializeToString(state["signsXML"]);
+      localStorage.setItem("score", xmlString);
+    },
   },
   actions: {
     addColumn (context, side) {
@@ -736,15 +749,20 @@ export default createStore({
         context.commit("deleteSignFromXML", obj.index);
         context.commit("deleteSignFromObj", obj.index);
       }
+      context.commit("saveScoreToLocalStorage");
     },
     editScoreParameters(context, data) {
       context.commit("editScoreParameters", data);
     },
     newScore (context, template) {
-      if (template) {
+      if (template) { 
         context.commit("loadScoreFromTemplate", template);
       } else {
-        context.commit("makeEmptyScore");
+        if (localStorage.getItem("score")) {
+          context.commit("loadScoreFromTemplate", "local-storage");
+        } else {
+          context.commit("loadScoreFromTemplate", "blank-score");
+        }
       }
     },
     changeSettings(context, data) {

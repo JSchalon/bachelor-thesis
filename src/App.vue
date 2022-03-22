@@ -75,7 +75,11 @@ export default {
     } else {
       this.$store.dispatch("changeSettings", settingsObj);
     }
-    this.$store.dispatch("newScore", "blank-score");
+    if (localStorage.getItem("score")) {
+      this.$store.dispatch("newScore", "local-storage");
+    } else {
+      this.$store.dispatch("newScore", "blank-score");
+    }
     this.isPhone = window.matchMedia("only screen and (max-width: 760px)").matches;
     this.isTablet = window.matchMedia("only screen and (max-width: 1024px)").matches;
     document.documentElement.style.setProperty('--contextMenuWidth', this.contextMenuWidth + "px");

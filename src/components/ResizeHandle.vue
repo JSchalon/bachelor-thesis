@@ -24,13 +24,16 @@ export default {
     width: Number,
   },
   inject: ["handleDiam", "borderWidth"],
+  mounted () {
+    
+  },
   computed: {
     getPos () {
       if (this.pos == "top") {
         return{x: this.width / 2, y: 0}
       } else if (this.pos == "bottom") {
         return{x: this.width / 2, y: this.signHeight}
-      } if (this.pos == "left") {
+      } else if (this.pos == "left") {
         return{x: 0, y: this.signHeight / 2}
       } else {
         return{x: this.width, y: this.signHeight / 2}

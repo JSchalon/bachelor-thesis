@@ -52,7 +52,7 @@
       fill="#ffffff00"
       :signID="id"
     />
-    <circle v-if="signData.holding" :cx="width / 2" :cy="5" r="5" :class="{active: isSelected}" stroke="black" :stroke-width="isSelected ? borderWidth + 1: borderWidth" :signID="id"/>
+    <circle v-if="signData.holding" :cx="width / 2" cy="5" r="5" :class="{active: isSelected}" stroke="black" :stroke-width="isSelected ? borderWidth + 1: borderWidth" :signID="id"/>
   </g>
 </template>
 

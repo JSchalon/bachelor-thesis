@@ -11,8 +11,7 @@ Git Repo zur Bachelorarbeit zur Entwicklung eines webbasierten Interaktionsedito
 
 ## Versions
 
-### Version 0.3.11
-- Implemented js signs to xml-score conversion
-- Implemented xml score reader with js signs conversion
-- Implemented rudimentary xml-score saving (ctrl + s)
-- Fixed bugs pertaining to the xml generation and incorrect sign manipulation
+### Version 0.4.0
+- Implemented saving and loading scores to the localStorage
+- Properly implemented relationship bow resizing
+- Fixed some issues pertaining to the conversion of xml- to js-scores

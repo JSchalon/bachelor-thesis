@@ -8,7 +8,8 @@
         signData.baseType != 'PathSign' && signData.baseType != 'RoomDirectionSign' && signData.baseType != 'BodyPartSign' ? 'bound-inner' : ''
       ]" 
       :x="x" :y="y" 
-      :data-y="y" 
+      :data-y="y"
+      :data-x="x"
       :transform="'translate(' + x + ',' + y +')'" 
       ref="sign" 
       :signID="id"

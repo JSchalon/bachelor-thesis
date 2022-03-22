@@ -449,10 +449,10 @@ export default {
             beatsOverall = elem.beat + beatsMoved;
           } 
           if (beatsOverall < this.beats) {
-            this.$store.dispatch("editSign", {type: "changeSignData", index: this.signs.indexOf(elem), data: {bar: elem.bar, beat: beatsOverall}});
+            this.$store.dispatch("editSign", {type: "changeSignData", index: index, data: {bar: elem.bar, beat: beatsOverall}});
           } else {
             let barsMoved = (beatsOverall - beatsOverall % this.beats) / this.beats;
-            this.$store.dispatch("editSign", {type: "changeSignData", index: this.signs.indexOf(elem), data: {bar: (elem.bar + barsMoved), beat: (beatsOverall % this.beats)}});
+            this.$store.dispatch("editSign", {type: "changeSignData", index: index, data: {bar: (elem.bar + barsMoved), beat: (beatsOverall % this.beats)}});
           }
         } else {
           if (beatsMoved % 1 != 0) {
@@ -460,13 +460,22 @@ export default {
             beatsOverall = elem.beat + beatsMoved;
           } 
           if (beatsOverall > -this.beats) {
-            this.$store.dispatch("editSign", {type: "changeSignData", index: this.signs.indexOf(elem), data: {bar: (elem.bar - 1), beat: (beatsOverall + this.beats)}});
+            this.$store.dispatch("editSign", {type: "changeSignData", index: index, data: {bar: (elem.bar - 1), beat: (beatsOverall + this.beats)}});
           } else {
             let barsMoved = (beatsOverall - ((beatsOverall % this.beats) + this.beats) % this.beats) / this.beats;
-            this.$store.dispatch("editSign", {type: "changeSignData", index: this.signs.indexOf(elem), data: {bar: (elem.bar + barsMoved), beat: (((beatsOverall % this.beats) + this.beats) % this.beats)}});
+            this.$store.dispatch("editSign", {type: "changeSignData", index: index, data: {bar: (elem.bar + barsMoved), beat: (((beatsOverall % this.beats) + this.beats) % this.beats)}});
           }
         }
       }
+    },
+
+    calcColumnMove(index, startX, startW, endX, endW) {
+      console.log("index: " + index + " startX: " + startX + " startW: " + startW + " endX: " + endX + " endW: " + endW);
+      let movedRight = Math.round(((endX + endW) - (startX + startW)) / this.blocksizeX);
+      let movedLeft = Math.round((endX - startX)/this.blocksizeX);
+      console.log(movedLeft + " " + movedRight)
+      const elem = this.signs[index];
+      this.$store.dispatch("editSign", {type: "changeSignData", index: index, data: {col: (elem.col + movedLeft), colRight: (elem.colRight + movedRight)}});
     },
 
     /**
@@ -700,7 +709,7 @@ export default {
               min: { width: this.columnWidth * 2 + this.handleDiam * 2, height: this.minHeight}
             }),
             interact.modifiers.restrictEdges({
-              outer: "parent",
+              outer: this.$refs.boundingInner.getBoundingClientRect(),
             })
           ],
 
@@ -846,7 +855,6 @@ export default {
         shadow[key] = value;
       }
       shadow.isShadow = true;
-
       this.$store.dispatch("editSign", {type: "add", data: shadow});
       this.makeLocalSignData();
     },
@@ -874,7 +882,7 @@ export default {
       const targetID = target.getAttribute("signID");
       
       //get current element position
-      let  y = (this.localSignData[targetID].y || 0) + event.dy;
+      let y = (this.localSignData[targetID].y || 0) + event.dy;
       target.setAttribute("start-y", y);
       target.setAttribute("start-h", this.localSignData[targetID].height);
 
@@ -928,7 +936,6 @@ export default {
       target.setAttribute("data-y", y);
       
       //translate group
-      this.localSignData[targetID].x = targetElem.x;
       this.localSignData[targetID].y = this.localSignData[targetID].y + event.deltaRect.top;
     },
 
@@ -985,11 +992,11 @@ export default {
       const targetID = target.getAttribute("signID");
       
       //get current element position
-      let  x = (this.localSignData[targetID].x || 0) + event.dx;
+      let x = (this.localSignData[targetID].x || 0) + event.dx;
       target.setAttribute("start-x", x);
       target.setAttribute("start-w", this.localSignData[targetID].width);
 
-      this.makeShadow(this.localSignData[targetID]);
+      this.makeShadow(this.signs[targetID]);
 
       //apply dragging styling to group
       target.classList.add("dragging");
@@ -1019,20 +1026,19 @@ export default {
       let newWidth = targetElem.width + x - actualX;
       let actualW = Math.round(newWidth / this.blocksizeX) * this.blocksizeX;
 
-      // update the element height (-14 for the handles)
+      // update the element width (-14 for the handles)
       this.localSignData[targetID].width = (event.rect.width - this.handleDiam * 2);
-      //check if the element was resized from the top
+      //check if the element was resized from the left
       if (event.deltaRect.left != 0) {
-        //top handle -> adjust y position to nearest grid position
+        //top handle -> adjust x position to nearest grid position
         this.localSignData[shadowID].x = actualX;
         this.localSignData[shadowID].y = shadowElem.y;
 
       }
 
-      //stop resizing at the starting line
       this.localSignData[shadowID].width = actualW;
 
-      //set new y data
+      //set new x data
       target.setAttribute("data-x", x);
       
       //translate group
@@ -1040,7 +1046,7 @@ export default {
     },
 
     /**
-     * The bow resize end listener, sets the actual height/position after a resize
+     * The bow resize end listener, sets the actual width/position after a resize
      * @arg event the resize-end event
      */
     bowResizeEnd (event) {
@@ -1053,7 +1059,7 @@ export default {
       let x = parseFloat(target.getAttribute("data-x"));
       let actualX = Math.round(x / this.blocksizeX) * this.blocksizeX;
 
-      //check if the element was resized from the top
+      //check if the element was resized from the left
       if (event.deltaRect.left != 0) {
         //left handle -> adjust x position to nearest grid position
         target.setAttribute("data-x", actualX);
@@ -1061,10 +1067,11 @@ export default {
       }
       this.localSignData[targetID].width = shadowElem.width;
 
-      if (actualX == 0 && this.localSignData[targetID].x != 0) {
-        this.localSignData[targetID].x = 0;
+      if (actualX == this.columnWidth && this.localSignData[targetID].x != this.columnWidth) {
+        this.localSignData[targetID].x = this.columnWidth;
       }
-      //calculate new column?
+      //calculate new column
+      this.calcColumnMove(targetID, parseFloat(target.getAttribute("start-x")), parseFloat(target.getAttribute("start-w")), this.localSignData[targetID].x, this.localSignData[targetID].width);
       this.removeSign(shadowID);
       target.classList.remove("dragging");
       this.makeLocalSignData();
