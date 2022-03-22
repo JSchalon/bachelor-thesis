@@ -29,7 +29,8 @@ export default createStore({
     fingerNames: ["thumb","indexFinger","middleFinger","ringFinger","littleFinger"],
     toeNames: ["bigToe","longToe","middleToe","ringToe","littleToe"],
     xmlParts: ["Head", "Chest", "Waist", "Pelvis", "Torso"],
-    commandStack: [],
+    undoStack: [],
+    redoStack: [],
   },
   mutations: {
     setColumns (state, data) {
@@ -484,7 +485,7 @@ export default createStore({
       state["author"] = xml.getElementsByTagName("laban:author")[0].innerHTML;
       state["title"] = xml.getElementsByTagName("laban:title")[0].innerHTML;
       state["description"] = xml.getElementsByTagName("laban:description")[0].innerHTML;
-      state["timeUnit"] = parseInt(xml.getElementsByTagName("laban:timeUnit")[0].innerHTML);
+      state["timeUnit"] = xml.getElementsByTagName("laban:timeUnit")[0].innerHTML;
       state["bars"] = parseInt(xml.getElementsByTagName("laban:measures")[0].innerHTML);
       state["beatDuration"] = parseInt(xml.getElementsByTagName("laban:beatDuration")[0].innerHTML);
       state["beatsPerBar"] = parseInt(xml.getElementsByTagName("laban:beats")[0].innerHTML);
@@ -707,9 +708,62 @@ export default createStore({
       let xmlString = new XMLSerializer().serializeToString(state["signsXML"]);
       localStorage.setItem("score", xmlString);
     },
-    addCommandToStack(state, data) {
-      console.log(data);
-      console.log(state["commandStack"]);
+    addToStack (state) {
+      //clear redo stack
+      state["redoStack"] = [];
+      const signsXMLString = new XMLSerializer().serializeToString(state["signsXML"]);
+      const curState = JSON.stringify({
+        author: state["author"], 
+        bars: state["bars"], 
+        beatDuration: state["beatDuration"], 
+        beatsPerBar: state["beatsPerBar"], 
+        columnsLeft: state["columnsLeft"], 
+        columnsRight: state["columnsRight"],
+        description: state["description"],
+        signs: state["signs"],
+        signsXML: signsXMLString,
+        timeUnit: state["timeUnit"],
+        title: state["title"]
+      });
+      state["undoStack"].push(curState);
+      if (state["undoStack"].length > 50) {
+        state["undoStack"].slice(1);
+      }
+      console.log(state)
+    },
+    undo (state) {
+      if (state["undoStack"].length > 1) {
+        const curState = state["undoStack"].pop();
+        const newState = state["undoStack"][state["undoStack"].length - 1];
+        state["redoStack"].push(curState);
+        for (const [key, value] of Object.entries(JSON.parse(newState))) {
+          if (key != "signsXML") {
+            state[key] = value;
+          } else {
+            const parser = new DOMParser();
+            let xml = parser.parseFromString(value,"text/xml");
+            state[key] = xml;
+          }
+        }
+        //pop undostack, push to redostack
+        //parse json from undostack and loop into state
+      }
+    },
+    redo (state) {
+      if (state["redoStack"].length > 0) {
+        const curState = state["redoStack"].pop();
+        state["undoStack"].push(curState);
+        const newState = state["undoStack"][state["undoStack"].length - 1];
+        for (const [key, value] of Object.entries(JSON.parse(newState))) {
+          if (key != "signsXML") {
+            state[key] = value;
+          } else {
+            const parser = new DOMParser();
+            let xml = parser.parseFromString(value,"text/xml");
+            state[key] = xml;
+          }
+        }
+      }
     }
   },
   actions: {
@@ -737,6 +791,7 @@ export default createStore({
       }
     },
     editSign (context, obj) {
+      console.log(obj.type)
       if (obj.type == "add") {
         context.commit("addSignToObj", obj.data);
         if (!("isShadow" in obj.data && obj.data.isShadow)) {
@@ -754,7 +809,6 @@ export default createStore({
         context.commit("deleteSignFromObj", obj.index);
       }
       context.commit("saveScoreToLocalStorage");
-      context.commit("addCommandToStack", obj);
     },
     editScoreParameters(context, data) {
       context.commit("editScoreParameters", data);
@@ -769,9 +823,21 @@ export default createStore({
           context.commit("loadScoreFromTemplate", "blank-score");
         }
       }
+      context.commit("addToStack");
     },
     changeSettings(context, data) {
       context.commit("setSettings", data);
+    },
+    saveStateInHistory (context) {
+      context.commit("addToStack");
+    },
+    undoChanges(context) {
+      context.commit("undo");
+      context.commit("saveScoreToLocalStorage");
+    },
+    redoChanges(context) {
+      context.commit("redo");
+      context.commit("saveScoreToLocalStorage");
     }
   },
   modules: {

@@ -11,7 +11,5 @@ Git Repo zur Bachelorarbeit zur Entwicklung eines webbasierten Interaktionsedito
 
 ## Versions
 
-### Version 0.4.1
-- Started implementing command stack
-- Further fixed bugs with and inconsistencies between xml and js scores
-- Fixed incorrect placements of right-sided signs after a column deletion
+### Version 0.4.2
+- Implemented undo/redo

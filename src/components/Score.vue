@@ -284,6 +284,7 @@ export default {
       }
       
       this.$store.dispatch('addColumn',side);
+      this.$store.dispatch("saveStateInHistory");
       setTimeout(function () {this.initInteractListeners()}.bind(this), 1);
     },
     /**
@@ -330,6 +331,7 @@ export default {
         this.localSignData.splice(remove[last], 1);
       }
       this.$store.dispatch('removeColumn',side);
+      this.$store.dispatch("saveStateInHistory");
       setTimeout(function () {this.initInteractListeners()}.bind(this), 1);
     },
 
@@ -348,6 +350,7 @@ export default {
         }
       }
       this.$store.dispatch('addBar');
+      this.$store.dispatch("saveStateInHistory");
       setTimeout(function () {this.initInteractListeners()}.bind(this), 1);
     },
     /**
@@ -389,6 +392,7 @@ export default {
         this.localSignData.splice(remove[last], 1);
       }
       this.$store.dispatch('removeBar');
+      this.$store.dispatch("saveStateInHistory");
       setTimeout(function () {this.initInteractListeners()}.bind(this), 1);
     },
     /**
@@ -423,6 +427,7 @@ export default {
         signData.beatHeight = 1;
       }
       this.$store.dispatch("editSign", {type: "add", data: signData});
+      this.$store.dispatch("saveStateInHistory");
       this.makeLocalSignData();
     },
     /**
@@ -430,13 +435,13 @@ export default {
      * @arg id the id of the sign to remove
      */
     removeSign (id = -1) {
-        this.selectSign(-1);
-        this.contextActive = false;
-        if (id > 0) {
-          this.$store.dispatch("editSign", {type: "delete", index: id});
-          this.localSignData.splice(id, 1);
-          this.contextSign = 0;
-        }
+      this.selectSign(-1);
+      this.contextActive = false;
+      if (id > 0) {
+        this.$store.dispatch("editSign", {type: "delete", index: id});
+        this.localSignData.splice(id, 1);
+        this.contextSign = 0;
+      }
     },
 
 
@@ -494,6 +499,7 @@ export default {
      */
     updateSignData(data) {
       this.$store.dispatch("editSign", {type: "changeSignData", index: data.index, data: data.data});
+      this.$store.dispatch("saveStateInHistory");
     },
 
     /**
@@ -548,7 +554,6 @@ export default {
       if (event.key == "e") {
         console.log(this.signs)
         console.log(this.xmlScore);
-        console.log(this.localSignData)
       }
       if (event.key == "s" && (event.ctrlKey || event.metaKey )) {
         event.preventDefault();
@@ -579,6 +584,7 @@ export default {
         for (let max = sortedSelected.length - 1; max >= 0; max--) {
             this.removeSign (sortedSelected[max]);
         }
+        this.$store.dispatch("saveStateInHistory");
       }
       //move sign with arrow keys key.id are 37 to 40
       if (event.which >= 37 && event.which <= 40) {
@@ -630,14 +636,15 @@ export default {
             }
           }
         }
+        this.$store.dispatch("saveStateInHistory");
       }
       //undo command listener
-      if (event.key == "z" && event.ctrlKey) {
-        console.log("undo");
+      if (event.key == "z" && (event.ctrlKey || event.metaKey)) {
+        this.$store.dispatch("undoChanges");
       }
       //redo event listener
-      if (event.key == "y" && event.ctrlKey) {
-        console.log("redo");
+      if (event.key == "y" && (event.ctrlKey || event.metaKey)) {
+        this.$store.dispatch("redoChanges");
       }
     },
 
@@ -984,7 +991,7 @@ export default {
         this.openContextMenu(event, 0, actualY - y);
         this.contextWasActive = false;
       }
-     
+      this.$store.dispatch("saveStateInHistory");
     },
 
     /**
@@ -1090,7 +1097,7 @@ export default {
         this.openContextMenu(event, actualX - x);
         this.contextWasActive = false;
       }
-      
+      this.$store.dispatch("saveStateInHistory");
     },
 
     /**
@@ -1284,7 +1291,7 @@ export default {
       }
 
       this.draggingSigns = [];
-      
+      this.$store.dispatch("saveStateInHistory");
     },
 
 
@@ -1300,7 +1307,6 @@ export default {
         console.warn(`The following event couldn't be canceled:`);
         console.dir(event);
       }
-        
     },
   }
 }
