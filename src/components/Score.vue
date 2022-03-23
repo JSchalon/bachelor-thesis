@@ -75,9 +75,7 @@ export default {
   data() {
     return {
       canvasScroll: {x: 0, y:0},
-      contextActive: false,
       contextPos: {x: 0, y: 0},
-      selectedSigns: [],
       contextSign: 0,
       keyCommandsEnabled: true,
       contextWasActive: false,
@@ -95,6 +93,15 @@ export default {
   computed: {
     signs () {
       return this.$store.state["signs"];
+    },
+    contextActive() {
+      return this.$store.state["contextActive"];
+    },
+    selectedSigns(){
+      return this.$store.state["selectedSigns"];
+    },
+    multiselectActive () {
+      return this.$store.state["multiselectActive"];
     },
     columnHandleTranslate () {
       return "left: " + this.selectedColumnTranslate.x + "px; top: " + this.selectedColumnTranslate.y + "px;";
@@ -209,9 +216,9 @@ export default {
       for (let elem of this.signs) {
         
         if (this.signs.indexOf(elem) == 0) {
-          this.localSignData.push({isSelected: false, height: 0, x: 0, y: 0, purpose: "dummy sign"})
+          this.localSignData.push({height: 0, x: 0, y: 0, purpose: "dummy sign"})
         } else {
-          let elemData = {canResize: true, isSelected: false};
+          let elemData = {canResize: true};
           elemData.height = elem.beatHeight * this.minHeight;
 
           elemData.x = (this.columnsLeft + 1 + elem.col) * this.columnWidth + (this.columnWidth - this.signWidth) / 2;
@@ -236,7 +243,7 @@ export default {
       }
     },
     placeGridHandles(data) {
-      this.contextActive = false;
+      this.$store.dispatch("changeContextMenu", false);
       if (data.type == "col") {
         this.columnHandlesActive = true;
         this.selectedColumnTranslate = {x: data.x, y: (data.y + document.getElementById("canvasContainer").scrollTop) + this.barHeight / 2 - 15};
@@ -258,7 +265,7 @@ export default {
      * @arg beforeIndex the index to insert the new column after
      */
     addColumn(beforeIndex) {
-      this.contextActive = false;
+      this.$store.dispatch("changeContextMenu", false);
       this.contextSign = 0;
       let side = "right";
       if (beforeIndex < 0) {
@@ -274,11 +281,11 @@ export default {
         if (elem.col >= beforeIndex) {
           this.localSignData[this.signs.indexOf(elem)].x = (this.localSignData[this.signs.indexOf(elem)].x + this.columnWidth);
           if (side == "right") {
-            this.$store.dispatch("editSign", {type: "changeSignData", index: this.signs.indexOf(elem), data: {col: elem.col + 1}});
+            this.$store.dispatch("editSigns", {type: "changeSignData", index: this.signs.indexOf(elem), data: {col: elem.col + 1}});
           }
         }else if (elem.col < beforeIndex) {
           if (side == "left") {
-            this.$store.dispatch("editSign", {type: "changeSignData", index: this.signs.indexOf(elem), data: {col: elem.col - 1}});
+            this.$store.dispatch("editSigns", {type: "changeSignData", index: this.signs.indexOf(elem), data: {col: elem.col - 1}});
           }
         }
       }
@@ -292,7 +299,7 @@ export default {
      * @arg col the column to remove  
      */
     removeColumn(col) {
-      this.contextActive = false;
+      this.$store.dispatch("changeContextMenu", false);
       this.contextSign = 0;
       let side = "left";
       if (col >= 0) {
@@ -316,18 +323,18 @@ export default {
           if (elem.col > col) {
             this.localSignData[this.signs.indexOf(elem)].x = (this.localSignData[this.signs.indexOf(elem)].x - this.columnWidth);
           } else if (elem.col < col) {
-            this.$store.dispatch("editSign", {type: "changeSignData", index: this.signs.indexOf(elem), data: {col: (elem.col + 1)}});
+            this.$store.dispatch("editSigns", {type: "changeSignData", index: this.signs.indexOf(elem), data: {col: (elem.col + 1)}});
           }
         } else {
           if (elem.col > col) {
             this.localSignData[this.signs.indexOf(elem)].x = (this.localSignData[this.signs.indexOf(elem)].x - this.columnWidth);
-            this.$store.dispatch("editSign", {type: "changeSignData", index: this.signs.indexOf(elem), data: {col: (elem.col - 1)}});
+            this.$store.dispatch("editSigns", {type: "changeSignData", index: this.signs.indexOf(elem), data: {col: (elem.col - 1)}});
           }
         }
       }
       
       for (let last = remove.length - 1; last >= 0; last--) {
-        this.$store.dispatch("editSign", {type: "delete", index: remove[last]});
+        this.$store.dispatch("editSigns", {type: "delete", index: remove[last]});
         this.localSignData.splice(remove[last], 1);
       }
       this.$store.dispatch('removeColumn',side);
@@ -340,13 +347,13 @@ export default {
      * @arg beforeIndex the index to insert the new bar before
      */
     addBar(beforeIndex) {
-      this.contextActive = false;
+      this.$store.dispatch("changeContextMenu", false);
       this.contextSign = 0;
       for (let elem of this.signs) {
         if (elem.bar < beforeIndex) {
           this.localSignData[this.signs.indexOf(elem)].y = this.localSignData[this.signs.indexOf(elem)].y + this.barHeight;
         } else if (elem.bar >= beforeIndex) {
-          this.$store.dispatch("editSign", {type: "changeSignData", index: this.signs.indexOf(elem), data: {bar: (elem.bar + 1), beat: elem.beat}});
+          this.$store.dispatch("editSigns", {type: "changeSignData", index: this.signs.indexOf(elem), data: {bar: (elem.bar + 1), beat: elem.beat}});
         }
       }
       this.$store.dispatch('addBar');
@@ -361,7 +368,7 @@ export default {
       if (this.bars < bar || this.bars == 1) {
         return false;
       }
-      this.contextActive = false;
+      this.$store.dispatch("changeContextMenu", false);
       this.contextSign = 0;
       let remove = [];
       for (let elem of this.signs) {
@@ -375,20 +382,18 @@ export default {
             if ((this.localSignData[index].y - this.barHeight) >= this.outerCanvasMargin) {
               this.localSignData[index].y = this.localSignData[index].y - this.barHeight;
             } else {
-              console.log(index)
-              console.log(this.localSignData[index]);
               this.localSignData[index].y = this.localSignData[index].y + offset - this.barHeight;
               this.localSignData[index].height = this.localSignData[index].height - offset;
               
-              this.$store.dispatch("editSign", {type: "changeSignData", index: index, data: {beatHeight: (this.localSignData[index].height / this.minHeight)}});
+              this.$store.dispatch("editSigns", {type: "changeSignData", index: index, data: {beatHeight: (this.localSignData[index].height / this.minHeight)}});
             }
           } else {
-            this.$store.dispatch("editSign", {type: "changeSignData", index: index, data: {bar: elem.bar -1, beat: elem.beat}});
+            this.$store.dispatch("editSigns", {type: "changeSignData", index: index, data: {bar: elem.bar -1, beat: elem.beat}});
           }
         }
       }
       for (let last = remove.length - 1; last >= 0; last--) {
-        this.$store.dispatch("editSign", {type: "delete", index: remove[last]});
+        this.$store.dispatch("editSigns", {type: "delete", index: remove[last]});
         this.localSignData.splice(remove[last], 1);
       }
       this.$store.dispatch('removeBar');
@@ -426,7 +431,8 @@ export default {
       if (signData.bar == this.bars && signData.beat == this.beats - 1 && signData.beatHeight > 1) {
         signData.beatHeight = 1;
       }
-      this.$store.dispatch("editSign", {type: "add", data: signData});
+
+      this.$store.dispatch("editSigns", {type: "add", data: signData});
       this.$store.dispatch("saveStateInHistory");
       this.makeLocalSignData();
     },
@@ -436,9 +442,9 @@ export default {
      */
     removeSign (id = -1) {
       this.selectSign(-1);
-      this.contextActive = false;
+      this.$store.dispatch("changeContextMenu", false);
       if (id > 0) {
-        this.$store.dispatch("editSign", {type: "delete", index: id});
+        this.$store.dispatch("editSigns", {type: "delete", index: id});
         this.localSignData.splice(id, 1);
         this.contextSign = 0;
       }
@@ -466,10 +472,10 @@ export default {
             beatsOverall = elem.beat + beatsMoved;
           } 
           if (beatsOverall < this.beats) {
-            this.$store.dispatch("editSign", {type: "changeSignData", index: index, data: {bar: elem.bar, beat: beatsOverall}});
+            this.$store.dispatch("editSigns", {type: "changeSignData", index: index, data: {bar: elem.bar, beat: beatsOverall}});
           } else {
             let barsMoved = (beatsOverall - beatsOverall % this.beats) / this.beats;
-            this.$store.dispatch("editSign", {type: "changeSignData", index: index, data: {bar: (elem.bar + barsMoved), beat: (beatsOverall % this.beats)}});
+            this.$store.dispatch("editSigns", {type: "changeSignData", index: index, data: {bar: (elem.bar + barsMoved), beat: (beatsOverall % this.beats)}});
           }
         } else {
           if (beatsMoved % 1 != 0) {
@@ -477,10 +483,10 @@ export default {
             beatsOverall = elem.beat + beatsMoved;
           } 
           if (beatsOverall > -this.beats) {
-            this.$store.dispatch("editSign", {type: "changeSignData", index: index, data: {bar: (elem.bar - 1), beat: (beatsOverall + this.beats)}});
+            this.$store.dispatch("editSigns", {type: "changeSignData", index: index, data: {bar: (elem.bar - 1), beat: (beatsOverall + this.beats)}});
           } else {
             let barsMoved = (beatsOverall - ((beatsOverall % this.beats) + this.beats) % this.beats) / this.beats;
-            this.$store.dispatch("editSign", {type: "changeSignData", index: index, data: {bar: (elem.bar + barsMoved), beat: (((beatsOverall % this.beats) + this.beats) % this.beats)}});
+            this.$store.dispatch("editSigns", {type: "changeSignData", index: index, data: {bar: (elem.bar + barsMoved), beat: (((beatsOverall % this.beats) + this.beats) % this.beats)}});
           }
         }
       }
@@ -490,7 +496,7 @@ export default {
       let movedRight = Math.round(((endX + endW) - (startX + startW)) / this.blocksizeX);
       let movedLeft = Math.round((endX - startX)/this.blocksizeX);
       const elem = this.signs[index];
-      this.$store.dispatch("editSign", {type: "changeSignData", index: index, data: {col: (elem.col + movedLeft), colRight: (elem.colRight + movedRight)}});
+      this.$store.dispatch("editSigns", {type: "changeSignData", index: index, data: {col: (elem.col + movedLeft), colRight: (elem.colRight + movedRight)}});
     },
 
     /**
@@ -498,7 +504,7 @@ export default {
      * @arg data the new sign data and the index of that sign in the signs object 
      */
     updateSignData(data) {
-      this.$store.dispatch("editSign", {type: "changeSignData", index: data.index, data: data.data});
+      this.$store.dispatch("editSigns", {type: "changeSignData", index: data.index, data: data.data});
       this.$store.dispatch("saveStateInHistory");
     },
 
@@ -507,23 +513,22 @@ export default {
      * @arg id the index of the sign in the signs object 
      */
     selectSign(id, selectMultiple = false) {
-      
-      if (!selectMultiple) {
-        for (let elem of this.signs) {
-          this.localSignData[this.signs.indexOf(elem)].isSelected = false;
-          this.selectedSigns = [];
-        }
+      if (!(selectMultiple || this.multiselectActive)) {
+        this.$store.dispatch("clearSelectedSigns");
       }
       if (id >= 0) {
-        this.localSignData[id].isSelected = true;
-        this.selectedSigns.push(id);
-        this.barHandlesActive = false;
-        this.columnHandlesActive = false;
-      } else {
-        this.selectedSigns = [];
+        if (this.signs[id].isSelected == false) {
+          this.$store.dispatch("addToSelectedSigns", id);
+          this.barHandlesActive = false;
+          this.columnHandlesActive = false;
+        } else {
+          this.$store.dispatch("removeFromSelectedSigns", id);
+        }
+      } else if (id == -1) {
+        this.$store.dispatch("clearSelectedSigns");
         this.contextSign = 0;
       }
-      this.contextActive = false;
+      this.$store.dispatch("changeContextMenu", false);
     },
 
     /**
@@ -554,6 +559,7 @@ export default {
       if (event.key == "e") {
         console.log(this.signs)
         console.log(this.xmlScore);
+        return;
       }
       if (event.key == "s" && (event.ctrlKey || event.metaKey )) {
         event.preventDefault();
@@ -576,33 +582,35 @@ export default {
         document.body.appendChild(pom);
         pom.click();
         document.body.removeChild(pom);
+        return;
       }
       //delete sign on x or del
-      if (event.key == "x" || event.key == "Delete") {
-        let sortedSelected = this.selectedSigns.sort();
+      if ((event.key == "x" || event.key == "Delete") && this.selectedSigns.length > 0) {
+        const sortedSelected = this.selectedSigns.sort();
         
         for (let max = sortedSelected.length - 1; max >= 0; max--) {
             this.removeSign (sortedSelected[max]);
         }
         this.$store.dispatch("saveStateInHistory");
+        return;
       }
       //move sign with arrow keys key.id are 37 to 40
       if (event.which >= 37 && event.which <= 40) {
         let move = this.getArrowKeyAction (event.which);
         for (let elem of this.signs) {
-          if (this.localSignData[this.signs.indexOf(elem)].isSelected == true) {
+          if (elem.isSelected == true) {
             //if the key id is odd -> left / right arrow key, move the sign(s) to the next column
             if (event.which % 2 == 1) {
               if (elem.col + move.column  >= -this.columnsLeft && elem.col + move.column < this.columnsRight && elem.baseType != "RoomDirectionSign" && elem.baseType != "PathSign") {
                 if (elem.baseType == "RelationshipBow") {
-                  this.$store.dispatch("editSign", {type: "changeSignData", index: this.signs.indexOf(elem), data: {col: (elem.col + move.column), colRight: (elem.colRight + move.column)}});
+                  this.$store.dispatch("editSigns", {type: "changeSignData", index: this.signs.indexOf(elem), data: {col: (elem.col + move.column), colRight: (elem.colRight + move.column)}});
                 } else {
-                  this.$store.dispatch("editSign", {type: "changeSignData", index: this.signs.indexOf(elem), data: {col: (elem.col + move.column)}});
+                  this.$store.dispatch("editSigns", {type: "changeSignData", index: this.signs.indexOf(elem), data: {col: (elem.col + move.column)}});
                 }
                 if (elem.col < 0) {
-                  this.$store.dispatch("editSign", {type: "changeSignData", index: this.signs.indexOf(elem), data: {side: "left"}});
+                  this.$store.dispatch("editSigns", {type: "changeSignData", index: this.signs.indexOf(elem), data: {side: "left"}});
                 } else {
-                  this.$store.dispatch("editSign", {type: "changeSignData", index: this.signs.indexOf(elem), data: {side: "right"}});
+                  this.$store.dispatch("editSigns", {type: "changeSignData", index: this.signs.indexOf(elem), data: {side: "right"}});
                 }
                 this.localSignData[this.signs.indexOf(elem)].x = this.localSignData[this.signs.indexOf(elem)].x + move.column * this.columnWidth;
               }
@@ -624,7 +632,7 @@ export default {
                   this.localSignData[this.signs.indexOf(elem)].y = this.localSignData[this.signs.indexOf(elem)].y + this.localSignData[this.signs.indexOf(elem)].height + this.startBarOffset;
                   if (elem.resizable) {
                     this.localSignData[this.signs.indexOf(elem)].height = (this.minHeight * 2);
-                    this.$store.dispatch("editSign", {type: "changeSignData", index: this.signs.indexOf(elem), data: {beatHeight: (this.localSignData[this.signs.indexOf(elem)].height / this.minHeight)}});
+                    this.$store.dispatch("editSigns", {type: "changeSignData", index: this.signs.indexOf(elem), data: {beatHeight: (this.localSignData[this.signs.indexOf(elem)].height / this.minHeight)}});
                   } else {
                     this.localSignData[this.signs.indexOf(elem)].y = this.localSignData[this.signs.indexOf(elem)].y + this.minHeight;
                   }
@@ -637,14 +645,47 @@ export default {
           }
         }
         this.$store.dispatch("saveStateInHistory");
+        return;
       }
       //undo command listener
       if (event.key == "z" && (event.ctrlKey || event.metaKey)) {
         this.$store.dispatch("undoChanges");
+        return;
       }
       //redo event listener
       if (event.key == "y" && (event.ctrlKey || event.metaKey)) {
         this.$store.dispatch("redoChanges");
+        return;
+      }
+      //select/unselect all event listener
+      if (event.key == "a" && (event.ctrlKey || event.metaKey )) {
+        if (this.selectedSigns.length > 0) {
+          this.selectSign(-1);
+        } else {
+          for (let index = 1; index < this.signs.length; index++) {
+            this.selectSign(index, true)
+          }
+        }
+        return;
+      }
+      //inverse selection event listener
+      if (event.key == "i" && (event.ctrlKey || event.metaKey )) {
+        if (this.selectedSigns.length > 0) {
+          let unselected = [];
+          for (let index = 1; index < this.signs.length; index++) {
+            unselected.push(index);
+          }
+          const sortedSelected = this.selectedSigns.sort();
+          for (let index = sortedSelected.length - 1; index >= 0; index--) {
+            unselected.splice(sortedSelected[index] - 1, 1);
+          }
+          
+          this.selectSign(-1);
+          for (let index of unselected) {
+            this.selectSign(index, true);
+          }
+        }
+        return;
       }
     },
 
@@ -741,7 +782,7 @@ export default {
      */
     openContextMenu (event, additionalX = 0, additionalY = 0) {
       event.preventDefault();
-      this.contextActive = false;
+      this.$store.dispatch("changeContextMenu", false);
       this.contextSign = 0;
       let target = event.target;
       const targetID = target.getAttribute("signID");
@@ -753,7 +794,7 @@ export default {
       if (this.contextPos.x + this.contextMenuWidth >= window.innerWidth) {
         this.contextPos.x = boundingRect.x + additionalX - this.contextMenuWidth - 5; 
       }
-      if (this.localSignData[targetID].isSelected) {
+      if (this.signs[targetID].isSelected) {
         this.contextPos.y = boundingRect.top + additionalY;
       } else {
         this.contextPos.y = boundingRect.top;
@@ -761,7 +802,7 @@ export default {
       
       
       this.selectSign(targetID);
-      this.contextActive = true;
+      this.$store.dispatch("changeContextMenu", true);
 
       setTimeout(function () {this.moveContextIntoView()}.bind(this), 0);
     },
@@ -872,7 +913,7 @@ export default {
         shadow[key] = value;
       }
       shadow.isShadow = true;
-      this.$store.dispatch("editSign", {type: "add", data: shadow});
+      this.$store.dispatch("editSigns", {type: "add", data: shadow});
       this.makeLocalSignData();
     },
 
@@ -894,7 +935,7 @@ export default {
       if (this.contextActive) {
         this.contextWasActive = true;
       }
-      this.contextActive = false;
+      this.$store.dispatch("changeContextMenu", false);
       
       const targetID = target.getAttribute("signID");
       
@@ -935,7 +976,7 @@ export default {
 
       // update the element height (-14 for the handles)
       this.localSignData[targetID].height = (event.rect.height - this.handleDiam * 2);
-      //this.$store.dispatch("editSign", {type: "changeSignData", index: targetID, data: {beatHeight: (this.localSignData[targetID].height / this.minHeight)}});
+      //this.$store.dispatch("editSigns", {type: "changeSignData", index: targetID, data: {beatHeight: (this.localSignData[targetID].height / this.minHeight)}});
       //check if the element was resized from the top
       if (event.deltaRect.top != 0) {
         //top handle -> adjust y position to nearest grid position
@@ -946,7 +987,7 @@ export default {
       //stop resizing at the starting line
       if (!this.checkStartingPos(actualY, actualH)) {
         this.localSignData[shadowID].height = actualH;
-        //this.$store.dispatch("editSign", {type: "changeSignData", index: shadowID, data: {beatHeight: (this.localSignData[shadowID].height / this.minHeight)}});
+        //this.$store.dispatch("editSigns", {type: "changeSignData", index: shadowID, data: {beatHeight: (this.localSignData[shadowID].height / this.minHeight)}});
       }
 
       //set new y data
@@ -977,7 +1018,7 @@ export default {
         this.localSignData[targetID].y = actualY;
       }
       this.localSignData[targetID].height = shadowElem.height;
-      this.$store.dispatch("editSign", {type: "changeSignData", index: targetID, data: {beatHeight: (this.localSignData[targetID].height / this.minHeight)}});
+      this.$store.dispatch("editSigns", {type: "changeSignData", index: targetID, data: {beatHeight: (this.localSignData[targetID].height / this.minHeight)}});
       
       if (actualY == 0 && this.localSignData[targetID].y != 0) {
         this.localSignData[targetID].y = 0;
@@ -1004,7 +1045,7 @@ export default {
       if (this.contextActive) {
         this.contextWasActive = true;
       }
-      this.contextActive = false;
+      this.$store.dispatch("changeContextMenu", false);
       
       const targetID = target.getAttribute("signID");
       
@@ -1139,14 +1180,13 @@ export default {
      * @arg event the drag-move event
      */
     dragMove: function(event) {
-      this.selectSign(-1);
       let target = event.target;
       
       const targetID = target.getAttribute("signID");
       const shadowID = this.signs.length - 1;
       let targetElem = this.localSignData[targetID];
       this.localSignData[shadowID].height = targetElem.height;
-      //this.$store.dispatch("editSign", {type: "changeSignData", index: shadowID, data: {beatHeight: (this.localSignData[shadowID].height / this.minHeight)}});
+      //this.$store.dispatch("editSigns", {type: "changeSignData", index: shadowID, data: {beatHeight: (this.localSignData[shadowID].height / this.minHeight)}});
       const isBow = (this.signs[targetID].baseType == "RelationshipBow");
       const isBodyPart = (this.signs[targetID].baseType == "BodyPartSign");
       const isPath = (this.signs[targetID].baseType == "PathSign");
@@ -1188,7 +1228,7 @@ export default {
           actualY = this.innerCanvasDimFull.y - this.barHeight / this.beats * 2 - this.minHeight + this.blocksizeY;
         } else {
           this.localSignData[shadowID].height = (this.barHeight / this.beats * 2);
-          //this.$store.dispatch("editSign", {type: "changeSignData", index: shadowID, data: {beatHeight: (this.localSignData[shadowID].height / this.minHeight)}});
+          //this.$store.dispatch("editSigns", {type: "changeSignData", index: shadowID, data: {beatHeight: (this.localSignData[shadowID].height / this.minHeight)}});
           actualY = this.innerCanvasDimFull.y - this.minHeight - this.barHeight / this.beats * 2;
         }
       }
@@ -1252,7 +1292,7 @@ export default {
           screenY = this.innerCanvasDimFull.y - this.barHeight / this.beats * 2;
         } else {
           this.localSignData[targetID].height = (this.barHeight / this.beats * 2);
-          this.$store.dispatch("editSign", {type: "changeSignData", index: targetID, data: {beatHeight: (this.localSignData[targetID].height / this.minHeight)}});
+          this.$store.dispatch("editSigns", {type: "changeSignData", index: targetID, data: {beatHeight: (this.localSignData[targetID].height / this.minHeight)}});
           screenY = this.innerCanvasDimFull.y - this.barHeight / this.beats * 2 - this.minHeight;
           this.localSignData[targetID].canResize = false;
         }
@@ -1266,20 +1306,20 @@ export default {
 
       let columnsMoved = (parseFloat(target.getAttribute("start-x")) - this.localSignData[targetID].x) / -this.blocksizeX;
       if (isBow) {
-        this.$store.dispatch("editSign", {type: "changeSignData", index: targetID, data: {col: (this.signs[targetID].col + columnsMoved), colRight: (this.signs[targetID].colRight + columnsMoved)}});
+        this.$store.dispatch("editSigns", {type: "changeSignData", index: targetID, data: {col: (this.signs[targetID].col + columnsMoved), colRight: (this.signs[targetID].colRight + columnsMoved)}});
       } else {
-        this.$store.dispatch("editSign", {type: "changeSignData", index: targetID, data: {col: (this.signs[targetID].col + columnsMoved)}});
+        this.$store.dispatch("editSigns", {type: "changeSignData", index: targetID, data: {col: (this.signs[targetID].col + columnsMoved)}});
       }
       
       if (this.signs[targetID].col >= 0 ) {
-        this.$store.dispatch("editSign", {type: "changeSignData", index: targetID, data: {side: "right"}});
+        this.$store.dispatch("editSigns", {type: "changeSignData", index: targetID, data: {side: "right"}});
       } else {
-        this.$store.dispatch("editSign", {type: "changeSignData", index: targetID, data: {side: "left"}});
+        this.$store.dispatch("editSigns", {type: "changeSignData", index: targetID, data: {side: "left"}});
       }
 
       this.calcBeatMove(targetID, parseFloat(target.getAttribute("start-y")), parseFloat(target.getAttribute("start-h")), this.localSignData[targetID].y, this.localSignData[targetID].height);
       if (isBodyPart && bodyPartBelowScore) {
-        this.$store.dispatch("editSign", {type: "changeSignData", index: targetID, data: {bar: -1, beat: 0}});
+        this.$store.dispatch("editSigns", {type: "changeSignData", index: targetID, data: {bar: -1, beat: 0}});
       }
       const shadowID = this.signs.length - 1;
       this.removeSign(shadowID);

@@ -28,18 +28,6 @@
       <SignCategoryContainer v-if="signData.definition && signData.definition.signType == 'Low'" :optionText="'Angle'" category="pins-low" :parentY="y" :active="signData.definition ? true : false" @updateSignData="changeDefinitionAngle"/>
       <SignCategoryContainer v-else-if="signData.definition && signData.definition.signType == 'Middle'" :optionText="'Angle'" category="pins-middle" :parentY="y" :active="signData.definition ? true : false" @updateSignData="changeDefinitionAngle"/>
       <SignCategoryContainer v-else-if="signData.definition && signData.definition.signType == 'High'" :optionText="'Angle'" category="pins-high" :parentY="y" :active="signData.definition ? true : false" @updateSignData="changeDefinitionAngle"/>
-      <!--
-        Todo: 
-          - hodl (on/off)
-          - presign (body part): active -> display presign options
-          - - presign (body part) (on/off)
-            - type -> category
-            - limb (if applicable)
-            - if limb: surface (radio)
-          - presign (space measurement sign)
-            - type (category)
-            - if not unfoldnig/neitherOr ->  degree (slider, 0-5)
-      -->
       <DeleteOption @delete="emitDelete"/>
     </div>
 </template>

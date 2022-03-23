@@ -16,8 +16,8 @@
             :degree="signData.degree"
           />
         </g>
-        <circle v-if="(signData.degree-1) % 3 > 0" :cx="signWidth / 2" :cy="height - signWidth" r="4" fill="black" :signID="id"/>
-        <circle v-if="(signData.degree-1) % 3 > 1" :cx="signWidth / 2" :cy="height" r="4" fill="black" :signID="id"/>
+        <circle v-if="(signData.degree - 1) % 3 > 0" :cx="signWidth / 2" :cy="height - signWidth" r="4" fill="black" :signID="id"/>
+        <circle v-if="(signData.degree - 1) % 3 > 1" :cx="signWidth / 2" :cy="height" r="4" fill="black" :signID="id"/>
       </g>
     </g>
   </g>

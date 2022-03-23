@@ -1,20 +1,5 @@
 <template>
     <div>
-      <!--
-        Todo: 
-          - hodl
-          - type (radio)
-          - presign (body part) (on/off)
-            - type -> category
-            - limb (if applicable)
-            - if limb: surface (radio)
-          - presign (space measurement sign)
-            - type (category)
-            - if not unfoldnig/neitherOr ->  degree (slider, 0-5)
-            - if space
-              type (cat)
-              degree (slider 0-5)
-      -->
       <SignCategoryContainer :optionText="'Type'" :category="'turn-signs'" :parentY="y" :active="true" @updateSignData="newSignData"/>
       <OnOffOption :optionText="'Hold'" :initState="signData.holding" :active="true" @switchState="changeHolding"/>
       <RadioOption 

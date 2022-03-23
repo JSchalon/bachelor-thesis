@@ -14,8 +14,11 @@ export default createStore({
     beatDuration: 1,
     //sign data
     curSign: false,
+    selectedSigns: [],
+    contextActive: false,
+    multiselectActive: false, 
     signs: [
-      {baseType: "GenericSign", signType: "In place"},
+      {baseType: "GenericSign", signType: "In place", isSelected: false},
       
     ],
     signsXML: null,
@@ -50,6 +53,26 @@ export default createStore({
     },
     removeCurSign (state) {
       state["curSign"] = false;
+    },
+    clearSelectedSigns (state) {
+      state["selectedSigns"] = [];
+      for (let elem of state["signs"]) {
+        elem.isSelected = false;
+      }
+    },
+    addToSelectedSigns (state, index) {
+      state["selectedSigns"].push(index);
+      state["signs"][index].isSelected = true;
+    },
+    removeFromSelectedSigns (state, index) {
+      state["selectedSigns"].splice(state["selectedSigns"].indexOf(index));
+      state["signs"][index].isSelected = false;
+    },
+    changeContextMenu (state, bool) {
+      state["contextActive"] = bool;
+    },
+    toggleMultiSelect (state) {
+      state["multiselectActive"] = !state["multiselectActive"];
     },
     addSignToObj(state, data) {
       state["signs"].push(data);
@@ -281,7 +304,7 @@ export default createStore({
             innerContainer.appendChild(valueContainer);
             // degree
             valueContainer = state["signsXML"].createElement("laban:degree");
-            valueContainer.innerHTML = data.degree + 1;
+            valueContainer.innerHTML = data.degree;
             innerContainer.appendChild(valueContainer);
             space.appendChild(innerContainer);
             signWrapper.appendChild(space);
@@ -490,7 +513,7 @@ export default createStore({
       state["beatDuration"] = parseInt(xml.getElementsByTagName("laban:beatDuration")[0].innerHTML);
       state["beatsPerBar"] = parseInt(xml.getElementsByTagName("laban:beats")[0].innerHTML);
       for (let elem of xml.getElementsByTagName("laban:columns")[0].children) {
-        let sign = {baseType: "", signType: "", digit: false, joint: false, surface: false, limb: false, resizable: false, canBeLimb: false};
+        let sign = {baseType: "", signType: "", digit: false, joint: false, surface: false, limb: false, resizable: false, canBeLimb: false, isSelected: false};
         sign.col = parseInt(elem.getElementsByTagName("laban:index")[0].innerHTML);
         if (sign.col < -state["columnsLeft"]) {
           state["columnsLeft"] = Math.abs(sign.col);
@@ -555,7 +578,7 @@ export default createStore({
         state["signs"].push(sign);
       }
       for (let elem of xml.getElementsByTagName("laban:movements")[0].children) {
-        let sign = {};
+        let sign = {isSelected: false};
         if (elem.nodeName == "laban:path") {
           sign.baseType = "PathSign";
           sign.signType = elem.getElementsByTagName("laban:type")[0].innerHTML;
@@ -721,6 +744,8 @@ export default createStore({
         columnsRight: state["columnsRight"],
         description: state["description"],
         signs: state["signs"],
+        selectedSigns: [],
+        contextActive: false,
         signsXML: signsXMLString,
         timeUnit: state["timeUnit"],
         title: state["title"]
@@ -729,7 +754,6 @@ export default createStore({
       if (state["undoStack"].length > 50) {
         state["undoStack"].slice(1);
       }
-      console.log(state)
     },
     undo (state) {
       if (state["undoStack"].length > 1) {
@@ -790,13 +814,13 @@ export default createStore({
         context.commit('removeCurSign');
       }
     },
-    editSign (context, obj) {
-      console.log(obj.type)
+    editSigns (context, obj) {
       if (obj.type == "add") {
         context.commit("addSignToObj", obj.data);
         if (!("isShadow" in obj.data && obj.data.isShadow)) {
           context.commit("addSignToXML", {obj: obj.data, index: -1});
           context.commit('removeCurSign');
+          context.commit("clearSelectedSigns");
         }
       } else if (obj.type == "changeSignData") {
         context.commit("changeSignData", {index: obj.index, data: obj.data});
@@ -807,11 +831,27 @@ export default createStore({
       } else if (obj.type == "delete") {
         context.commit("deleteSignFromXML", obj.index);
         context.commit("deleteSignFromObj", obj.index);
+        context.commit("clearSelectedSigns");
       }
       context.commit("saveScoreToLocalStorage");
     },
     editScoreParameters(context, data) {
       context.commit("editScoreParameters", data);
+    },
+    clearSelectedSigns (context) {
+      context.commit("clearSelectedSigns");
+    },
+    addToSelectedSigns (context, index) {
+      context.commit("addToSelectedSigns", index);
+    },
+    removeFromSelectedSigns (context, index) {
+      context.commit("removeFromSelectedSigns", index);
+    },
+    changeContextMenu (context, bool) {
+      context.commit("changeContextMenu", bool);
+    },
+    toggleMultiSelect(context) {
+      context.commit("toggleMultiSelect");
     },
     newScore (context, template) {
       if (template) { 
@@ -838,7 +878,7 @@ export default createStore({
     redoChanges(context) {
       context.commit("redo");
       context.commit("saveScoreToLocalStorage");
-    }
+    },
   },
   modules: {
   }

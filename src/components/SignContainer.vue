@@ -14,16 +14,16 @@
       ref="sign" 
       :signID="id"
     >
-      <component :is="signData.baseType" :id="id" :isSelected="isSelected" :height="height" :width="width" :signData="signData"/>
+      <component :is="signData.baseType" :id="id" :isSelected="signData.isSelected" :height="height" :width="width" :signData="signData"/>
       <ResizeHandle 
         :pos="signData.baseType == 'RelationshipBow' ? 'left' : 'top'" 
-        :isActive="isSelected && canResize && signData.resizable" 
+        :isActive="signData.isSelected && canResize && signData.resizable" 
         :signHeight="height" 
         :width="signData.baseType == 'RelationshipBow' ? width : signWidth"
         :signID="id"/>
       <ResizeHandle 
         :pos="signData.baseType == 'RelationshipBow' ? 'right' : 'bottom'" 
-        :isActive="isSelected && canResize && signData.resizable"
+        :isActive="signData.isSelected && canResize && signData.resizable"
         :signHeight="height"
         :width="signData.baseType == 'RelationshipBow' ? width : signWidth"
         :signID="id"/>
@@ -64,13 +64,6 @@ export default {
   computed: {
     beats () {
       return this.$store.state["beatsPerBar"];
-    },
-    isSelected () {
-      let isSelected = false;
-      if (this.localData != undefined) {
-        isSelected = this.localData.isSelected;
-      }
-      return isSelected;
     },
     height () {
       let height = this.barHeight / this.beats;

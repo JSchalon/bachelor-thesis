@@ -1,5 +1,5 @@
 <template>
-  <div id="app">
+  <div>
     <router-view/>
     <div class="alert-container" v-if="isPhone">
       <div class="alert-box">
