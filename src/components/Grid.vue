@@ -1,7 +1,7 @@
 <template>
     <g ref="grid" id="grid">
       <g class="column" :id="'grid-column' + (index - 1 - columnsLeft)" :x="columnWidth * (index - 1)" y="0" :key="index" v-for="index in (columnsLeft+columnsRight)">
-        <rect 
+        <rect
           :class="'beat-rect ba' + (getBar(rect) + 1) + ' ' +  'be' + getBeat(rect)" 
           :x="columnWidth * (index - 1)" 
           :y="(barHeight / beats) * (rect - 1)" 
@@ -78,6 +78,9 @@ export default {
     },
     columnsRight () {
       return this.$store.state["columnsRight"] + 1;
+    },
+    gridDimensions() {
+      return {w: (this.columnsLeft + this.columnsRight) * this.columnWidth, h: this.fullHeight};
     }
   },
   watch: {
@@ -106,6 +109,19 @@ export default {
     interact(".beat-rect").on("tap", this.click);
     interact(".grid-line").on("tap", this.lineClick);
     interact(".beat-rect").on("doubletap", this.doubleClick);
+    interact(".column").draggable({
+      inertia: false,
+      restrict: {
+        restriction: "parent",
+        elementRect: { top: 0, left: 0, bottom: 1, right: 1 },
+      },
+      autoScroll: false,
+
+      // functions to call on event
+      onstart: this.lassoStart,
+      onmove: this.lassoScale,
+      onend: this.lassoEnd
+    }).styleCursor(false);
     this.$refs.grid.addEventListener("contextmenu", function (event) {
       event.preventDefault();
     });
@@ -233,7 +249,92 @@ export default {
           elem.classList.remove("highlighted");
         }
       }
-    }
+    },
+    lassoStart (event) {
+      const outerRect = this.$refs.grid.getBoundingClientRect();
+      const lassoRect = `<rect x="${event.client.x - outerRect.x}" start-x="${event.client.x - outerRect.x}" y="${event.client.y - outerRect.y}" start-y="${event.client.y - outerRect.y}" width="0" height="0" fill="#fff" fill-opacity="0" stroke="#5e9fc7" stroke-width="3" stroke-dasharray="5 10" id="lasso-rect"/>`
+      this.$refs.grid.innerHTML = this.$refs.grid.innerHTML + lassoRect;
+    },
+
+    /**
+     * The drag-move event listener, moves the sign and the shadow element
+     * @arg event the drag-move event
+     */
+    lassoScale (event) {
+      let lassoRect = this.$refs.grid.querySelector("#lasso-rect");
+      
+      const curX = parseFloat(lassoRect.getAttribute("x"));
+      const startX = parseFloat(lassoRect.getAttribute("start-x"));
+      const curY = parseFloat(lassoRect.getAttribute("y"));
+      const startY = parseFloat(lassoRect.getAttribute("start-y"));
+      const width = parseFloat(lassoRect.getAttribute("width"));
+      const height = parseFloat(lassoRect.getAttribute("height"));
+
+      if (event.dx < 0) {
+        if (curX < startX) {
+          lassoRect.setAttribute("x", curX + event.dx);
+          lassoRect.setAttribute("width", startX - (curX + event.dx));
+        } else {
+          if (width + event.dx < 0) {
+            lassoRect.setAttribute("x", curX + event.dx);
+            lassoRect.setAttribute("width", startX - (curX + event.dx));
+          } else {
+            lassoRect.setAttribute("x", startX);
+            lassoRect.setAttribute("width", width + event.dx);
+          }
+        }
+      } else if (event.dx > 0) {
+        if (curX < startX) {
+          if (curX + event.dx >= startX) {
+            lassoRect.setAttribute("x", startX);
+            lassoRect.setAttribute("width", event.dx);
+          } else {
+            lassoRect.setAttribute("x", curX + event.dx);
+            lassoRect.setAttribute("width", startX - (curX + event.dx));
+          }
+        } else {
+          lassoRect.setAttribute("x", startX);
+          lassoRect.setAttribute("width", width + event.dx);
+        }
+      }
+
+      if (event.dy < 0) {
+        if (curY < startY) {
+          lassoRect.setAttribute("y", curY + event.dy);
+          lassoRect.setAttribute("height", startY - (curY + event.dy));
+        } else {
+          if (height + event.dy < 0) {
+            lassoRect.setAttribute("y", curY + event.dy);
+            lassoRect.setAttribute("height", startY - (curY + event.dy));
+          } else {
+            lassoRect.setAttribute("y", startY);
+            lassoRect.setAttribute("height", height + event.dy);
+          }
+        }
+      } else if (event.dy > 0) {
+        if (curY < startY) {
+          if (curY + event.dy >= startY) {
+            lassoRect.setAttribute("y", startY);
+            lassoRect.setAttribute("height", event.dy);
+          } else {
+            lassoRect.setAttribute("y", curY + event.dy);
+            lassoRect.setAttribute("height", startY - (curY + event.dy));
+          }
+        } else {
+          lassoRect.setAttribute("y", startY);
+          lassoRect.setAttribute("height", height + event.dy);
+        }
+      }
+    },
+    
+    /**
+     * The drag-end event listener, places the sign at the proper position and removes the shadow
+     * @arg event the drag-move event
+     */
+    lassoEnd () {
+      
+      this.$refs.grid.removeChild(this.$refs.grid.querySelector("#lasso-rect"));
+    },
   },
 };
 </script>

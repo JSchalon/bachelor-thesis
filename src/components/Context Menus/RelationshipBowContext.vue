@@ -5,7 +5,7 @@
         :options="addressingTypes" 
         :initState="getAddressInitState()"
         :optionText="'Definition'"
-        :active="signData.signType == 'Address'"
+        :active="signData.signType == 'address'"
         @switchState="changeAdressing"
       />
       <OnOffOption :optionText="'Hold'" :initState="signData.holding" :active="true" @switchState="changeHolding"/>
@@ -80,7 +80,8 @@ export default {
       this.$emit("delete", parseInt(this.signIndex))
     },
     getAddressInitState () {
-      if (this.signData.addressing == "right") {
+      console.log(this.signData.addressing)
+      if (this.signData.addressing == "right" || this.signData.addressing == undefined) {
         return "Right";
       } if (this.signData.addressing == "left") {
         return "Left";

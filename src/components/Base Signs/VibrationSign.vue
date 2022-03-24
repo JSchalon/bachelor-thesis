@@ -1,6 +1,6 @@
 <template>
   <g>
-    <rect class="no-save draggable" :x="signWidth / 2 - squiggleAmplitude" y="1" :width="squiggleAmplitude * 2" :height="height - 2" :signID="id"/>
+    <rect class="no-save draggable" opacity="0" :x="signWidth / 2 - squiggleAmplitude" y="1" :width="squiggleAmplitude * 2" :height="height - 2" :signID="id"/>
     <path
       :d="makeSquiggle"
       class="draggable actual-sign" 

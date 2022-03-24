@@ -2,18 +2,24 @@
   <div id="menu">
     <ul class="options-list">
       <li :class="undoPossible ? 'active':'inactive'" class="option-item" @click="undo()">
-        <img src="@/assets/images/interaction-menu/undo-arrow.svg" class="option-img">
+          <img src="@/assets/images/interaction-menu/undo-arrow.svg" class="option-img">
       </li>
       <li :class="redoPossible ? 'active':'inactive'" class="option-item" @click="redo()">
         <img src="@/assets/images/interaction-menu/redo-arrow.svg" class="option-img">
-
       </li>
+      
       <li class="option-divider"><p></p></li>
-      <li :class="multiSelect ? 'enabled':'disabled'" class="option-item" @click="activateMultiSelect()"><p>MutliSelect</p></li>
+      <li :class="multiSelect ? 'enabled':'disabled'" class="option-item" @click="activateMultiSelect()">
+        <img v-show="multiSelect" src="@/assets/images/interaction-menu/multi-select-active.svg" class="option-img">
+        <img v-show="!multiSelect" src="@/assets/images/interaction-menu/multi-select-inactive.svg" class="option-img">
+      </li>
       <ul class="option-nested" tabIndex="0" role="button">
-        <li class="option-dropdown-top"><p>Selection options</p></li>
+        <li class="option-dropdown-top">
+          <img src="@/assets/images/interaction-menu/selection-options.svg" class="option-img">
+          <img src="@/assets/images/interaction-menu/triangle-left.svg" class="option-img dropdown">
+        </li>
         <div class="option-box">
-          <li class="option-item" @click="selectAll()"><p>Select all</p></li>
+          <li :class="signs.length > 1 ? 'active':'inactive'" class="option-item" @click="selectAll()"><p>Select all</p></li>
           <li :class="selectedSigns.length > 0 ? 'active':'inactive'" class="option-item" @click="unselectAll()"><p>Unselect all</p></li>
           <li :class="selectedSigns.length > 0 ? 'active':'inactive'" class="option-item" @click="invertSelection()"><p>Invert selection</p></li>
         </div>
@@ -69,11 +75,11 @@
         if (this.selectedSigns.length == 0) {
           return;
         }
-        let sortedSelected = this.selectedSigns.sort();
-        
+        const sortedSelected = this.selectedSigns.sort();
+        this.$store.dispatch("clearSelectedSigns");
+        this.$store.dispatch("changeContextMenu", false);
         for (let max = sortedSelected.length - 1; max >= 0; max--) {
-          this.$store.dispatch("clearSelectedSigns");
-          this.$store.dispatch("changeContextMenu", false);
+          
           if (sortedSelected[max] > 0) {
             this.$store.dispatch("editSigns", {type: "delete", index: sortedSelected[max]});
           } 
@@ -134,16 +140,21 @@
 
 .option-item, .option-divider {
   float: left;
-  height: 100%;
+  height: calc(100% - 10px);
+  margin-top: 5px;
   display: flex;
   align-items: center;
-  cursor: pointer;
   position: relative;
+  border-radius: 5px;
 }
 
 .option-item.inactive {
-  opacity: 0.7;
+  opacity: 0.5;
   cursor:not-allowed;
+}
+
+.option-item {
+  cursor: pointer;
 }
 
 .option-item * {
@@ -153,8 +164,23 @@
   padding: 0 0.5em;
 }
 
+.option-item:hover {
+  background-color: #b3b3b3;
+}
+
+.option-item:focus {
+  background-color: #b3b3b3;
+}
+
+.option-item:active {
+  background-color: #b3b3b3;
+}
+
+.option-item.enabled {
+  background-color: #b3b3b3;
+}
 .option-item.enabled p {
-  color: #486175;
+  color: #446f97;
 }
 
 .option-divider p {
@@ -169,6 +195,11 @@
   height: 70%;
 }
 
+.option-img.dropdown {
+  height: 40%;
+  transform: rotate(90deg);
+}
+
 .option-nested {
   float: left;
   height: 100%;
@@ -179,10 +210,26 @@
 
 .option-dropdown-top {
   display: inline-block;
-  height: 100%;
-  margin: 0 0.5em;
+  height: calc(100% - 10px);
+  margin: 5px 0;
   display: flex;
   align-items: center;
+  border-radius: 5px;
+}
+.option-dropdown-top * {
+  padding: 0 0.5em;
+}
+
+.option-dropdown-top:hover {
+  background-color: #b3b3b3;
+}
+
+.option-dropdown-top:focus {
+  background-color: #b3b3b3;
+}
+
+.option-dropdown-top:active {
+  background-color: #b3b3b3;
 }
 
 .option-nested:hover .option-box {
@@ -211,6 +258,11 @@
 .option-box li {
   width: 100%;
   display: block;
+  margin: 0;
+}
+.option-box p {
+  padding: 0.5em 0;
+  margin: 0 0.5em;
 }
 
 .option-box li:hover {background-color: rgb(184, 207, 236);}

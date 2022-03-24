@@ -12,10 +12,5 @@ Git Repo zur Bachelorarbeit zur Entwicklung eines webbasierten Interaktionsedito
 ## Versions
 
 ### Version 0.4.3
-- Started implementing interaction menu, implemented
-	- undo/redo
-	- deletion of current selected signs
-	- multiSelect mode toggle (similar behavior to ctrl + click)
-	- selecting/unselecting all for shortcut (ctrl + a) and interaction menu
-	- selection inversion for shortcut (ctrl + i) and interaction menu
-- Fixed a bug with the xml-conversion of space measurement signs
+- Started implementing a selection lasso
+- Fixed some bugs

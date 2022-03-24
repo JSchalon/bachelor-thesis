@@ -1,6 +1,6 @@
 <template>
     <div id="canvasContainer" @scroll="getScroll">
-      <div class="margin-box">
+      <div class="margin-box" @click="selectSign(-1)">
         <svg preserveAspectRatio="xMinYMax meet" ref="canvas" id="canvas" :width="canvasDimensions.x" :height="canvasDimensions.y" fill="white" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg">
           <defs>
             <pattern id="direction-high-left" width="10" height="10" patternTransform="rotate(-45 0 0)" patternUnits="userSpaceOnUse">
@@ -41,7 +41,9 @@
               :key="index"
               v-for="(item, index) in signs"
             />
+            <use href="#lasso-rect"/>
           </g>
+          
         </svg>
       </div>
       <ContextMenu v-if="contextActive" :signData="signs[contextSign]" :signIndex="contextSign" :isActive="contextActive" :x="contextPos.x" :y="contextPos.y" @updateSignData="updateSignData" :key="'context' + contextSign" @delete="removeSign"/>
@@ -85,8 +87,8 @@ export default {
       barHandlesActive: false,
       selectedBar: false,
       selectedBarTranslate: {x: 0, y: 0},
-      dragging: false,
-      draggingSigns: [],
+      interacting: false,
+      interactingSigns: [],
       localSignData: [],
     };
   },
@@ -166,9 +168,13 @@ export default {
     }
   },
   watch: {
-    signs() {
-      
-      this.makeLocalSignData();
+    signs: {
+      deep: true,
+      handler() {
+        if (!this.interacting) {
+          this.makeLocalSignData();
+        }
+      }
     }
   },
   mounted () {
@@ -195,8 +201,8 @@ export default {
       if (this.canvasScroll.y != event.target.scrollTop && this.barHandlesActive) {
         this.placeGridHandles({type: "bar", x: this.selectedBarTranslate.x - (this.columnWidth - this.signWidth - 15), y: this.selectedBarTranslate.y + (this.canvasScroll.y - event.target.scrollTop)})
       }
-      if (this.dragging) {
-        for (let index of this.draggingSigns) {
+      if (this.interacting) {
+        for (let index of this.interactingSigns) {
           this.localSignData[index].x = (this.localSignData[index].x + (this.canvasScroll.x - event.target.scrollLeft));
           this.localSignData[index].y = (this.localSignData[index].y - (this.canvasScroll.y - event.target.scrollTop));
         }
@@ -226,9 +232,15 @@ export default {
           if (elem.bar > 0) {
             elemData.y = (this.bars - elem.bar) * this.barHeight + (this.beats - elem.beat) * this.minHeight - elemData.height;
           } else if (elem.bar == 0) {
-            elemData.y = this.bars * this.barHeight + this.startBarOffset;
+            elemData.canResize = false;
+            if (elem.resizable && elem.baseType != "RelationshipBow") {
+              elemData.y = this.bars * this.barHeight + this.startBarOffset;
+            } else {
+              elemData.y = this.bars * this.barHeight + this.startBarOffset + this.minHeight;
+            }
           } else if (elem.bar == -1) {
             elemData.y = this.bars * this.barHeight + 2 * this.minHeight + this.startBarOffset * 2;
+            elemData.canResize = false;
           }
 
           if (elem.baseType == "RelationshipBow") {
@@ -930,6 +942,7 @@ export default {
      * @arg event the resize-start event
      */
     resizeStart (event) {
+      this.interacting = true;
       this.keyCommandsEnabled = false;
       let target = event.target;
       if (this.contextActive) {
@@ -1026,6 +1039,7 @@ export default {
       this.calcBeatMove (targetID, parseFloat(target.getAttribute("start-y")), parseFloat(target.getAttribute("start-h")), this.localSignData[targetID].y, this.localSignData[targetID].height);
       this.removeSign(shadowID);
       target.classList.remove("dragging");
+      this.interacting = false;
       this.makeLocalSignData();
       this.selectSign(targetID);
       if (this.contextWasActive) {
@@ -1041,6 +1055,7 @@ export default {
      */
     bowResizeStart (event) {
       this.keyCommandsEnabled = false;
+      this.interacting = true;
       let target = event.target;
       if (this.contextActive) {
         this.contextWasActive = true;
@@ -1132,6 +1147,7 @@ export default {
       this.calcColumnMove(targetID, parseFloat(target.getAttribute("start-x")), parseFloat(target.getAttribute("start-w")), this.localSignData[targetID].x, this.localSignData[targetID].width);
       this.removeSign(shadowID);
       target.classList.remove("dragging");
+      this.interacting = false;
       this.makeLocalSignData();
       this.selectSign(targetID);
       if (this.contextWasActive) {
@@ -1147,11 +1163,11 @@ export default {
      */
     dragStart (event) {
       this.keyCommandsEnabled = false;
-      this.dragging = true;
+      this.interacting = true;
 
       let target = event.target;
       const targetID = target.getAttribute("signID");
-      this.draggingSigns.push(targetID);
+      this.interactingSigns.push(targetID);
       if (this.contextActive) {
         this.contextWasActive = true;
       }
@@ -1248,7 +1264,6 @@ export default {
      */
     dragEnd (event) {
       this.keyCommandsEnabled = true;
-      this.dragging = false;
       let target = event.target;
 
       const targetID = target.getAttribute("signID");
@@ -1323,14 +1338,16 @@ export default {
       }
       const shadowID = this.signs.length - 1;
       this.removeSign(shadowID);
+      this.interacting = false;
       this.makeLocalSignData();
+      this.interactingSigns = [];
       this.selectSign(targetID);
       if (this.contextWasActive) {
         this.openContextMenu(event, screenX - x, screenY - y - this.handleDiam);
         this.contextWasActive = false;
       }
 
-      this.draggingSigns = [];
+      
       this.$store.dispatch("saveStateInHistory");
     },
 

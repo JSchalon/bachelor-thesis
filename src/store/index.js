@@ -19,7 +19,6 @@ export default createStore({
     multiselectActive: false, 
     signs: [
       {baseType: "GenericSign", signType: "In place", isSelected: false},
-      
     ],
     signsXML: null,
     libraryActive: true,
@@ -615,15 +614,17 @@ export default createStore({
           sign.holding = ("true" === elem.getElementsByTagName("laban:hold")[0].innerHTML);
           sign.passing = ("true" === elem.getElementsByTagName("laban:passing")[0].innerHTML);
           sign.resizable = true;
-          if (data.signType == "address") {
-            if (elem.getElementsByTagName("laban:active")[0] === "true") {
-              if (elem.getElementsByTagName("laban:active")[1] === "true") {
-                data.addressing = "both";
+          if (sign.signType == "address") {
+            
+            if (elem.getElementsByTagName("laban:active")[0].innerHTML === "true") {
+              if (elem.getElementsByTagName("laban:active")[1].innerHTML === "true") {
+                sign.addressing = "both";
               } else {
-                data.addressing = "right";
+                
+                sign.addressing = "right";
               }
             } else {
-              data.addressing = "left";
+              sign.addressing = "left";
             }
           }
         } else { //normal movements
@@ -708,7 +709,7 @@ export default createStore({
         }
         if (sign.col < -state["columnsLeft"] && sign.baseType != "RoomDirectionSign") {
           state["columnsLeft"] = Math.abs(sign.col);
-        } else if (sign.col > state["columnsRight"] - 1) {
+        } else if (sign.col > state["columnsRight"] - 1 && sign.baseType != "PathSign") {
           state["columnsRight"] = sign.col + 1;
         }
         if (sign.beat >= state["beatsPerBar"]) {
@@ -719,6 +720,7 @@ export default createStore({
         }
         state["signs"].push(sign);
       }
+      console.log()
       for (let elem of state["signs"]) {
         if (elem.baseType == "PathSign" && elem.col < state["columnsRight"]) {
           elem.col == state["columnsRight"];
@@ -873,10 +875,12 @@ export default createStore({
     },
     undoChanges(context) {
       context.commit("undo");
+      context.commit("clearSelectedSigns");
       context.commit("saveScoreToLocalStorage");
     },
     redoChanges(context) {
       context.commit("redo");
+      context.commit("clearSelectedSigns");
       context.commit("saveScoreToLocalStorage");
     },
   },
