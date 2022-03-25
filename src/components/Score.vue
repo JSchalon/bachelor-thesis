@@ -1,6 +1,6 @@
 <template>
     <div id="canvasContainer" @scroll="getScroll">
-      <div class="margin-box" @click="selectSign(-1)">
+      <div class="margin-box" @click.self="selectSign(-1)">
         <svg preserveAspectRatio="xMinYMax meet" ref="canvas" id="canvas" :width="canvasDimensions.x" :height="canvasDimensions.y" fill="white" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg">
           <defs>
             <pattern id="direction-high-left" width="10" height="10" patternTransform="rotate(-45 0 0)" patternUnits="userSpaceOnUse">
@@ -12,7 +12,7 @@
               <line x1="0" y1="0" x2="0" y2="10" stroke="black" stroke-width="2" />
             </pattern>
           </defs>
-          <rect x="0" y="0" :width="canvasDimensions.x" :height="canvasDimensions.y" ref="canvasBG" @click="selectSign(-1)"/>
+          <rect x="0" y="0" :width="canvasDimensions.x" :height="canvasDimensions.y" ref="canvasBG" class="lasso-able" @click="selectSign(-1)"/>
           <g :transform="'translate(' + canvasMarginLeft + ', ' + canvasMarginTop +')'" ref="bounding">
             <rect x="0" y="0" :width="columnWidth" :height="innerCanvasDimFull.y" ref="boundingOuterLeft" />
             <rect :x="columnWidth * (columnsLeft + 1 + columnsRight)" y="0" :width="columnWidth" :height="innerCanvasDimRight.y" ref="boundingOuterRight" />
@@ -24,7 +24,8 @@
               @selectBar="updateSelectedBar" 
               @placeSign="addSign" 
               @getGridHandles="placeGridHandles" 
-              @removeGridHandles="columnHandlesActive = false; barHandlesActive = false;" 
+              @removeGridHandles="columnHandlesActive = false; barHandlesActive = false;"
+              @lassoSelect="lassoSelect" 
               :beats="beats" 
               :bars="bars" 
               :selectedColumn="selectedColumn"
@@ -270,6 +271,25 @@ export default {
     },
     updateSelectedBar (data) {
       this.selectedBar = data;
+    },
+    lassoSelect (data) {
+      this.selectSign(-1);
+      for (let index = 1; index < this.localSignData.length; index++) {
+        let elem = this.localSignData[index];
+        if (elem.x >= data.x && elem.x <= data.x + data.w) {
+          if (elem.y >= data.y && elem.y <= data.y + data.h) {
+            this.selectSign(index, true);
+          } else if (elem.y + elem.height >= data.y && elem.y + elem.height <= data.y + data.h) { 
+            this.selectSign(index, true);
+          }
+        } else if (elem.x + elem.width >= data.x && elem.x + elem.width <= data.x + data.w) { 
+          if (elem.y >= data.y && elem.y <= data.y + data.h) {
+            this.selectSign(index, true);
+          } else if (elem.y + elem.height >= data.y && elem.y + elem.height <= data.y + data.h) { 
+            this.selectSign(index, true);
+          }
+        }
+      }
     },
     /**
      * Method for adding a column on the chosen side in the vuex state

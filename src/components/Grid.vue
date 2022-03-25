@@ -1,6 +1,6 @@
 <template>
     <g ref="grid" id="grid">
-      <g class="column" :id="'grid-column' + (index - 1 - columnsLeft)" :x="columnWidth * (index - 1)" y="0" :key="index" v-for="index in (columnsLeft+columnsRight)">
+      <g class="column lasso-able" :id="'grid-column' + (index - 1 - columnsLeft)" :x="columnWidth * (index - 1)" y="0" :key="index" v-for="index in (columnsLeft+columnsRight)">
         <rect
           :class="'beat-rect ba' + (getBar(rect) + 1) + ' ' +  'be' + getBeat(rect)" 
           :x="columnWidth * (index - 1)" 
@@ -17,24 +17,25 @@
       </g>
       <!--horizontal lines-->
       <!-- beat lines-->
-      <line class="grid-line" :x1="columnWidth * columnsLeft - beatLineWidth" :y1="(barHeight / beats) * (line - 1)" :x2="columnWidth * columnsLeft + beatLineWidth" :y2="(barHeight / beats) * (line - 1)" :key="line" v-for="line in ((bars) * beats)" stroke-width="2" stroke="black"/>
+      <line class="grid-line lasso-able" :x1="columnWidth * columnsLeft - beatLineWidth" :y1="(barHeight / beats) * (line - 1)" :x2="columnWidth * columnsLeft + beatLineWidth" :y2="(barHeight / beats) * (line - 1)" :key="line" v-for="line in ((bars) * beats)" stroke-width="2" stroke="black"/>
       <!-- bar lines-->
-      <line class="grid-line" :x1="columnWidth * (columnsLeft - 2)" :y1="barHeight * (line - 1)" :x2="columnWidth * (columnsLeft + 2)" :y2="barHeight * (line - 1)" :key="line" v-for="line in (bars + 1)" stroke-width="2" stroke="black"/>
+      <line class="grid-line lasso-able" :x1="columnWidth * (columnsLeft - 2)" :y1="barHeight * (line - 1)" :x2="columnWidth * (columnsLeft + 2)" :y2="barHeight * (line - 1)" :key="line" v-for="line in (bars + 1)" stroke-width="2" stroke="black"/>
       <!-- start bar lines -->
-      <line class="grid-line" :x1="columnWidth * (columnsLeft - 2)" :y1="barHeight * bars + startBarOffset" :x2="columnWidth * (columnsLeft + 2)" :y2="barHeight * bars + startBarOffset" stroke-width="2" stroke="black"/>
-      <line class="grid-line" :x1="columnWidth * (columnsLeft - 2)" :y1="barHeight * (bars + .5) + startBarOffset" :x2="columnWidth * (columnsLeft + 2)" :y2="barHeight * (bars + .5) + startBarOffset" stroke-width="2" stroke="black"/>
+      <line class="grid-line lasso-able" :x1="columnWidth * (columnsLeft - 2)" :y1="barHeight * bars + startBarOffset" :x2="columnWidth * (columnsLeft + 2)" :y2="barHeight * bars + startBarOffset" stroke-width="2" stroke="black"/>
+      <line class="grid-line lasso-able" :x1="columnWidth * (columnsLeft - 2)" :y1="barHeight * (bars + .5) + startBarOffset" :x2="columnWidth * (columnsLeft + 2)" :y2="barHeight * (bars + .5) + startBarOffset" stroke-width="2" stroke="black"/>
 
       <!--vertical lines-->
       <!-- left outer line -->
-      <line class="grid-line" :x1="columnWidth * (columnsLeft - 2)" y1="0" :x2="columnWidth * (columnsLeft - 2)" :y2="barHeight * (bars + .5) + startBarOffset" stroke-width="2" stroke="black"/>
+      <line class="grid-line lasso-able" :x1="columnWidth * (columnsLeft - 2)" y1="0" :x2="columnWidth * (columnsLeft - 2)" :y2="barHeight * (bars + .5) + startBarOffset" stroke-width="2" stroke="black"/>
       <!-- middle line -->
-      <line class="grid-line" :x1="columnWidth * (columnsLeft)" y1="0" :x2="columnWidth * (columnsLeft)" :y2="barHeight * (bars + .5) + startBarOffset" stroke-width="3" stroke="black"/>
+      <line class="grid-line lasso-able" :x1="columnWidth * (columnsLeft)" y1="0" :x2="columnWidth * (columnsLeft)" :y2="barHeight * (bars + .5) + startBarOffset" stroke-width="3" stroke="black"/>
       <!-- right outer line -->
-      <line class="grid-line" :x1="columnWidth * (columnsLeft + 2)" y1="0" :x2="columnWidth * (columnsLeft + 2)" :y2="barHeight * (bars + .5) + startBarOffset" stroke-width="2" stroke="black"/>
+      <line class="grid-line lasso-able" :x1="columnWidth * (columnsLeft + 2)" y1="0" :x2="columnWidth * (columnsLeft + 2)" :y2="barHeight * (bars + .5) + startBarOffset" stroke-width="2" stroke="black"/>
       <!-- help lines left -->
-      <line class="grid-line help" :x1="columnWidth * (helpLine - 1)" y1="0" :x2="columnWidth * (helpLine - 1)" :y2="barHeight * (bars + .5) + startBarOffset" stroke-width="2" :key="helpLine" v-for="helpLine in (columnsLeft - 2)"/>
+      <line class="grid-line lasso-able help" :x1="columnWidth * (helpLine - 1)" y1="0" :x2="columnWidth * (helpLine - 1)" :y2="barHeight * (bars + .5) + startBarOffset" stroke-width="2" :key="helpLine" v-for="helpLine in (columnsLeft - 2)"/>
       <!-- help lines right -->
-      <line class="grid-line help" :x1="columnWidth * (columnsLeft + helpLine + 2)" y1="0" :x2="columnWidth * (columnsLeft + helpLine + 2)" :y2="barHeight * (bars + .5) + startBarOffset" stroke-width="2" :key="helpLine" v-for="helpLine in (columnsRight - 2)"/>
+      <line class="grid-line lasso-able help" :x1="columnWidth * (columnsLeft + helpLine + 2)" y1="0" :x2="columnWidth * (columnsLeft + helpLine + 2)" :y2="barHeight * (bars + .5) + startBarOffset" stroke-width="2" :key="helpLine" v-for="helpLine in (columnsRight - 2)"/>
+      <rect :x="lasso.x" :y="lasso.y" :width="lasso.w" :height="lasso.h" fill="#fff" fill-opacity="0" stroke="#5e9fc7" stroke-width="3" stroke-dasharray="5 10" id="lasso-rect"/>
     </g>
 </template>
 
@@ -47,7 +48,7 @@ import interact from "interactjs";
 export default {
   name: "Grid",
   inject: ["barHeight", "columnWidth", "borderWidth", "startBarOffset", "beatLineWidth"],
-  emits: ["unselect", "placeSign", "getGridHandles","removeGridHandles", "selectColumn", "selectBar"],
+  emits: ["unselect", "placeSign", "getGridHandles","removeGridHandles", "selectColumn", "selectBar", "lassoSelect"],
   props: {
     bars: Number,
     beats: Number,
@@ -61,6 +62,7 @@ export default {
     return {
       barSelected: false,
       colSelected: false,
+      lasso: {x: 0, y: 0, startY: 0, startX: 0, w: 0, h: 0},
     };
   },
   computed: {
@@ -109,12 +111,8 @@ export default {
     interact(".beat-rect").on("tap", this.click);
     interact(".grid-line").on("tap", this.lineClick);
     interact(".beat-rect").on("doubletap", this.doubleClick);
-    interact(".column").draggable({
+    interact(".lasso-able").draggable({
       inertia: false,
-      restrict: {
-        restriction: "parent",
-        elementRect: { top: 0, left: 0, bottom: 1, right: 1 },
-      },
       autoScroll: false,
 
       // functions to call on event
@@ -213,12 +211,14 @@ export default {
      * @arg column the the column 
      */
     highlightCol (column, highlight) {
+      
       let elem = this.$refs.grid.querySelector("#grid-column" + column);
       let isHighlighted = elem.classList.contains("highlighted");
       this.highlight();
       if (highlight) {
         if (!isHighlighted) {
           elem.classList.toggle("highlighted");
+          console.log({type: "col", x: elem.getBoundingClientRect().x, y: elem.getBoundingClientRect().y})
           this.$emit("getGridHandles", {type: "col", x: elem.getBoundingClientRect().x, y: elem.getBoundingClientRect().y});
         }
       } else {
@@ -252,8 +252,10 @@ export default {
     },
     lassoStart (event) {
       const outerRect = this.$refs.grid.getBoundingClientRect();
-      const lassoRect = `<rect x="${event.client.x - outerRect.x}" start-x="${event.client.x - outerRect.x}" y="${event.client.y - outerRect.y}" start-y="${event.client.y - outerRect.y}" width="0" height="0" fill="#fff" fill-opacity="0" stroke="#5e9fc7" stroke-width="3" stroke-dasharray="5 10" id="lasso-rect"/>`
-      this.$refs.grid.innerHTML = this.$refs.grid.innerHTML + lassoRect;
+      this.lasso.x = Math.round(event.client.x - outerRect.x);
+      this.lasso.y = Math.round(event.client.y - outerRect.y);
+      this.lasso.startX = Math.round(event.client.x - outerRect.x);
+      this.lasso.startY = Math.round(event.client.y - outerRect.y);
     },
 
     /**
@@ -261,68 +263,66 @@ export default {
      * @arg event the drag-move event
      */
     lassoScale (event) {
-      let lassoRect = this.$refs.grid.querySelector("#lasso-rect");
-      
-      const curX = parseFloat(lassoRect.getAttribute("x"));
-      const startX = parseFloat(lassoRect.getAttribute("start-x"));
-      const curY = parseFloat(lassoRect.getAttribute("y"));
-      const startY = parseFloat(lassoRect.getAttribute("start-y"));
-      const width = parseFloat(lassoRect.getAttribute("width"));
-      const height = parseFloat(lassoRect.getAttribute("height"));
-
       if (event.dx < 0) {
-        if (curX < startX) {
-          lassoRect.setAttribute("x", curX + event.dx);
-          lassoRect.setAttribute("width", startX - (curX + event.dx));
+        if (this.lasso.x < this.lasso.startX) {
+          this.lasso.x = this.lasso.x + event.dx;
+          this.lasso.w = this.lasso.startX - (this.lasso.x + event.dx);
         } else {
-          if (width + event.dx < 0) {
-            lassoRect.setAttribute("x", curX + event.dx);
-            lassoRect.setAttribute("width", startX - (curX + event.dx));
+          if (this.lasso.w + event.dx < 0) {
+            this.lasso.x = this.lasso.x + event.dx;
+            this.lasso.w = this.lasso.startX - (this.lasso.x + event.dx);
           } else {
-            lassoRect.setAttribute("x", startX);
-            lassoRect.setAttribute("width", width + event.dx);
+            this.lasso.x = this.lasso.startX;
+            this.lasso.w = this.lasso.w + event.dx;
           }
         }
       } else if (event.dx > 0) {
-        if (curX < startX) {
-          if (curX + event.dx >= startX) {
-            lassoRect.setAttribute("x", startX);
-            lassoRect.setAttribute("width", event.dx);
+        if (this.lasso.x < this.lasso.startX) {
+          if (this.lasso.x + event.dx >= this.lasso.startX) {
+            this.lasso.x = this.lasso.startX;
+            this.lasso.w = event.dx;
           } else {
-            lassoRect.setAttribute("x", curX + event.dx);
-            lassoRect.setAttribute("width", startX - (curX + event.dx));
+            this.lasso.x = this.lasso.x + event.dx;
+            this.lasso.w = this.lasso.startX - (this.lasso.x + event.dx);
+            if (this.lasso.w < 0) {
+              this.lasso.w = 0;
+            }
           }
         } else {
-          lassoRect.setAttribute("x", startX);
-          lassoRect.setAttribute("width", width + event.dx);
+          this.lasso.x = this.lasso.startX;
+          this.lasso.w = this.lasso.w + event.dx;
         }
       }
 
       if (event.dy < 0) {
-        if (curY < startY) {
-          lassoRect.setAttribute("y", curY + event.dy);
-          lassoRect.setAttribute("height", startY - (curY + event.dy));
+        if (this.lasso.y < this.lasso.startY) {
+          this.lasso.y = this.lasso.y + event.dy;
+          this.lasso.h = this.lasso.startY - (this.lasso.y + event.dy);
         } else {
-          if (height + event.dy < 0) {
-            lassoRect.setAttribute("y", curY + event.dy);
-            lassoRect.setAttribute("height", startY - (curY + event.dy));
+          if (this.lasso.h + event.dy < 0) {
+            this.lasso.y = this.lasso.y + event.dy;
+            this.lasso.h = this.lasso.startY - (this.lasso.y + event.dy);
           } else {
-            lassoRect.setAttribute("y", startY);
-            lassoRect.setAttribute("height", height + event.dy);
+            this.lasso.y = this.lasso.startY;
+            this.lasso.h = this.lasso.h + event.dy;
           }
         }
       } else if (event.dy > 0) {
-        if (curY < startY) {
-          if (curY + event.dy >= startY) {
-            lassoRect.setAttribute("y", startY);
-            lassoRect.setAttribute("height", event.dy);
+        if (this.lasso.y < this.lasso.startY) {
+          if (this.lasso.y + event.dy >= this.lasso.startY) {
+            this.lasso.y = this.lasso.startY;
+            this.lasso.h = event.dy;
           } else {
-            lassoRect.setAttribute("y", curY + event.dy);
-            lassoRect.setAttribute("height", startY - (curY + event.dy));
+            this.lasso.y = this.lasso.y + event.dy;
+            this.lasso.h = this.lasso.startY - (this.lasso.y + event.dy);
+            //console.log((this.lasso.y + event.dx) + " " + this.lasso.startY);
+            if (this.lasso.h < 0) {
+              this.lasso.h = 0;
+            }
           }
         } else {
-          lassoRect.setAttribute("y", startY);
-          lassoRect.setAttribute("height", height + event.dy);
+          this.lasso.y = this.lasso.startY;
+            this.lasso.h = this.lasso.h + event.dy;
         }
       }
     },
@@ -332,8 +332,8 @@ export default {
      * @arg event the drag-move event
      */
     lassoEnd () {
-      
-      this.$refs.grid.removeChild(this.$refs.grid.querySelector("#lasso-rect"));
+      this.$emit("lassoSelect", {x: this.lasso.x, y: this.lasso.y, w: this.lasso.w, h: this.lasso.h});
+      this.lasso = {x: 0, y: 0, startY: 0, startX: 0, w: 0, h: 0};
     },
   },
 };

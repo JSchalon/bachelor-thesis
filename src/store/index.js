@@ -296,10 +296,16 @@ export default createStore({
           
           if (data.baseType == "SpaceMeasurementSign") {
             let space = state["signsXML"].createElement("laban:space");
+            
             innerContainer = state["signsXML"].createElement("laban:spaceMeasurement");
             //type
             valueContainer = state["signsXML"].createElement("laban:type");
-            valueContainer.innerHTML = data.signType.toLowerCase();
+            if (data.signType == "NeitherOr") {
+              valueContainer.innerHTML = "none";
+            } else {
+              valueContainer.innerHTML = data.signType.toLowerCase();
+            }
+            data.signType.toLowerCase();
             innerContainer.appendChild(valueContainer);
             // degree
             valueContainer = state["signsXML"].createElement("laban:degree");
@@ -405,7 +411,11 @@ export default createStore({
             if ("spaceMeasurement" in data && data.spaceMeasurement) {
               let space = state["signsXML"].createElement("laban:spaceMeasurement");
               valueContainer = state["signsXML"].createElement("laban:vertical");
-              valueContainer.innerHTML = data.spaceMeasurement.signType.toLowerCase();
+              if (data.signType == "NeitherOr") {
+                valueContainer.innerHTML = "none";
+              } else {
+                valueContainer.innerHTML = data.signType.toLowerCase();
+              }
               space.appendChild(valueContainer);
               valueContainer = state["signsXML"].createElement("laban:horizontal");
               valueContainer.innerHTML = data.position.degree;
@@ -642,7 +652,11 @@ export default createStore({
             sign.baseType = "SpaceMeasurementSign";
             let innerElem = elem.getElementsByTagName("laban:space")[0];
             let type = innerElem.getElementsByTagName("laban:type")[0].innerHTML;
-            sign.signType = type.charAt(0).toUpperCase() + type.slice(1);
+            if (type == "none") {
+              sign.signType = "NeitherOr";
+            } else {
+              sign.signType = type.charAt(0).toUpperCase() + type.slice(1);
+            }
             sign.degree = parseInt(innerElem.getElementsByTagName("laban:degree")[0].innerHTML);
             sign.resizable = true;
           } else if (elem.getElementsByTagName("laban:turn").length > 0) {
@@ -659,7 +673,11 @@ export default createStore({
             } else if (elem.getElementsByTagName("laban:qualitative").length > 0) {
               definition.baseType = "SpaceMeasurementSign";
               let type = elem.getElementsByTagName("laban:type")[0].innerHTML;
-              definition.signType = type.charAt(0).toUpperCase() + type.slice(1);
+              if (type == "none") {
+                definition.signType = "NeitherOr";
+              } else {
+                definition.signType = type.charAt(0).toUpperCase() + type.slice(1);
+              }
               definition.degree = parseInt(elem.getElementsByTagName("laban:degree")[1].innerHTML);
               sign.definition = definition;
             }

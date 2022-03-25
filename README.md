@@ -11,6 +11,6 @@ Git Repo zur Bachelorarbeit zur Entwicklung eines webbasierten Interaktionsedito
 
 ## Versions
 
-### Version 0.4.3
-- Started implementing a selection lasso
+### Version 0.4.4
+- Implemented
 - Fixed some bugs
