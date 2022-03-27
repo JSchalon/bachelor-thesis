@@ -1,7 +1,7 @@
 <template>
   <div v-show="active" class="library-item-container">
     <div class="library-item" :key="index" v-for="(elem, index) of signs" @click="selectSign(index)">
-      <svg width="100%" :height="'beatHeight' in elem.signData ? elem.signData.beatHeight * minHeight + 2: height + 2" fill="white">
+      <svg width="100%" :height="'beatHeight' in elem.signData ? elem.signData.beatHeight * minHeight + 2: height + 2" fill="white" class="library-sign-svg" :cat-index="catIndex" :index="index">
         <g :transform="'translate('+ offset + ',1)'">
           <g :transform="elem.signData.baseType == 'RelationshipBow' ? 'translate(-60,0)' : ''">
               <component :is="elem.signData.baseType" :isSelected="index == selected" :height="'beatHeight' in elem.signData ? elem.signData.beatHeight * minHeight : elem.height" :signData="elem.signData"/>
@@ -20,7 +20,7 @@
 export default {
   name: 'LibraryItem',
   inject: ["barHeight"],
-  emits: ["expand", "selectSign", "barHeight"],
+  emits: ["expand", "emitSigns", "selectSign"],
   props: {
     active: Boolean,
     category: String,
@@ -64,14 +64,15 @@ export default {
         newSign.signData[key] = value;
       }
       this.signs.push(newSign);
+
     }
+    this.$emit("emitSigns", {catIndex: this.catIndex, signs: this.signs});
   },
   methods: {
     selectSign (index) {
       let nameElem = this.langStrings.names.find(elem => this.signs[index].signData.signType == elem.signType);
-      this.$emit("selectSign", {catIndex: this.catIndex, name: nameElem.name, index: index, height: this.baseHeight, signData: this.signs[index].signData});
+      this.$emit("selectSign", {catIndex: this.catIndex, name: nameElem.name, index: index, height: this.baseHeight, signData: this.signs[index].signData, updateSign: false});
     },
-    
   },
 }
 </script>

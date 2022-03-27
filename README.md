@@ -11,6 +11,6 @@ Git Repo zur Bachelorarbeit zur Entwicklung eines webbasierten Interaktionsedito
 
 ## Versions
 
-### Version 0.4.4
-- Fully implemented lasso selection
+### Version 0.4.5
+- Fully reimplemented sign placement via drag and drop (selecting signs to see their name still works)
 - Fixed some bugs

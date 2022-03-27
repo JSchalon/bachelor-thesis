@@ -16,17 +16,20 @@
       "baseType": "RoomDirectionSign",
       "signType": "RoomDirectionSign",
       "degree": 0,
-      "resizable": false
+      "resizable": false,
+      "beatHeight": 0.8
     },
     {
       "baseType": "Cancel",
       "signType": "back-normal",
-      "resizable": false
+      "resizable": false,
+      "beatHeight": 0.8
     },
     {
       "baseType": "Cancel",
       "signType": "release-contact",
-      "resizable": false
+      "resizable": false,
+      "beatHeight": 0.8
     },
     {
       "baseType": "VibrationSign",

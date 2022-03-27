@@ -2,11 +2,12 @@
   <div id="library" :style="libraryActive ? 'width: 250px;' : 'width: 0;'">
     <div></div>
     <div id="cur-sign-container"><p class="cur-sign-text">Current Sign: {{curSign}}</p></div>
-    <LibraryItemContainer :active="item.active" :selected="item.selected" :category="item.category" :catIndex="index" :key="index" v-for="(item, index) of categories" @expand="selectCategory" @selectSign="updateCurSign"/>
+    <LibraryItemContainer :active="item.active" :selected="item.selected" :category="item.category" :catIndex="index" :key="index" v-for="(item, index) of categories" @expand="selectCategory" @selectSign="updateCurSign" @emitSigns="addSigns"/>
   </div>
 </template>
 
 <script>
+import interact from "interactjs";
 
 /**
  * The sign library component
@@ -14,6 +15,7 @@
  */
 export default {
   name: 'SignLibrary',
+  emits: ["selectSignDrag"],
   props: {
   },
   data() {
@@ -27,7 +29,8 @@ export default {
         {active: false, category: "body-part-signs", selected: -1}, 
         {active: false, category: "misc-signs", selected: -1},
       ],
-      curSign: "---"
+      curSign: "---",
+      signs: {},
     };
   },
   computed: {
@@ -39,9 +42,20 @@ export default {
     }
   },
   mounted () {
-    
+    interact(".library-sign-svg").draggable({
+      inertia: false,
+      autoScroll: false,
+
+      // functions to call on event
+      onstart: this.selectSignStart,
+      onmove: this.selectSignMove,
+      onend: this.selectSignEnd,
+    }).styleCursor(false);
   },
   methods: {
+    addSigns (data) {
+      this.signs[data.catIndex] = data.signs;
+    },
     selectCategory (index) {
       for (let ind = 0; ind < this.categories.length; ind++) {
         if (ind != index) {
@@ -65,12 +79,46 @@ export default {
         this.categories[data.catIndex].selected = data.index;
         this.curSign = data.name;
         //push to current sign
-        let sign = {height: data.height, signData: data.signData};
-        this.$store.dispatch('changeCurSign',sign);
-      } else {
+        if (data.updateSign) {
+          console.log("here")
+          let sign = {signData: data.signData};
+          this.$store.dispatch('changeCurSign',sign);
+        }
+      } else if (!data.updateSign) {
         this.$store.dispatch('changeCurSign',false);
+      } else {
+        let sign = {signData: data.signData};
+        this.$store.dispatch('changeCurSign',sign);
+        this.categories[data.catIndex].selected = data.index;
+        this.curSign = data.name;
       }
-    }
+      console.log(this.storedSign)
+    },
+
+
+
+    selectSignStart (event) {
+      
+      const catIndex = parseInt(event.target.getAttribute("cat-index"));
+      const index = parseInt(event.target.getAttribute("index"));
+      const lang = this.$store.state["language"];
+      const json = require('@/assets/sign-category-loaders/' + this.categories[catIndex].category + '-' + lang + '.json');
+      const obj = JSON.parse(JSON.stringify(json));
+      const nameElem = obj.names.find(elem => this.signs[catIndex][index].signData.signType == elem.signType);
+      this.updateCurSign({catIndex: catIndex, index: index, name: nameElem.name, signData: this.signs[catIndex][index].signData, updateSign: true});
+      this.$emit("selectSignDrag", {type: "start", pos: {x: event.target.firstChild.getBoundingClientRect().x, y: event.target.firstChild.getBoundingClientRect().y}})
+    },
+
+    selectSignMove (event) {
+      this.$emit("selectSignDrag", {type: "move", delta: {x: event.dx, y: event.dy}});
+    },
+    
+    selectSignEnd (event) {
+      const catIndex = parseInt(event.target.getAttribute("cat-index"));
+      const index = parseInt(event.target.getAttribute("index"));
+      this.updateCurSign({catIndex: catIndex, index: index, name: this.categories[catIndex].category, signData: this.signs[catIndex][index].signData});
+      this.$emit("selectSignDrag", {type: "end"});
+    },
   },
   watch: {
     storedSign (sign) {

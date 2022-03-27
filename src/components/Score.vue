@@ -1,6 +1,6 @@
 <template>
     <div id="canvasContainer" @scroll="getScroll">
-      <div class="margin-box" @click.self="selectSign(-1)">
+      <div class="margin-box" @mousedown.self="selectSign(-1)">
         <svg preserveAspectRatio="xMinYMax meet" ref="canvas" id="canvas" :width="canvasDimensions.x" :height="canvasDimensions.y" fill="white" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg">
           <defs>
             <pattern id="direction-high-left" width="10" height="10" patternTransform="rotate(-45 0 0)" patternUnits="userSpaceOnUse">
@@ -13,7 +13,7 @@
             </pattern>
           </defs>
           <rect x="0" y="0" :width="canvasDimensions.x" :height="canvasDimensions.y" ref="canvasBG" class="lasso-able" @click="selectSign(-1)"/>
-          <g :transform="'translate(' + canvasMarginLeft + ', ' + canvasMarginTop +')'" ref="bounding">
+          <g :transform="'translate(' + outerCanvasMargin + ', ' + canvasMarginTop +')'" ref="bounding">
             <rect x="0" y="0" :width="columnWidth" :height="innerCanvasDimFull.y" ref="boundingOuterLeft" />
             <rect :x="columnWidth * (columnsLeft + 1 + columnsRight)" y="0" :width="columnWidth" :height="innerCanvasDimRight.y" ref="boundingOuterRight" />
             <rect :x="columnWidth" y="0" :width="innerCanvasDim.x" :height="innerCanvasDim.y" ref="boundingInner" />
@@ -74,7 +74,7 @@ import interact from "interactjs";
 
 export default {
   name: 'Score',
-  inject: ["signWidth", "barHeight", "columnWidth", "handleDiam", "innerCanvasMargin", "outerCanvasMargin", "borderWidth", "addRemoveHeight", "startBarOffset","contextMenuWidth"],
+  inject: ["signWidth", "barHeight", "columnWidth", "handleDiam", "outerCanvasMargin", "borderWidth", "addRemoveHeight", "startBarOffset","contextMenuWidth"],
   data() {
     return {
       canvasScroll: {x: 0, y:0},
@@ -83,14 +83,13 @@ export default {
       keyCommandsEnabled: true,
       contextWasActive: false,
       columnHandlesActive: false,
-      selectedColumn: false,
       selectedColumnTranslate: {x: 0, y: 0},
       barHandlesActive: false,
-      selectedBar: false,
       selectedBarTranslate: {x: 0, y: 0},
       interacting: false,
       interactingSigns: [],
       localSignData: [],
+      canMoveGhost: false,
     };
   },
   computed: {
@@ -124,6 +123,12 @@ export default {
     beats () {
       return this.$store.state["beatsPerBar"];
     },
+    selectedColumn () {
+      return this.$store.state["selectedColumn"];
+    },
+    selectedBar () {
+      return this.$store.state["selectedBar"];
+    },
     curLibrarySign () {
       return this.$store.state["curSign"];
     },
@@ -141,8 +146,8 @@ export default {
     },
     canvasDimensions () {
       return {
-        x: this.columnWidth * (this.columnsLeft + this.columnsRight + 2) + 2 * this.canvasMarginLeft, 
-        y: this.barHeight * (this.bars + 0.5) + this.minHeight + this.innerCanvasMargin + this.outerCanvasMargin / 2 +  (this.addRemoveHeight) + this.startBarOffset
+        x: this.columnWidth * (this.columnsLeft + this.columnsRight + 2) + 2 * this.outerCanvasMargin, 
+        y: this.barHeight * (this.bars + 0.5) + this.minHeight + this.outerCanvasMargin + this.startBarOffset
       };
     },
     innerCanvasDimFull () {
@@ -155,10 +160,7 @@ export default {
       return {x: this.columnWidth * (this.columnsLeft + this.columnsRight), y: this.barHeight * (this.bars + 0.5) + this.minHeight + this.startBarOffset};
     },
     canvasMarginTop () {
-      return this.innerCanvasMargin + this.outerCanvasMargin / 2;
-    },
-    canvasMarginLeft () {
-      return this.innerCanvasMargin + this.outerCanvasMargin;
+      return this.outerCanvasMargin / 2;
     },
     signsSelected () {
       if (this.selectedSigns.length == 0) {
@@ -166,6 +168,15 @@ export default {
       } else {
         return true;
       }
+    },
+    ghostOverCanvas () {
+      return this.$store.state["ghostOverCanvas"];
+    },
+    ghostPos () {
+      return this.$store.state["ghostPos"];
+    },
+    ghostActive () {
+      return this.$store.state["ghostActive"];
     }
   },
   watch: {
@@ -175,6 +186,25 @@ export default {
         if (!this.interacting) {
           this.makeLocalSignData();
         }
+      }
+    },
+    ghostOverCanvas (bool) {
+      if (bool) {
+        let pos = this.getGhostScorePos();
+        this.addSign(pos, false);
+        this.canMoveGhost = true;
+      } else if (this.ghostActive) {
+        this.removeSign(this.signs.length - 1);
+        this.canMoveGhost = false;
+      } else {
+        this.canMoveGhost = false;
+      }
+    },
+    ghostPos () {
+      if (this.ghostOverCanvas && this.canMoveGhost) {
+        let pos = this.getGhostScorePos();
+        pos.colRight = pos.col + 1;
+        this.$store.dispatch("editSigns", {type: "changeSignData", index: this.signs.length - 1, data: pos});
       }
     }
   },
@@ -218,6 +248,42 @@ export default {
       this.canvasScroll = {x: event.target.scrollLeft, y: event.target.scrollTop};
       
     },
+    getGhostScorePos () {
+      const canvasRect = this.$refs.canvas.getBoundingClientRect();
+      let canvasPos = {x: this.ghostPos.x - canvasRect.x, y: this.ghostPos.y - canvasRect.y};
+
+      let signX = Math.round(canvasPos.x / this.blocksizeX) * this.blocksizeX - this.columnWidth;
+      if (signX < this.columnWidth) {
+        signX = this.columnWidth;
+      } else if (signX > this.innerCanvasDim.x) {
+        signX = this.innerCanvasDim.x;
+      }
+      let signY = Math.round(canvasPos.y / this.blocksizeY) * this.blocksizeY - this.minHeight;
+      if (signY < 0) {
+        signY = 0;
+      }
+      const totalCol = signX / this.columnWidth;
+      let col = totalCol - this.columnsLeft - 1;
+      let bar = this.bars - Math.floor(signY / this.barHeight);
+      let beat = this.beats - Math.round((signY - (this.bars-bar) * this.barHeight) / this.minHeight) - this.curLibrarySign.signData.beatHeight;
+      if (this.curLibrarySign.signData.baseType == "BodyPartSign") {
+        bar = -1;
+        beat = 0;
+      } else if (this.checkStartingPos(signY, this.curLibrarySign.signData.beatHeight * this.minHeight)) {
+        bar = 0;
+        beat = 0;
+      } 
+      if (this.curLibrarySign.signData.baseType == "RelationshipBow" && col >= this.columnsRight - 1) {
+        col = this.columnsRight - 2;
+      }
+
+      if (this.curLibrarySign.signData.baseType == "RoomDirectionSign") {
+        col = -this.columnsLeft - 1;
+      } else if (this.curLibrarySign.signData.baseType == "PathSign") {
+        col = this.columnsRight;
+      }
+      return {col: col, bar: bar, beat: beat};
+    },
     makeLocalSignData() {
       this.localSignData = [];
       for (let elem of this.signs) {
@@ -236,6 +302,11 @@ export default {
             elemData.canResize = false;
             if (elem.resizable && elem.baseType != "RelationshipBow") {
               elemData.y = this.bars * this.barHeight + this.startBarOffset;
+              if (elem.beatHeight != 2) {
+                this.interacting = true;
+                this.$store.dispatch("editSigns", {type: "changeSignData", index: this.signs.indexOf(elem), data: {beatHeight: 2}});
+                this.interacting = false;
+              }
             } else {
               elemData.y = this.bars * this.barHeight + this.startBarOffset + this.minHeight;
             }
@@ -267,10 +338,10 @@ export default {
       }
     },
     updateSelectedColumn (data) {
-      this.selectedColumn = data;
+      this.$store.dispatch("setSelectedColumn", data);
     },
     updateSelectedBar (data) {
-      this.selectedBar = data;
+      this.$store.dispatch("setSelectedBar", data);
     },
     lassoSelect (data) {
       this.selectSign(-1);
@@ -381,6 +452,11 @@ export default {
     addBar(beforeIndex) {
       this.$store.dispatch("changeContextMenu", false);
       this.contextSign = 0;
+      if (beforeIndex > this.selectedBar) {
+        this.selectedBarTranslate.y = this.selectedBarTranslate.y + this.barHeight;
+      } else {
+        this.updateSelectedBar (this.selectedBar + 1)
+      }
       for (let elem of this.signs) {
         if (elem.bar < beforeIndex) {
           this.localSignData[this.signs.indexOf(elem)].y = this.localSignData[this.signs.indexOf(elem)].y + this.barHeight;
@@ -403,9 +479,14 @@ export default {
       this.$store.dispatch("changeContextMenu", false);
       this.contextSign = 0;
       let remove = [];
+      if (bar == this.bars) {
+        this.$store.dispatch("setSelectedBar", (bar - 1));
+      } else {
+        this.selectedBarTranslate.y = this.selectedBarTranslate.y - this.barHeight
+      }
       for (let elem of this.signs) {
         const index = this.signs.indexOf(elem);
-        if (elem.baseType != "GenericSign") {
+        if (index > 0) {
           if (elem.bar == bar) {
             remove.push(this.signs.indexOf(elem));
           } else if (elem.bar < bar) {
@@ -434,17 +515,18 @@ export default {
     },
     /**
      * Method for adding a sign to the score
-     * @arg elem the beat on the grid, where the sign is to be placed
+     * @arg obj contains the col, bar and beat, where the sign is supposed to be placed 
+     * @arg permanent whether or not the sign will be permanently placed. If not, don't delete the current library sign
      */
-    addSign (elem) {
+    addSign (obj, permanent = true) {
       let signData = {};
       for (const [key, value] of Object.entries(this.curLibrarySign.signData)) {
         signData[key] = value;
-      }
+      } 
       
-      signData.col = parseInt(elem.getAttribute("col"));
-      signData.bar = parseInt(elem.getAttribute("bar"));
-      signData.beat = parseInt(elem.getAttribute("beat"));
+      signData.col = obj.col;
+      signData.bar = obj.bar;
+      signData.beat = obj.beat;
       if (!("beatHeight" in signData)) {
         signData.beatHeight = this.curLibrarySign.height / this.minHeight;
       }
@@ -456,16 +538,18 @@ export default {
       }
       if (this.curLibrarySign.signData.baseType == "RelationshipBow") {
         signData.colRight = signData.col + 1;
-        
       }
       
-      //the grid element beat/bar is at the y of the new sign, not y + height -> "move it" downwards after placing
+      //if the sign is larger than one beat and supposed to be placed at the top-most beat -> make it smaller to fit
       if (signData.bar == this.bars && signData.beat == this.beats - 1 && signData.beatHeight > 1) {
         signData.beatHeight = 1;
       }
-
       this.$store.dispatch("editSigns", {type: "add", data: signData});
-      this.$store.dispatch("saveStateInHistory");
+      if (permanent) {
+        this.$store.dispatch('changeCurSign',false);
+        this.$store.dispatch("saveStateInHistory");
+      }
+      
       this.makeLocalSignData();
     },
     /**
@@ -585,7 +669,7 @@ export default {
      * @arg event the keydown event 
      */
     keyEvent(event) {
-      if (!this.keyCommandsEnabled) {
+      if (!this.keyCommandsEnabled || this.ghostActive) {
         return false;
       }
       if (event.key == "e") {
@@ -925,7 +1009,7 @@ export default {
       if (event.button == 0) {
         const targetID = event.target.getAttribute("signID")
         this.placeSignOnTop(targetID);
-        this.selectSign(targetID, event.ctrlKey);
+        this.selectSign(targetID, (event.ctrlKey || event.metaKey));
       }
     },
 

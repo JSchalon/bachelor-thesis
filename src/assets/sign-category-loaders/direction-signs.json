@@ -1,7 +1,7 @@
 {
   "catName": "Direction Signs",
   "catHeight": 80,
-  "baseHeight": 100,
+  "baseHeight": 80,
   "general": [
     {
       "isSelected": false,
@@ -16,57 +16,66 @@
       "baseType": "DirectionSign",
       "signType": "left-forward",
       "dimension": "Middle",
-      "resizable": true
+      "resizable": true,
+      "beatHeight": 2
     },
     {
       "baseType": "DirectionSign",
       "signType": "forward",
       "dimension": "Middle",
       "side": "left",
-      "resizable": true
+      "resizable": true,
+      "beatHeight": 2
     },
     {
       "baseType": "DirectionSign",
       "signType": "right-forward",
       "dimension": "Middle",
-      "resizable": true
+      "resizable": true,
+      "beatHeight": 2
     },
     {
       "baseType": "DirectionSign",
       "signType": "left",
       "dimension": "Middle",
-      "resizable": true
+      "resizable": true,
+      "beatHeight": 2
     },
     {
       "baseType": "DirectionSign",
       "signType": "place",
       "dimension": "Middle",
-      "resizable": true
+      "resizable": true,
+      "beatHeight": 2
     },
     {
       "baseType": "DirectionSign",
       "signType": "right",
       "dimension": "Middle",
-      "resizable": true
+      "resizable": true,
+      "beatHeight": 2
     },
     {
       "baseType": "DirectionSign",
       "signType": "left-backward",
       "dimension": "Middle",
-      "resizable": true
+      "resizable": true,
+      "beatHeight": 2
     },
     {
       "baseType": "DirectionSign",
       "signType": "backward",
       "dimension": "Middle",
       "side": "left",
-      "resizable": true
+      "resizable": true,
+      "beatHeight": 2
     },
     {
       "baseType": "DirectionSign",
       "signType": "right-backward",
       "dimension": "Middle",
-      "resizable": true
+      "resizable": true,
+      "beatHeight": 2
     }
   ]
 }

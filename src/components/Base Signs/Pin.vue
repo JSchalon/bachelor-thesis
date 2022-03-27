@@ -105,11 +105,6 @@ export default {
       }
     },
   },
-  watch: {
-    inverted (value) {
-      console.log("inverted: " + value)
-    }
-  }
 }
 </script>
 

@@ -15,17 +15,20 @@
     {
       "baseType": "TurnSign",
       "signType": "counterClockwise",
-      "resizable": true
+      "resizable": true,
+      "beatHeight": 2
     },
     {
       "baseType": "TurnSign",
       "signType": "clockwise",
-      "resizable": true
+      "resizable": true,
+      "beatHeight": 2
     },
     {
       "baseType": "TurnSign",
       "signType": "any",
-      "resizable": true
+      "resizable": true,
+      "beatHeight": 2
     }
   ]
 }

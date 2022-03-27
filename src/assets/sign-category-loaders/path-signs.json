@@ -15,24 +15,28 @@
     {
       "baseType": "PathSign",
       "signType": "straight",
-      "resizable": true
+      "resizable": true,
+      "beatHeight": 2
     },
     {
       "baseType": "PathSign",
       "signType": "circularLeft",
       "direction": "left",
-      "resizable": true
+      "resizable": true,
+      "beatHeight": 2
     },
     {
       "baseType": "PathSign",
       "signType": "circularRight",
       "direction": "right",
-      "resizable": true
+      "resizable": true,
+      "beatHeight": 2
     },
     {
       "baseType": "PathSign",
       "signType": "any",
-      "resizable": true
+      "resizable": true,
+      "beatHeight": 2
     }
   ]
 }

@@ -14,14 +14,22 @@ export default createStore({
     beatDuration: 1,
     //sign data
     curSign: false,
+    ghostOverCanvas: false,
+    ghostPos: {x: 0, y: 0},
+    ghostActive: false,
     selectedSigns: [],
     contextActive: false,
     multiselectActive: false, 
+      //first sign is a dummy sign:
+      //Else there are problems with context menu errors
+      //A relationship bow is used, since the interact listener for their resize function does not work unless there is a bow on the score upon mount (not fixable, maybe a interact.js bug?)
     signs: [
-      {baseType: "GenericSign", signType: "In place", isSelected: false},
+      {baseType: "RelationshipBow", signType: "Address", isSelected: false, beatHeight: 0, width: 0, resizable: false},
     ],
     signsXML: null,
     libraryActive: true,
+    selectedBar: false,
+    selectedColumn: false,
     //editor settings
     seenIntro: false, 
     language: "eng", 
@@ -47,11 +55,26 @@ export default createStore({
       state["bars"] = state["bars"] + number;
       state["signsXML"].getElementsByTagName("laban:measures")[0].innerHTML = state["bars"];
     },
+    setSelectedBar (state, index) {
+      state["selectedBar"] = index;
+    },
+    setSelectedColumn (state, index) {
+      state["selectedColumn"] = index;
+    },
     setCurSign(state, data) {
       state["curSign"] = data;
     },
     removeCurSign (state) {
       state["curSign"] = false;
+    },
+    setGhostOverCanvas (state, bool) {
+      state["ghostOverCanvas"] = bool;
+    },
+    setGhostPos (state, obj) {
+      state["ghostPos"] = obj;
+    },
+    setGhostActive (state, bool) {
+      state["ghostActive"] = bool;
     },
     clearSelectedSigns (state) {
       state["selectedSigns"] = [];
@@ -518,7 +541,6 @@ export default createStore({
       state["title"] = xml.getElementsByTagName("laban:title")[0].innerHTML;
       state["description"] = xml.getElementsByTagName("laban:description")[0].innerHTML;
       state["timeUnit"] = xml.getElementsByTagName("laban:timeUnit")[0].innerHTML;
-      state["bars"] = parseInt(xml.getElementsByTagName("laban:measures")[0].innerHTML);
       state["beatDuration"] = parseInt(xml.getElementsByTagName("laban:beatDuration")[0].innerHTML);
       state["beatsPerBar"] = parseInt(xml.getElementsByTagName("laban:beats")[0].innerHTML);
       for (let elem of xml.getElementsByTagName("laban:columns")[0].children) {
@@ -733,12 +755,18 @@ export default createStore({
         if (sign.beat >= state["beatsPerBar"]) {
           state["beatsPerBar"] = sign.beat + 1;
         }
+        
         if (sign.bar > state["bars"]) {
           state["bars"] = sign.bar;
+        } 
+        if (sign.bar + Math.floor((sign.beatHeight + sign.beat - 1) / state["beatsPerBar"]) > state["bars"]) {
+          state["bars"] = sign.bar + Math.floor((sign.beatHeight + sign.beat - 1) / state["beatsPerBar"] );
         }
         state["signs"].push(sign);
       }
-      console.log()
+      if (state["bars"] != parseInt(xml.getElementsByTagName("laban:measures")[0].innerHTML)) {
+        state["signsXML"].getElementsByTagName("laban:measures")[0].innerHTML = state["bars"];
+      }
       for (let elem of state["signs"]) {
         if (elem.baseType == "PathSign" && elem.col < state["columnsRight"]) {
           elem.col == state["columnsRight"];
@@ -827,6 +855,21 @@ export default createStore({
       let number = -1;
       context.commit('setBars', number);
     },
+    setSelectedBar (context, index) {
+      context.commit("setSelectedBar", index);
+    },
+    setGhostOverCanvas (context, bool) {
+      context.commit("setGhostOverCanvas", bool);
+    },
+    setGhostPos (context, obj) {
+      context.commit("setGhostPos", obj);
+    },
+    setGhostActive (context, bool) {
+      context.commit("setGhostActive", bool);
+    },
+    setSelectedColumn (context, index) {
+      context.commit("setSelectedColumn", index);
+    },
     changeCurSign (context, sign) {
       if (sign != false) {
         context.commit('setCurSign', sign);
@@ -839,7 +882,6 @@ export default createStore({
         context.commit("addSignToObj", obj.data);
         if (!("isShadow" in obj.data && obj.data.isShadow)) {
           context.commit("addSignToXML", {obj: obj.data, index: -1});
-          context.commit('removeCurSign');
           context.commit("clearSelectedSigns");
         }
       } else if (obj.type == "changeSignData") {
@@ -894,11 +936,15 @@ export default createStore({
     undoChanges(context) {
       context.commit("undo");
       context.commit("clearSelectedSigns");
+      context.commit("setSelectedBar", false);
+      context.commit("setSelectedColumn", false);
       context.commit("saveScoreToLocalStorage");
     },
     redoChanges(context) {
       context.commit("redo");
       context.commit("clearSelectedSigns");
+      context.commit("setSelectedBar", false);
+      context.commit("setSelectedColumn", false);
       context.commit("saveScoreToLocalStorage");
     },
   },

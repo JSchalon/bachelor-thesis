@@ -19,7 +19,8 @@
       "passing": false, 
       "grasping": false,
       "resizable": true,
-      "holding": false
+      "holding": false,
+      "beatHeight": 1
     },
     {
       "baseType": "RelationshipBow",
@@ -28,7 +29,8 @@
       "grasping": false,
       "resizable": true,
       "addressing": "right",
-      "holding": false
+      "holding": false,
+      "beatHeight": 1
     },
     {
       "baseType": "RelationshipBow",
@@ -36,7 +38,8 @@
       "passing": false, 
       "grasping": false,
       "resizable": true,
-      "holding": false
+      "holding": false,
+      "beatHeight": 1
     },
     {
       "baseType": "RelationshipBow",
@@ -44,7 +47,8 @@
       "passing": false, 
       "grasping": false,
       "resizable": true,
-      "holding": false
+      "holding": false,
+      "beatHeight": 1
     }
   ]
 }

@@ -16,43 +16,50 @@
       "baseType": "SpaceMeasurementSign",
       "signType": "Narrow",
       "degree": 1,
-      "resizable": true
+      "resizable": true,
+      "beatHeight": 1
     },
     {
       "baseType": "SpaceMeasurementSign",
       "signType": "Wide",
       "degree": 1,
-      "resizable": true
+      "resizable": true,
+      "beatHeight": 1
     },
     {
       "baseType": "SpaceMeasurementSign",
       "signType": "Joining",
       "degree": 1,
-      "resizable": true
+      "resizable": true,
+      "beatHeight": 1
     },
     {
       "baseType": "SpaceMeasurementSign",
       "signType": "Spreading",
       "degree": 1,
-      "resizable": true
+      "resizable": true,
+      "beatHeight": 1
     },
     {
       "baseType": "SpaceMeasurementSign",
       "signType": "Folding",
       "degree": 1,
-      "resizable": true
+      "resizable": true,
+      "beatHeight": 1
     },
     {
       "baseType": "SpaceMeasurementSign",
       "signType": "Unfolding",
       "degree": 1,
-      "resizable": true
+      "resizable": true,
+      "beatHeight": 1
     },
     {
       "baseType": "SpaceMeasurementSign",
       "signType": "NeitherOr",
       "degree": 1,
-      "resizable": true
+      "resizable": true,
+      "beatHeight": 1
     }
 
   ]

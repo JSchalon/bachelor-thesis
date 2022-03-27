@@ -1,16 +1,14 @@
 <template>
-  <div>
-    <router-view/>
-    <div class="alert-container" v-if="isPhone">
-      <div class="alert-box">
-        <p class="alert-text">We recommend using a Tablet or PC to use this editor. Using a phone is possible, but not advised.</p>
-        <div class="divider-bar"></div>
-        <div class="alert-btn-container">
-          <button class="alert-btn" @click="isPhone=false">Got it</button><p>>></p>
-        </div>  
-      </div>
-    </div> 
-  </div>
+  <router-view/>
+  <div class="alert-container" v-if="isPhone">
+    <div class="alert-box">
+      <p class="alert-text">We recommend using a Tablet or PC to use this editor. Using a phone is possible, but not advised.</p>
+      <div class="divider-bar"></div>
+      <div class="alert-btn-container">
+        <button class="alert-btn" @click="isPhone=false">Got it</button><p>>></p>
+      </div>  
+    </div>
+  </div> 
 </template>
 
 <script>
@@ -49,8 +47,7 @@ export default {
       beatLineWidth: 25,
       addRemoveHeight: 40,
       addRemoveWidth: 10,
-      innerCanvasMargin: 30,
-      outerCanvasMargin: 50,
+      outerCanvasMargin: 70,
       handleDiam: 7,
       borderWidth: 2,
       contextMenuWidth: this.contextMenuWidth,

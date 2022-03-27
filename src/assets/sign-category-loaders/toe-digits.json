@@ -20,7 +20,8 @@
       "digit": 1,
       "joint": 0,
       "resizable": false,
-      "canBeLimb": true
+      "canBeLimb": true,
+      "beatHeight": 0.8
     },
     { 
       "baseType": "BodyPartSign",
@@ -30,7 +31,8 @@
       "digit": 2,
       "joint": 0,
       "resizable": false,
-      "canBeLimb": true
+      "canBeLimb": true,
+      "beatHeight": 0.8
     },
     { 
       "baseType": "BodyPartSign",
@@ -40,7 +42,8 @@
       "digit": 3,
       "joint": 0,
       "resizable": false,
-      "canBeLimb": true
+      "canBeLimb": true,
+      "beatHeight": 0.8
     },
     { 
       "baseType": "BodyPartSign",
@@ -50,7 +53,8 @@
       "digit": 4,
       "joint": 0,
       "resizable": false,
-      "canBeLimb": true
+      "canBeLimb": true,
+      "beatHeight": 0.8
     },
     { 
       "baseType": "BodyPartSign",
@@ -60,7 +64,8 @@
       "digit": 5,
       "joint": 0,
       "resizable": false,
-      "canBeLimb": true
+      "canBeLimb": true,
+      "beatHeight": 0.8
     }
   ]
 }

@@ -8,7 +8,7 @@
           <img class="context-item-interact-img smaller" :class="active ? 'turned' : 'unturned'" src="@/assets/images/sign-categories/triangle-right.svg" alt="triangle"/>
       </div>
     </div>
-    <LibraryItem v-show="active" :active="active" :category="category" :catIndex="catIndex" :selected="selected" :offset="itemOffset"  @selectSign="selectSign"/>
+    <LibraryItem v-show="active" :active="active" :category="category" :catIndex="catIndex" :selected="selected" :offset="itemOffset" @emitSigns="emitSigns" @selectSign="selectSign"/>
   </div>
 </template>
 
@@ -20,7 +20,7 @@
 export default {
   name: 'LibraryItemContainer',
   inject: ["barHeight"],
-  emits: ["expand", "selectSign"],
+  emits: ["expand", "emitSigns", "selectSign"],
   props: {
     active: Boolean,
     category: String,
@@ -47,12 +47,15 @@ export default {
     expand () {
       this.$emit("expand", this.catIndex);
     },
+    getWidth() {
+        return this.$refs.container.offsetWidth / 6 - 20;
+    },
+    emitSigns (data) {
+      this.$emit("emitSigns", data);
+    },
     selectSign (data) {
       this.$emit("selectSign", data);
     },
-    getWidth() {
-        return this.$refs.container.offsetWidth / 6 - 20;
-    }
   },
 }
 </script>

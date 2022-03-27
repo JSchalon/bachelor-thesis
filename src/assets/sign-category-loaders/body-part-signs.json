@@ -20,7 +20,8 @@
       "joint": false,
       "surface": false,
       "limb": false,
-      "canBeLimb": false
+      "canBeLimb": false,
+      "beatHeight": 0.8
     },
     {
       "baseType": "BodyPartSign",
@@ -30,7 +31,8 @@
       "digit": false,
       "joint": false,
       "resizable": false,
-      "canBeLimb": true
+      "canBeLimb": true,
+      "beatHeight": 0.8
     },
     {
       "baseType": "BodyPartSign",
@@ -40,7 +42,8 @@
       "digit": false,
       "joint": false,
       "resizable": false,
-      "canBeLimb": true
+      "canBeLimb": true,
+      "beatHeight": 0.8
     },
     {
       "baseType": "BodyPartSign",
@@ -50,7 +53,8 @@
       "joint": false,
       "surface": false,
       "limb": false,
-      "canBeLimb": false
+      "canBeLimb": false,
+      "beatHeight": 0.8
     },
     {
       "baseType": "BodyPartSign",
@@ -59,7 +63,8 @@
       "limb": false,
       "digit": false,
       "resizable": false,
-      "canBeLimb": true
+      "canBeLimb": true,
+      "beatHeight": 0.8
     },
     {
       "baseType": "BodyPartSign",
@@ -69,7 +74,8 @@
       "digit": false,
       "joint": false,
       "resizable": false,
-      "canBeLimb": true
+      "canBeLimb": true,
+      "beatHeight": 0.8
     },
     {
       "baseType": "BodyPartSign",
@@ -79,7 +85,8 @@
       "surface": false,
       "limb": false,
       "resizable": false,
-      "canBeLimb": false
+      "canBeLimb": false,
+      "beatHeight": 0.8
     },
     {
       "baseType": "BodyPartSign",
@@ -89,7 +96,8 @@
       "digit": false,
       "joint": false,
       "resizable": false,
-      "canBeLimb": true
+      "canBeLimb": true,
+      "beatHeight": 0.8
     },
     {
       "baseType": "BodyPartSign",
@@ -99,7 +107,8 @@
       "digit": false,
       "joint": false,
       "resizable": false,
-      "canBeLimb": true
+      "canBeLimb": true,
+      "beatHeight": 0.8
     },
     {
       "baseType": "BodyPartSign",
@@ -109,7 +118,8 @@
       "surface": false,
       "limb": false,
       "resizable": false,
-      "canBeLimb": false
+      "canBeLimb": false,
+      "beatHeight": 0.8
     },
     {
       "baseType": "BodyPartSign",
@@ -119,7 +129,8 @@
       "digit": false,
       "joint": false,
       "resizable": false,
-      "canBeLimb": false
+      "canBeLimb": false,
+      "beatHeight": 0.8
     },
     {
       "baseType": "BodyPartSign",
@@ -129,7 +140,8 @@
       "digit": false,
       "joint": false,
       "resizable": false,
-      "canBeLimb": false
+      "canBeLimb": false,
+      "beatHeight": 0.8
     },
     {
       "baseType": "BodyPartSign",
@@ -139,7 +151,8 @@
       "surface": false,
       "limb": false,
       "resizable": false,
-      "canBeLimb": false
+      "canBeLimb": false,
+      "beatHeight": 0.8
     },
     {
       "baseType": "BodyPartSign",
@@ -149,7 +162,8 @@
       "digit": false,
       "joint": false,
       "resizable": false,
-      "canBeLimb": false
+      "canBeLimb": false,
+      "beatHeight": 0.8
     },
     {
       "baseType": "BodyPartSign",
@@ -159,7 +173,8 @@
       "digit": false,
       "joint": false,
       "resizable": false,
-      "canBeLimb": false
+      "canBeLimb": false,
+      "beatHeight": 0.8
     }
   ]
 }

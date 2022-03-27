@@ -16,55 +16,64 @@
       "baseType": "Pin",
       "degree": 315,
       "signType": "Middle",
-      "resizable": false
+      "resizable": false,
+      "beatHeight": 1
     },
     {
       "baseType": "Pin",
       "degree": 0,
       "signType": "Middle",
-      "resizable": false
+      "resizable": false,
+      "beatHeight": 1
     },
     {
       "baseType": "Pin",
       "degree": 45,
       "signType": "Middle",
-      "resizable": false
+      "resizable": false,
+      "beatHeight": 1
     },
     {
       "baseType": "Pin",
       "degree": 270,
       "signType": "Middle",
-      "resizable": false
+      "resizable": false,
+      "beatHeight": 1
     },
     {
       "baseType": "Pin",
       "degree": -1,
       "signType": "Middle",
-      "resizable": false
+      "resizable": false,
+      "beatHeight": 1
     },
     {
       "baseType": "Pin",
       "degree": 90,
       "signType": "Middle",
-      "resizable": false
+      "resizable": false,
+      "beatHeight": 1
     },
     {
       "baseType": "Pin",
       "degree": 225,
       "signType": "Middle",
-      "resizable": false
+      "resizable": false,
+      "beatHeight": 1
     },
     {
       "baseType": "Pin",
       "degree": 180,
       "signType": "Middle",
-      "resizable": false
+      "resizable": false,
+      "beatHeight": 1
     },
     {
       "baseType": "Pin",
       "degree": 135,
       "signType": "Middle",
-      "resizable": false
+      "resizable": false,
+      "beatHeight": 1
     }
   ]
 }

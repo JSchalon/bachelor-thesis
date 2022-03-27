@@ -142,8 +142,12 @@ export default {
       }
     },
     barHighlightAfterAddRemove() {
-      this.$emit("removeGridHandles");
-      this.highlight();
+      if (!(this.selectedBar === false)) {
+        this.highlight(this.selectedBar);
+      } else {
+        this.highlight();
+        this.$emit("removeGridHandles")
+      }
     },
     /**
      * When the grid is clicked -> unselect all signs
@@ -154,12 +158,6 @@ export default {
         this.$emit("removeGridHandles")
         this.highlight();
       } else if (event.button == 0){
-        if (this.curSign) {
-          this.$emit("placeSign", event.target);
-          return true;
-        }
-        //now -> 
-        //column select/unselect
         if (event.target.parentElement.classList.contains("highlighted")) {
           this.highlightCol(parseInt(event.target.getAttribute("col")), false);
         } else {
@@ -218,7 +216,6 @@ export default {
       if (highlight) {
         if (!isHighlighted) {
           elem.classList.toggle("highlighted");
-          console.log({type: "col", x: elem.getBoundingClientRect().x, y: elem.getBoundingClientRect().y})
           this.$emit("getGridHandles", {type: "col", x: elem.getBoundingClientRect().x, y: elem.getBoundingClientRect().y});
         }
       } else {

@@ -80,7 +80,6 @@ export default {
       this.$emit("delete", parseInt(this.signIndex))
     },
     getAddressInitState () {
-      console.log(this.signData.addressing)
       if (this.signData.addressing == "right" || this.signData.addressing == undefined) {
         return "Right";
       } if (this.signData.addressing == "left") {

@@ -97,6 +97,8 @@
       },
       unselectAll () {
         this.$store.dispatch("clearSelectedSigns");
+        this.$store.dispatch("setSelectedColumn", false);
+        this.$store.dispatch("setSelectedBar", false);
       },
       invertSelection () {
         if (this.selectedSigns.length > 0) {
@@ -113,6 +115,8 @@
           for (let index of unselected) {
             this.$store.dispatch("addToSelectedSigns", index);
           }
+          this.$store.dispatch("setSelectedColumn", false);
+          this.$store.dispatch("setSelectedBar", false);
         }
       }
     },
