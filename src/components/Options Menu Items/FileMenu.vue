@@ -175,13 +175,12 @@ export default {
       },
       exportSVGDropBox () {
         const svg = this.makeSVGFile();
-        const bb = new Blob([svg], {type: 'application/xml'});
         let filename = this.$store.state["title"];
         if (!filename.includes(".svg")) {
           filename = filename + ".svg";
         }
         let options = {
-          files: [{url: "data:text/html,"+encodeURIComponent(bb), filename: filename}],
+          files: [{url: "data:text/html,"+encodeURIComponent(svg), filename: filename}],
           success: function () {
               // Indicate to the user that the files have been saved.
           },
