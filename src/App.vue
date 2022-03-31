@@ -69,7 +69,8 @@ export default {
     }
     if (settingsObj == null) {
       //create settings cookie
-      let newCookie = {seenIntro: false, language: "eng", showHelpLines: true};
+      console.log("here")
+      let newCookie = {seenIntro: false, language: "eng", showHelpLines: true, showScoreDescription: false};
       document.cookie = "settings=" + JSON.stringify(newCookie) + "; expires=" + d.toUTCString() + "; path=/";
     } else {
       this.$store.dispatch("changeSettings", settingsObj);

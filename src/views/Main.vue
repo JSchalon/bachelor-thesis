@@ -1,6 +1,6 @@
 <template>
   <div ref="view" class="is-clipped">
-    <OptionsMenu @requestNewScore="openNewScoreDialog" @requestUpload="openConfirmationPopUp" @requestScoreDetails="openScoreDetails" @startIntroduction="openIntroduction"/>
+    <OptionsMenu @requestNewScore="openNewScoreDialog" @requestUpload="uploadScore" @requestScoreDetails="openScoreDetails" @startIntroduction="openIntroduction"/>
     <SignLibrary @selectSignDrag="selectSignDrag"/>
     <div id="interactionBox">
       <InteractionMenu/>
@@ -11,94 +11,20 @@
         <component :is="ghostSignData.baseType" :isSelected="true" :height="ghostSignData.beatHeight * minHeight" :signData="ghostSignData" :class="ghostOverCanvas ? 'over-canvas' : ''"/>
       </g>
     </svg>
-    <div class="modal" :class="modalActive ? 'is-active' : ''">
-      <div class="modal-background"></div>
-      <div class="modal-content">
-        
-        <form class="box" id="edit-form">
-          
-          <h1 v-if="newScore" class="title">New Score <button class="delete is-large custom-close" aria-label="close" @click="modalActive=false; newScore=false"><img src="@/assets/images/interaction-menu/x.svg" class="option-img"></button></h1>
-          <h1 v-else class="title">Edit Score Parameters<button class="delete is-large custom-close" aria-label="close" @click="modalActive = false"><img src="@/assets/images/interaction-menu/x.svg" class="option-img"></button></h1>
-          <div class="field">
-            <label class="label">Author</label>
-            <div class="control">
-              <input class="input" type="text" placeholder="Author" name="author" required>
-            </div>
-          </div>
-          <div class="field">
-            <label class="label">Title</label>
-            <div class="control">
-              <input class="input" type="text" placeholder="Title" name="title" required>
-            </div>
-          </div>
-          <div class="field">
-            <label class="label">Template</label>
-            <div class="control">
-              <div class="select">
-                <select id="template-select" @change="beatsPerBarDisabled = document.getElementById('').value != 'Blank Score'">
-                  <option>Blank Score</option>
-                </select>
-              </div>
-            </div>
-          </div>
-          <div class="field">
-            <label class="label">Score Description</label>
-            <div class="control">
-              <textarea class="textarea" placeholder="Description" name="description" required></textarea>
-            </div>
-          </div>
-          <div class="field" v-if="newScore">
-            <!-- don't display if not blank score-->
-            <label class="label">Beats per Measure</label>
-            <p class="help is-info">Currently cannot be changed after score creation</p>
-            <div class="control">
-              <input class="input" type="number" min="1" max="8" placeholder="1 - 8" value="4" name="beatsPerBar" :disabled="beatsPerBarDisabled">
-            </div>
-          </div>
-          <div class="field">
-            <label class="label">Time Unit</label>
-            <p class="help">The Time Unit of the Beat Duration</p>
-            <div class="control">
-              <div class="select">
-                <select name="timeUnit">
-                  <option>Millisecond</option>
-                  <option selected="selected">Second</option>
-                  <option>Minute</option>
-                </select>
-              </div>
-            </div>
-          </div>
-          <div class="field">
-            <label class="label">Beat Duration</label>
-            <div class="control">
-              <input class="input" type="number" placeholder="1-1000" min="1" max="1000" value="1" name="beatDuration" required>
-            </div>
-          </div>
-          <button v-if="newScore" class="button is-success">Create Score</button>
-          <button v-else class="button is-success">Update Score Parameters</button>
-          <button class="button ml-3" type="reset" @click="modalActive=false; newScore=false">Cancel</button>
-        </form>
-      </div>
-    </div> 
-    <div class="modal" :class="confirmationModal ? 'is-active' : ''">
-      <div class="modal-background"></div>
-      <div class="modal-content">
-        <div class="box">
-          <h1 class="title">Confirm Creation of new Score<button class="delete is-large custom-close" aria-label="close" @click="confirmationModal=false; newScore=false"><img src="@/assets/images/interaction-menu/x.svg" class="option-img"></button></h1>
-          <p class="mb-4">Creating a new score will delete the contents of the existing score. This action is currently not reversible.</p>
-          <button class="button is-success" @click="makeNewScore">Understood</button>
-          <button class="button ml-3" type="reset" @click="confirmationModal=false; newScore=false">Cancel</button>
-        </div>
-      </div>
-    </div>
+    <ScoreEditModal :modalActive="modalActive" :newScore="newScore" :beatsPerBarDisabled="beatsPerBarDisabled" @disableModal="modalActive=false;newScore=false;" @checkBeatsPerBar="changeBeatsPerBarDisabled" @formSubmit="updateScore"/>
+    <ConfirmationModal :modalActive="confirmationModal" @disableModal="confirmationModal=false;newScore=false;" @confirm="makeNewScore">
+    </ConfirmationModal>
+    <ConfirmationModal :modalActive="uploadConfirm" @disableModal="uploadConfirm=false;this.curFile=null" @confirm="confirmUploadScore">
+      <template v-slot:title>Confirm importing Score</template>
+      <template v-slot:text>Importing a score will delete the current score, including any unsaved changes. This action is currently not reversible.</template>
+    </ConfirmationModal>
     <div class="desc-box">
       <div class="box" v-if="storeDescActive">
         <h4 class="title is-5">Score Description <button class="delete is-large custom-close" aria-label="close" @click="this.$store.dispatch('changeSettings', {showScoreDescription: !storeDescActive});"><img src="@/assets/images/interaction-menu/x.svg" class="option-img"></button></h4>
         <p>{{$store.state["description"]}}</p>
       </div>
-      <button v-else class="button has-background-white is-size-5 has-text-info" @click="this.$store.dispatch('changeSettings', {showScoreDescription: !storeDescActive});">?</button>
+      <button v-else class="button has-background-white is-size-5 has-text-info" @click="this.$store.dispatch('changeSettings', {showScoreDescription: !storeDescActive});">!</button>
     </div>
-    
   </div>
 </template>
 
@@ -123,6 +49,7 @@ export default {
       beatsPerBarDisabled: false,
       confirmationModal: false,
       newScoreData: null,
+      uploadConfirm: false,
     };
   },
   computed: {
@@ -163,7 +90,6 @@ export default {
     if (localStorage.getItem("score")) {
       this.$store.dispatch("newScore", "local-storage");
       this.$store.dispatch("clearHistory");
-      this.loadFormData();
     } else {
       this.$store.dispatch("newScore", "blank-score");
       this.$store.dispatch("clearHistory");
@@ -171,7 +97,14 @@ export default {
       this.modalActive = true;
       
     }
-    document.getElementById("edit-form").addEventListener("submit", this.updateScore);
+    window.addEventListener('keydown', function (e) {
+      if (e.key == "Escape") {
+        this.modalActive = false;
+        this.newScore = false;
+        this.confirmationModal = false;
+        this.uploadConfirm = false;
+      }
+    }.bind(this));
   },
   methods: {
     selectSignDrag (data) {
@@ -207,20 +140,10 @@ export default {
         // else the sign is already deleted
       }
     },
-    loadFormData () {
-      this.newScore = true;
-      let form = document.getElementById("edit-form");
-      form.elements["author"].value = this.$store.state["author"];
-      form.elements["title"].value = this.$store.state["title"];
-      form.elements["description"].value = this.$store.state["description"];
-      if (form.elements["beatsPerBar"]) {
-        form.elements["beatsPerBar"].value = this.$store.state["beatsPerBar"];
-      }
-      form.elements["timeUnit"].value =  this.$store.state["timeUnit"].charAt(0).toUpperCase() + this.$store.state["timeUnit"].slice(1);
-      form.elements["beatDuration"].value = parseInt(this.$store.state["beatDuration"]);
+    changeBeatsPerBarDisabled(bool) {
+      this.beatsPerBarDisabled = bool;
     },
     openNewScoreDialog () {
-      this.loadFormData();
       this.modalActive = true;
       this.newScore = true;
       if (document.getElementById("edit-form").elements["beatsPerBar"]) {
@@ -228,10 +151,21 @@ export default {
       }
       this.beatsPerBarDisabled = document.getElementById("template-select").value != "Blank Score";
     },
-    openConfirmationPopUp (file) {
-      //TODO
-      this.curFile = file;
-      this.$store.dispatch("openScore", file)
+    uploadScore (file) {
+      if (file == "error") {
+        console.log("error")
+        return;
+      }
+      if (this.signs.length > 1) {
+        this.curFile = file;
+        this.uploadConfirm = true;
+      } else {
+        this.$store.dispatch("openScore", file);
+      }
+    },
+    confirmUploadScore () {
+      this.uploadConfirm = false;
+      this.$store.dispatch("openScore", this.curFile)
     },
     openScoreDetails () {
       this.newScore = false;
@@ -240,25 +174,11 @@ export default {
     openIntroduction (which) {
       console.log("open intro " + which);
     },
-    updateScore (event) {
-      event.preventDefault();
-      let index = 0;
-      let data = {author: event.srcElement[1].value};
+    updateScore (data) {
       if (this.newScore) {
-        index = 1;
-        data.beatsPerBar = parseFloat(event.srcElement[5].value);
-      }
-      
-      data.title = event.srcElement[2].value;
-      data.template = event.srcElement[3].value;
-      data.description = event.srcElement[4].value;
-      data.timeUnit = event.srcElement[5+index].value;
-      data.beatDuration = event.srcElement[6+index].value;
-      console.log(data.description)
-      if (this.newScore) {
+        this.newScoreData = data;
         if (this.signs.length > 1) {
           this.confirmationModal = true;
-          this.newScoreData = data;
         } else {
           this.makeNewScore();
         }

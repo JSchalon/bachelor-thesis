@@ -670,8 +670,6 @@ export default {
       return rect;
     },
 
-
-
     /**
      * Method for checking the key of a keydown event and using its functions
      * @arg event the keydown event 

@@ -512,6 +512,10 @@ export default createStore({
       if ("showScoreDescription" in data) {
         state["showScoreDescription"] = data.showScoreDescription;
       }
+      let d = new Date();
+      d.setTime(d.getTime() + 60 * 24 * 60 * 60 * 1000);
+      let newCookie = {seenIntro: state["seenIntro"], language: state["language"], showHelpLines: state["showHelpLines"], showScoreDescription: state["showScoreDescription"]};
+      document.cookie = "settings=" + JSON.stringify(newCookie) + "; expires=" + d.toUTCString() + "; path=/";
     },
     editScoreParameters (state, data) {
       if ("author" in data) {

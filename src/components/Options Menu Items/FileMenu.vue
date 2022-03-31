@@ -12,7 +12,7 @@
       </li>
       <li class="option-item" @click="openFileUpload()">
         <div class="menu-option-container">
-          <input id="xml-file" type="file" @change="uploadScore('xml-file')" class="input-hidden">
+          <input id="xml-file" type="file" @change="uploadScoreFromString('xml-file')" class="input-hidden">
           <img src="@/assets/images/common/upload-local.svg" class="option-img">
           <p>Import from local Files</p>
         </div>
@@ -24,10 +24,10 @@
           <img src="@/assets/images/interaction-menu/triangle-left.svg" class="option-img dropdown">
           <ul class="option-nested sub-menu" tabIndex="0" role="button">
             <div class="option-box sub-menu">
-              <li class="option-item" @click="importFromGDrive()">
+              <li class="option-item" @click="dropboxImport()">
                 <div class="menu-option-container">
                   <img src="@/assets/images/common/upload-drive.svg" class="option-img">
-                  <p>Google Drive</p>
+                  <p>Dropbox</p>
                 </div>
               </li>
             </div>
@@ -49,10 +49,10 @@
                   <p class="shortcut" v-if="showShortCuts">Ctrl+P</p>
                 </div>
               </li>
-              <li class="option-item" @click="exportSVGGDrive()">
+              <li class="option-item" @click="exportSVGDropBox()">
                 <div class="menu-option-container">
                   <img src="@/assets/images/common/upload-drive.svg" class="option-img">
-                  <p>To Google Drive</p>
+                  <p>To Dropbox</p>
                 </div>
               </li>
             </div>
@@ -73,10 +73,10 @@
                   <p class="shortcut" v-if="showShortCuts">Ctrl+S</p>
                 </div>
               </li>
-              <li class="option-item" @click="exportXMLLocal()">
+              <li class="option-item" @click="exportXMLDropBox()">
                 <div class="menu-option-container">
                   <img src="@/assets/images/common/upload-drive.svg" class="option-img">
-                  <p>To Google Drive</p>
+                  <p>To Dropbox</p>
                 </div>
               </li>
             </div>
@@ -108,6 +108,16 @@ export default {
     computed: {
       
     },
+    mounted () {
+      let dropBox = document.createElement("script");
+      dropBox.setAttribute(
+        "src",
+        "https://www.dropbox.com/static/api/2/dropins.js"
+      );
+      dropBox.setAttribute("id", "dropboxjs");
+      dropBox.setAttribute("data-app-key", "6w1sobho503o9jj");
+      document.head.appendChild(dropBox);
+    },
     methods: {
       requestNewScore() {
         this.$emit("requestNewScore");
@@ -115,39 +125,43 @@ export default {
       openFileUpload () {
         document.getElementById("xml-file").click();
       },
-      uploadScore (string) {
+      uploadScoreFromString (string) {
         const elem = document.getElementById(string);
         if ("files" in elem) {
           const score = elem.files[0];
-          if (score.type.includes("xml")) {
-            const reader = new FileReader();
-            reader.onload = function () {
-              //currently there is no schema validation for the xml code since js does not easily support it
-              const xmlRes = reader.result;
-              const parser = new DOMParser();
-              const docRes = parser.parseFromString(xmlRes, "text/xml")
-              if (docRes.documentElement.nodeName == "laban:score" && !docRes.getElementsByTagName('parsererror').length > 0) {
-                this.$emit("requestUpload", xmlRes);
-              } else {
-                this.$emit("requestUpload", "error");
-              }
-            }.bind(this)
-            reader.readAsText(score);
-          }
+          this.uploadScore (score);
         }
       },
-      importFromGDrive () {
-        //TODO
+      uploadScore (score) {
+        console.log()
+        if (score.type.includes("xml")) {
+          const reader = new FileReader();
+          reader.onload = function () {
+            //currently there is no schema validation for the xml code since js does not easily support it
+            const xmlRes = reader.result;
+            const parser = new DOMParser();
+            const docRes = parser.parseFromString(xmlRes, "text/xml")
+            if (docRes.documentElement.nodeName == "laban:score" && !docRes.getElementsByTagName('parsererror').length > 0) {
+              this.$emit("requestUpload", xmlRes);
+            } else {
+              this.$emit("requestUpload", "error");
+            }
+          }.bind(this);
+          reader.readAsText(score);
+        }
       },
-      exportSVGLocal () {
+      makeSVGFile () {
         const serializer = new XMLSerializer();
         const svg = serializer.serializeToString(document.getElementById("canvas"));
+        return svg;
+      },
+      exportSVGLocal () {
+        const svg = this.makeSVGFile();
 
         let filename = this.$store.state["title"];
         if (!filename.includes(".svg")) {
           filename = filename + ".svg";
         }
-        //console.log(filename + ".xml");
         const pom = document.createElement('a');
         const bb = new Blob([svg], {type: 'application/xml'});
         pom.setAttribute('href', window.URL.createObjectURL(bb));
@@ -158,19 +172,38 @@ export default {
         document.body.appendChild(pom);
         pom.click();
         document.body.removeChild(pom);
-      }, 
-      exportSVGGDrive () {
-        //TODO
       },
-      exportXMLLocal () {
+      exportSVGDropBox () {
+        const svg = this.makeSVGFile();
+        const bb = new Blob([svg], {type: 'application/xml'});
+        let filename = this.$store.state["title"];
+        if (!filename.includes(".svg")) {
+          filename = filename + ".svg";
+        }
+        let options = {
+          files: [{url: "data:text/html,"+encodeURIComponent(bb), filename: filename}],
+          success: function () {
+              // Indicate to the user that the files have been saved.
+          },
+        }
+        // disabling eslint temporarily because it identifies "Dropbox" as undefined, 
+        // despite the fact that it is defined in the script defined in the mounted-hook
+        /* eslint-disable */
+        Dropbox.save(options);
+        /* eslint-enable */
+      },
+      makeXMLFile () {
         const serializer = new XMLSerializer();
         const xml = serializer.serializeToString(this.$store.state["signsXML"]);
+        return xml;
+      },
+      exportXMLLocal () {
+        const xml = this.makeXMLFile()
        
         let filename = this.$store.state["title"];
         if (!filename.includes(".xml")) {
           filename = filename + ".xml";
         }
-        //console.log(filename + ".xml");
         const pom = document.createElement('a');
         const bb = new Blob([xml], {type: 'application/xml'});
         pom.setAttribute('href', window.URL.createObjectURL(bb));
@@ -182,14 +215,73 @@ export default {
         pom.click();
         document.body.removeChild(pom);
       }, 
-      exportXMLGDrive () {
-        //TODO
+      exportXMLDropBox () {
+        const xml = this.makeXMLFile()
+       
+        let filename = this.$store.state["title"];
+        if (!filename.includes(".xml")) {
+          filename = filename + ".xml";
+        }
+        //const bb = new Blob([xml], {type: 'text/xml'});
+        let options = {
+          files: [{url: "data:text/html,"+encodeURIComponent(xml), filename: filename}],
+          success: function () {
+              // Indicate to the user that the files have been saved.
+          },
+        }
+        // disabling eslint temporarily because it identifies "Dropbox" as undefined, 
+        // despite the fact that it is defined in the script defined in the mounted-hook
+        /* eslint-disable */
+        Dropbox.save(options);
+        /* eslint-enable */
       },
       requestScoreDetails () {
         this.$emit("requestScoreDetails");
+      },
+      dropboxImport() {
+        let options = {
+          success: async files => {
+          let attachments = [];
+          for (let i = 0; i < files.length; i++) {
+            let attachment = {};
+            attachment._id = files[i].id;
+            attachment.title = files[i].name;
+            attachment.size = files[i].bytes;
+            attachment.iconURL = files[i].icon;
+            attachment.link = files[i].link;
+            attachment.extension = `. ${files[i].name.split(".")[1]}`;
+            attachments.push(attachment);
+          }
+          this.tempAttachments = attachments;
+          fetch(this.tempAttachments[0].link)
+            .then(res => res.blob())
+            .then(blob => {
+              this.uploadScore(blob);
+          });
+          },
+
+          cancel: function() {},
+
+          linkType: "direct",
+
+          multiselect: false,
+
+          extensions: [
+          ".xml",
+          ],
+
+          folderselect: false,
+
+          sizeLimit: 102400000
+        };
+        // disabling eslint temporarily because it identifies "Dropbox" as undefined, 
+        // despite the fact that it is defined in the script defined in the mounted-hook
+        /* eslint-disable */
+        Dropbox.choose(options);
+        /* eslint-enable */
       }
     }
-}
+  }
 </script>
 
 
