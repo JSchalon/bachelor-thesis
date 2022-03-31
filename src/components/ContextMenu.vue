@@ -61,8 +61,10 @@ export default {
   .context-menu {
     width: auto;
     position: absolute;
-    border: 2px solid black;
+    border: none;
+    border-radius: 10px;
     box-sizing: border-box;
+    box-shadow: 0 0px 5px 2px rgb(0 0 0 / 15%);
   }
 
 
@@ -103,8 +105,8 @@ export default {
     }
 
     .context-item-interact-img.smaller {
-      width: calc(var(--contextItemImageSize) / 1.5);
-      height: calc(var(--contextItemImageSize) / 1.5);
+      width: calc(var(--contextItemImageSize) / 1.65);
+      height: calc(var(--contextItemImageSize) / 1.65);
     }
 
   .unusable {

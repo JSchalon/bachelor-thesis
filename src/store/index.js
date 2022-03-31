@@ -7,9 +7,9 @@ export default createStore({
     columnsRight: 3,
     bars: 2,
     beatsPerBar: 4,
-    author: "Jebb",
-    title: "Jebb",
-    description: "Jebb",
+    author: "",
+    title: "",
+    description: "",
     timeUnit: "second",
     beatDuration: 1,
     //sign data
@@ -34,6 +34,7 @@ export default createStore({
     seenIntro: false, 
     language: "eng", 
     showHelpLines: true,
+    showScoreDescription: false,
     //converters, used for converting body part signs between js-obj and xml
     limbNames: {Head: "neck", Shoulder: "arm", Elbow: "upper_arm", Wrist: "lower_arm", Hip: "leg", Knee: "thigh", Ankle: "lower_leg"},
     fingerNames: ["thumb","indexFinger","middleFinger","ringFinger","littleFinger"],
@@ -499,9 +500,18 @@ export default createStore({
       }
     },
     setSettings(state, data) {
-      state["language"] = data.language;
-      state["showHelpLines"] = data.showHelpLines;
-      state["seenIntro"] = data.seenIntro;
+      if ("language" in data) {
+        state["language"] = data.language;
+      }
+      if ("showHelpLines" in data) {
+        state["showHelpLines"] = data.showHelpLines;
+      }
+      if ("seenIntro" in data) {
+        state["seenIntro"] = data.seenIntro;
+      }
+      if ("showScoreDescription" in data) {
+        state["showScoreDescription"] = data.showScoreDescription;
+      }
     },
     editScoreParameters (state, data) {
       if ("author" in data) {
@@ -527,15 +537,22 @@ export default createStore({
     loadScoreFromTemplate(state, template) {
       let data = require("@/assets/score-templates/blank-score.xml")
       if (!template || ((template == "local-storage" && !localStorage.getItem("score")))) {
-        data = require("@/assets/score-templates/blank-score.xml")
+        data = require("@/assets/score-templates/blank-score.xml");
       } else if (template == "local-storage" && localStorage.getItem("score")) {
         data = {};
         data.default = localStorage.getItem("score");
+      } else if (typeof template == "object" && "file" in template) {
+        data = {};
+        data.default = template.file;
       } else {
         data = require("@/assets/score-templates/" + template + ".xml")
       }
       const parser = new DOMParser();
       let xml = parser.parseFromString(data.default,"text/xml");
+      //clear signs if there are any present before loading a new score
+      while(state["signs"].length > 1) {
+        state["signs"].pop();
+      }
       state["signsXML"] = xml;
       state["author"] = xml.getElementsByTagName("laban:author")[0].innerHTML;
       state["title"] = xml.getElementsByTagName("laban:title")[0].innerHTML;
@@ -803,6 +820,10 @@ export default createStore({
         state["undoStack"].slice(1);
       }
     },
+    clearStack (state) {
+      state["redoStack"] = [];
+      state["undoStack"] = [];
+    },
     undo (state) {
       if (state["undoStack"].length > 1) {
         const curState = state["undoStack"].pop();
@@ -899,6 +920,7 @@ export default createStore({
     },
     editScoreParameters(context, data) {
       context.commit("editScoreParameters", data);
+      context.commit("saveScoreToLocalStorage");
     },
     clearSelectedSigns (context) {
       context.commit("clearSelectedSigns");
@@ -925,13 +947,20 @@ export default createStore({
           context.commit("loadScoreFromTemplate", "blank-score");
         }
       }
-      context.commit("addToStack");
+      context.commit("saveScoreToLocalStorage");
+    },
+    openScore (context, xml) {
+      context.commit("loadScoreFromTemplate", {file: xml});
+      context.commit("saveScoreToLocalStorage");
     },
     changeSettings(context, data) {
       context.commit("setSettings", data);
     },
     saveStateInHistory (context) {
       context.commit("addToStack");
+    },
+    clearHistory(context) {
+      context.commit("clearStack");
     },
     undoChanges(context) {
       context.commit("undo");

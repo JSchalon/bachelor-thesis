@@ -1,5 +1,5 @@
 <template>
-  <div id="library" :style="libraryActive ? 'width: 250px;' : 'width: 0;'">
+  <div id="library" :style="libraryActive ? 'width: 260px;' : 'width: 0;'">
     <div></div>
     <div id="cur-sign-container"><p class="cur-sign-text">Current Sign: {{curSign}}</p></div>
     <LibraryItemContainer :active="item.active" :selected="item.selected" :category="item.category" :catIndex="index" :key="index" v-for="(item, index) of categories" @expand="selectCategory" @selectSign="updateCurSign" @emitSigns="addSigns"/>
@@ -80,7 +80,6 @@ export default {
         this.curSign = data.name;
         //push to current sign
         if (data.updateSign) {
-          console.log("here")
           let sign = {signData: data.signData};
           this.$store.dispatch('changeCurSign',sign);
         }
@@ -92,7 +91,6 @@ export default {
         this.categories[data.catIndex].selected = data.index;
         this.curSign = data.name;
       }
-      console.log(this.storedSign)
     },
 
 
@@ -142,12 +140,16 @@ export default {
   
   float: left;
   position: relative;
-  z-index: 5;
+  z-index: 1;
+  box-sizing: border-box;
+  border-right: 1px solid #c1c1c1;
 }
 #cur-sign-container {
-  border-bottom: 1px solid #a1a1a1;
-  background-color: #c1c1c1;
-  min-height: 5vh;
+  background-color: #f4f4f4;
+  border-bottom: 1px solid #c1c1c1;
+  height: 5vh;
+  min-height: 38px;
+  max-height: 50px;
   box-sizing: border-box;
   display: flex;
   align-items: center;
@@ -170,7 +172,6 @@ export default {
   width: 100%;
   display: flex;
   flex-wrap: wrap;
-  border-top: 1px solid #c1c1c1;
   box-sizing: border-box;
 }
 .library-item {

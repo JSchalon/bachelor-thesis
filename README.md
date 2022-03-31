@@ -11,6 +11,9 @@ Git Repo zur Bachelorarbeit zur Entwicklung eines webbasierten Interaktionsedito
 
 ## Versions
 
-### Version 0.4.5
-- Fully reimplemented sign placement via drag and drop (selecting signs to see their name still works)
-- Fixed some bugs
+### Version 0.4.6
+- Implemented basic option menu structure
+- Implemented existing functionality (keyboard shortcuts, interaction menu functionality) in options menu 
+- Added new score/editing score parameter forms
+- Added score description box
+- fixed some bugs

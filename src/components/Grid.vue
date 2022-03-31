@@ -31,10 +31,12 @@
       <line class="grid-line lasso-able" :x1="columnWidth * (columnsLeft)" y1="0" :x2="columnWidth * (columnsLeft)" :y2="barHeight * (bars + .5) + startBarOffset" stroke-width="3" stroke="black"/>
       <!-- right outer line -->
       <line class="grid-line lasso-able" :x1="columnWidth * (columnsLeft + 2)" y1="0" :x2="columnWidth * (columnsLeft + 2)" :y2="barHeight * (bars + .5) + startBarOffset" stroke-width="2" stroke="black"/>
-      <!-- help lines left -->
-      <line class="grid-line lasso-able help" :x1="columnWidth * (helpLine - 1)" y1="0" :x2="columnWidth * (helpLine - 1)" :y2="barHeight * (bars + .5) + startBarOffset" stroke-width="2" :key="helpLine" v-for="helpLine in (columnsLeft - 2)"/>
-      <!-- help lines right -->
-      <line class="grid-line lasso-able help" :x1="columnWidth * (columnsLeft + helpLine + 2)" y1="0" :x2="columnWidth * (columnsLeft + helpLine + 2)" :y2="barHeight * (bars + .5) + startBarOffset" stroke-width="2" :key="helpLine" v-for="helpLine in (columnsRight - 2)"/>
+      <g v-if="showHelpLines">
+        <!-- help lines left -->
+        <line class="grid-line lasso-able help" :x1="columnWidth * (helpLine - 1)" y1="0" :x2="columnWidth * (helpLine - 1)" :y2="barHeight * (bars + .5) + startBarOffset" stroke-width="2" :key="helpLine" v-for="helpLine in (columnsLeft - 2)"/>
+        <!-- help lines right -->
+        <line class="grid-line lasso-able help" :x1="columnWidth * (columnsLeft + helpLine + 2)" y1="0" :x2="columnWidth * (columnsLeft + helpLine + 2)" :y2="barHeight * (bars + .5) + startBarOffset" stroke-width="2" :key="helpLine" v-for="helpLine in (columnsRight - 2)"/>
+      </g>
       <rect :x="lasso.x" :y="lasso.y" :width="lasso.w" :height="lasso.h" fill="#fff" fill-opacity="0" stroke="#5e9fc7" stroke-width="3" stroke-dasharray="5 10" id="lasso-rect"/>
     </g>
 </template>
@@ -83,6 +85,9 @@ export default {
     },
     gridDimensions() {
       return {w: (this.columnsLeft + this.columnsRight) * this.columnWidth, h: this.fullHeight};
+    },
+    showHelpLines(){
+      return this.$store.state["showHelpLines"];
     }
   },
   watch: {
@@ -263,11 +268,11 @@ export default {
       if (event.dx < 0) {
         if (this.lasso.x < this.lasso.startX) {
           this.lasso.x = this.lasso.x + event.dx;
-          this.lasso.w = this.lasso.startX - (this.lasso.x + event.dx);
+          this.lasso.w = this.lasso.startX - (this.lasso.x);
         } else {
           if (this.lasso.w + event.dx < 0) {
             this.lasso.x = this.lasso.x + event.dx;
-            this.lasso.w = this.lasso.startX - (this.lasso.x + event.dx);
+            this.lasso.w = this.lasso.startX - (this.lasso.x);
           } else {
             this.lasso.x = this.lasso.startX;
             this.lasso.w = this.lasso.w + event.dx;
@@ -280,7 +285,7 @@ export default {
             this.lasso.w = event.dx;
           } else {
             this.lasso.x = this.lasso.x + event.dx;
-            this.lasso.w = this.lasso.startX - (this.lasso.x + event.dx);
+            this.lasso.w = this.lasso.startX - (this.lasso.x);
             if (this.lasso.w < 0) {
               this.lasso.w = 0;
             }
@@ -294,11 +299,11 @@ export default {
       if (event.dy < 0) {
         if (this.lasso.y < this.lasso.startY) {
           this.lasso.y = this.lasso.y + event.dy;
-          this.lasso.h = this.lasso.startY - (this.lasso.y + event.dy);
+          this.lasso.h = this.lasso.startY - (this.lasso.y);
         } else {
           if (this.lasso.h + event.dy < 0) {
             this.lasso.y = this.lasso.y + event.dy;
-            this.lasso.h = this.lasso.startY - (this.lasso.y + event.dy);
+            this.lasso.h = this.lasso.startY - (this.lasso.y);
           } else {
             this.lasso.y = this.lasso.startY;
             this.lasso.h = this.lasso.h + event.dy;
@@ -311,7 +316,7 @@ export default {
             this.lasso.h = event.dy;
           } else {
             this.lasso.y = this.lasso.y + event.dy;
-            this.lasso.h = this.lasso.startY - (this.lasso.y + event.dy);
+            this.lasso.h = this.lasso.startY - (this.lasso.y);
             //console.log((this.lasso.y + event.dx) + " " + this.lasso.startY);
             if (this.lasso.h < 0) {
               this.lasso.h = 0;

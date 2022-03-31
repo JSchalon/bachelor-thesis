@@ -30,7 +30,7 @@ export default {
       isPhone: false,
       isTablet: false,
       contextMenuWidth: 250,
-      contextItemHeight: 50,
+      contextItemHeight: 45,
       contextItemMargin: 10,
       contextItemImageSize: 25,
       barHeight: 200,
@@ -55,6 +55,8 @@ export default {
       contextItemMargin: this.contextItemMargin,
       contextItemImageSize: this.contextItemImageSize,
       libraryImgHeight: 60,
+      isPhone: this.isPhone,
+      isTablet: this.isTablet,
     }
   },
   mounted () {
@@ -71,11 +73,6 @@ export default {
       document.cookie = "settings=" + JSON.stringify(newCookie) + "; expires=" + d.toUTCString() + "; path=/";
     } else {
       this.$store.dispatch("changeSettings", settingsObj);
-    }
-    if (localStorage.getItem("score")) {
-      this.$store.dispatch("newScore", "local-storage");
-    } else {
-      this.$store.dispatch("newScore", "blank-score");
     }
     this.isPhone = window.matchMedia("only screen and (max-width: 760px)").matches;
     this.isTablet = window.matchMedia("only screen and (max-width: 1024px)").matches;
@@ -113,7 +110,7 @@ export default {
   }
 
     .alert-box {
-      width: 80%;
+      max-width: 600px;
       border-radius: 30px;
       background-color: white;
       box-shadow: 0 1px 8px 5px rgba(0, 0, 0, 0.15);
