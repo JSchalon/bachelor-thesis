@@ -731,16 +731,19 @@ export default {
             if (event.which % 2 == 1) {
               if (elem.col + move.column  >= -this.columnsLeft && elem.col + move.column < this.columnsRight && elem.baseType != "RoomDirectionSign" && elem.baseType != "PathSign") {
                 if (elem.baseType == "RelationshipBow") {
-                  this.$store.dispatch("editSigns", {type: "changeSignData", index: index, data: {col: (elem.col + move.column), colRight: (elem.colRight + move.column)}});
+                  if (elem.colRight + move.column < this.columnsRight) {
+                    this.$store.dispatch("editSigns", {type: "changeSignData", index: index, data: {col: (elem.col + move.column), colRight: (elem.colRight + move.column)}});
+                    this.localSignData[index].x = this.localSignData[index].x + move.column * this.columnWidth;
+                  }
                 } else {
                   this.$store.dispatch("editSigns", {type: "changeSignData", index: index, data: {col: (elem.col + move.column)}});
+                  this.localSignData[index].x = this.localSignData[index].x + move.column * this.columnWidth;
                 }
                 if (elem.col < 0) {
                   this.$store.dispatch("editSigns", {type: "changeSignData", index: index, data: {side: "left"}});
                 } else {
                   this.$store.dispatch("editSigns", {type: "changeSignData", index: index, data: {side: "right"}});
                 }
-                this.localSignData[index].x = this.localSignData[index].x + move.column * this.columnWidth;
               }
             //if the key id is even -> up / down arrow key, move the sign up or down one beat if possible 
             } else if (elem.baseType != "BodyPartSign") {

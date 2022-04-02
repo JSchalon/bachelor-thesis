@@ -11,6 +11,7 @@ Git Repo zur Bachelorarbeit zur Entwicklung eines webbasierten Interaktionsedito
 
 ## Versions
 
-### Version 0.5.1
-- Implemented importing and exporting via dropbox
-- Fixed a bug with exporting of the svg doc
+### Version 0.6.0
+- Mostly implemented laban/editor introductions (missing proper placement)
+- Added more modals
+- Fixed some bugs

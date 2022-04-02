@@ -59,6 +59,12 @@
                   <p>Body Part Signs</p>
                 </div>
               </li>
+              <li class="option-item" @click="startIntroduction('bodyParts')">
+                <div class="menu-option-container">
+                  <img src="@/assets/images/common/relationship-pins.svg" class="option-img">
+                  <p>Relationship Pins</p>
+                </div>
+              </li>
               <li class="option-item" @click="startIntroduction('misc')">
                 <div class="menu-option-container">
                   <img src="@/assets/images/common/misc-signs.svg" class="option-img">

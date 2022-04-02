@@ -1,14 +1,5 @@
 <template>
   <router-view/>
-  <div class="alert-container" v-if="isPhone">
-    <div class="alert-box">
-      <p class="alert-text">We recommend using a Tablet or PC to use this editor. Using a phone is possible, but not advised.</p>
-      <div class="divider-bar"></div>
-      <div class="alert-btn-container">
-        <button class="alert-btn" @click="isPhone=false">Got it</button><p>>></p>
-      </div>  
-    </div>
-  </div> 
 </template>
 
 <script>
@@ -27,8 +18,6 @@ export default {
   },
   data() {
     return {
-      isPhone: false,
-      isTablet: false,
       contextMenuWidth: 250,
       contextItemHeight: 45,
       contextItemMargin: 10,
@@ -55,8 +44,6 @@ export default {
       contextItemMargin: this.contextItemMargin,
       contextItemImageSize: this.contextItemImageSize,
       libraryImgHeight: 60,
-      isPhone: this.isPhone,
-      isTablet: this.isTablet,
     }
   },
   mounted () {
@@ -69,14 +56,13 @@ export default {
     }
     if (settingsObj == null) {
       //create settings cookie
-      console.log("here")
       let newCookie = {seenIntro: false, language: "eng", showHelpLines: true, showScoreDescription: false};
       document.cookie = "settings=" + JSON.stringify(newCookie) + "; expires=" + d.toUTCString() + "; path=/";
     } else {
       this.$store.dispatch("changeSettings", settingsObj);
     }
-    this.isPhone = window.matchMedia("only screen and (max-width: 760px)").matches;
-    this.isTablet = window.matchMedia("only screen and (max-width: 1024px)").matches;
+    this.$store.dispatch("setIsPhone", window.matchMedia("only screen and (max-width: 760px)").matches);
+    this.$store.dispatch("setIsTablet", window.matchMedia("only screen and (max-width: 1024px)").matches);
     document.documentElement.style.setProperty('--contextMenuWidth', this.contextMenuWidth + "px");
     document.documentElement.style.setProperty('--contextItemHeight', this.contextItemHeight + "px");
     document.documentElement.style.setProperty('--contextItemMargin', this.contextItemMargin + "px");
@@ -98,58 +84,6 @@ export default {
     user-select: none;
     overflow: hidden;
   }
-  .alert-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background-color: rgba(0,0,0,.5);
-    width: 100%;
-    height: 100%;
-    position: fixed;
-    z-index: 10;
-    top: 0;
-  }
-
-    .alert-box {
-      max-width: 600px;
-      border-radius: 30px;
-      background-color: white;
-      box-shadow: 0 1px 8px 5px rgba(0, 0, 0, 0.15);
-    }
-    .alert-text {
-      width: 100%;
-      padding: 0 1em;
-      margin-bottom: 0.5em;
-      box-sizing: border-box;
-      font-size: 1.5em;
-    }
-
-    .divider-bar {
-      height: 0;
-      width:  calc(100% - 4em);
-      margin: 0 2em;
-      border-bottom: 2px solid;
-
-    }
-
-    .alert-btn-container {
-      width: 100%;
-      margin: 1em 0;
-      display: flex;
-      justify-content: center;
-    }
-
-    .alert-btn-container > * {
-      font-size: 1.5em;
-      color: #21a3fa;
-    }
-
-      .alert-btn {
-        background-color: white;
-        border: 0px;
-        
-      }
-
   text, p {
     font-family: Arial;
   }

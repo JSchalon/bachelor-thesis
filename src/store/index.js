@@ -18,6 +18,8 @@ export default createStore({
     ghostPos: {x: 0, y: 0},
     ghostActive: false,
     selectedSigns: [],
+    gridSelected: [],
+    cloudAlert: "",
     contextActive: false,
     multiselectActive: false, 
       //first sign is a dummy sign:
@@ -35,6 +37,8 @@ export default createStore({
     language: "eng", 
     showHelpLines: true,
     showScoreDescription: false,
+    isPhone: false,
+    isTablet: false,
     //converters, used for converting body part signs between js-obj and xml
     limbNames: {Head: "neck", Shoulder: "arm", Elbow: "upper_arm", Wrist: "lower_arm", Hip: "leg", Knee: "thigh", Ankle: "lower_leg"},
     fingerNames: ["thumb","indexFinger","middleFinger","ringFinger","littleFinger"],
@@ -90,6 +94,12 @@ export default createStore({
     removeFromSelectedSigns (state, index) {
       state["selectedSigns"].splice(state["selectedSigns"].indexOf(index));
       state["signs"][index].isSelected = false;
+    },
+    clearGridSelect (state) {
+      state["gridSelected"] = [];
+    },
+    addToGridSelect (state, obj) {
+      state["gridSelected"].push(obj);
     },
     changeContextMenu (state, bool) {
       state["contextActive"] = bool;
@@ -517,6 +527,15 @@ export default createStore({
       let newCookie = {seenIntro: state["seenIntro"], language: state["language"], showHelpLines: state["showHelpLines"], showScoreDescription: state["showScoreDescription"]};
       document.cookie = "settings=" + JSON.stringify(newCookie) + "; expires=" + d.toUTCString() + "; path=/";
     },
+    setIsPhone (state, bool) {
+      state["isPhone"] = bool;
+    },
+    setIsTablet (state, bool) {
+      state["isTablet"] = bool;
+    },
+    setCloudAlert (state, str) {
+      state["cloudAlert"] = str;
+    },
     editScoreParameters (state, data) {
       if ("author" in data) {
         state["author"] = data.author;
@@ -935,6 +954,12 @@ export default createStore({
     removeFromSelectedSigns (context, index) {
       context.commit("removeFromSelectedSigns", index);
     },
+    clearGridSelect (context) {
+      context.commit("clearGridSelect");
+    },
+    addToGridSelect (context, obj) {
+      context.commit("addToGridSelect", obj);
+    },
     changeContextMenu (context, bool) {
       context.commit("changeContextMenu", bool);
     },
@@ -980,6 +1005,15 @@ export default createStore({
       context.commit("setSelectedColumn", false);
       context.commit("saveScoreToLocalStorage");
     },
+    setIsPhone (context, bool) {
+      context.commit("setIsPhone", bool);
+    },
+    setIsTablet (context, bool) {
+      context.commit("setIsTablet", bool);
+    },
+    setCloudAlert (context, str) {
+      context.commit("setCloudAlert", str);
+    }
   },
   modules: {
   }

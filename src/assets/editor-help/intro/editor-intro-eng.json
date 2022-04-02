@@ -1,0 +1,94 @@
+{ 
+  "breakPoints": {"0": 1, "1": 1, "2": 4, "6": 4},
+  "introData": [
+    {
+      "title": "The Options Menu",
+      "text": "The options menu is used to create, import and export scores, edit signs as well as adjust score and editor settings.",
+      "buttonText": "Next Interface Element",
+      "position": {"x": 0, "y": 0},
+      "highlightID": "options-menu",
+      "highlightElem": "optionsMenu"
+    },
+    {
+      "title": "The Sign Library",
+      "text": "The sign library is used to place signs on the score. You can click a category to open it and then click a desired sign to display its name in the “Current Selected Sign” box. <br><br>To place a sign, click and drag it over the score. To abort placing the sign, drag it back into the sign library.",
+      "textTablet": "The sign library is used to place signs on the score. You can tap on a category to open it and then tap on a desired sign to display its name in the “Current Selected Sign” box. <br><br>To place a sign, tap and drag it over the score. To abort placing the sign, drag it back into the sign library.",
+      "buttonText": "Next Interface Element",
+      "position": {"x": 0, "y": 0},
+      "highlightID": "library",
+      "highlightElem": "signLibrary"
+    },
+    {
+      "title": "The Score - Moving and Resizing",
+      "text": "After placing a sign it can be moved by clicking it and then dragging it around. Signs will automatically snap to a column and a beat after letting go.<br><br>To resize a sign, click on it to select it. If it is resizable, two resize handles will appear which can be used to change its size.",
+      "textTablet": "After placing a sign it can be moved by tapping on it and then dragging it around. Signs will automatically snap to a column and a beat after letting go.<br><br>To resize a sign, tap on it to select it. If it is resizable, two resize handles will appear which can be used to change its size.",
+      "buttonText": "Next",
+      "position": {"x": 0, "y": 0},
+      "highlightID": "canvas",
+      "highlightElem": "score"
+    },
+    {
+      "title": "The Score - Selection Box",
+      "text": "To select multiple signs at once, click on an empty place on the score and drag. This will create a selection box. Stop dragging to confirm the selection. All signs within the box at that time will be selected.",
+      "textTablet": "To select multiple signs at once, tap on an empty place on the score and drag. This will create a selection box. Stop dragging to confirm the selection. All signs within the box will be selected.",
+      "buttonText": "Next",
+      "position": {"x": 0, "y": 0},
+      "highlightID": "canvas",
+      "highlightElem": "score"
+    },
+    {
+      "title": "The Score - Context Menus",
+      "text": "To edit a signs properties after its placement, right-click on it. A context menu with sign-specific settings will appear. To close the menu, click anywhere else on the score.",
+      "textTablet": "The score is used to compose movements.<br><br> To edit a signs properties after its placement, double-tap on it. A context menu with sign-specific settings will appear. To close the menu, tap anywhere else on the score.",
+      "buttonText": "Next",
+      "position": {"x": 0, "y": 0},
+      "highlightID": "canvas",
+      "highlightElem": "score"
+    },
+    {
+      "title": "The Score - Selecting Bars and Columns",
+      "text": "To add or remove a bar, click on it. This will highlight it and cause three buttons to appear. The “+” buttons will add a new bar either below or above the selected bar. The “-” button will remove the selected bar and its signs.<br><br> To select a column instead, click on the same spot again. To unselect a bar or column, click on any other place on the score",
+      "textTablet": "To add or remove a bar, tap on it. This will highlight it and cause three buttons to appear. The “+” buttons will add a new bar either below or above the selected bar. The “-” button will remove the selected bar and its signs.<br><br> To select a column instead, tap on the same spot again. To unselect a bar or column, tap on any other place on the score",
+      "buttonText": "Next Interface Element",
+      "position": {"x": 0, "y": 0},
+      "highlightID": "canvas",
+      "highlightElem": "score"
+    },
+    {
+      "title": "The Interaction Menu",
+      "text": "The interaction menu is used to execute certain operations on the score and its signs.<br><br> The arrows are used to undo and redo actions. Alternatively, the keyboard shortcuts ctrl + z and ctrl + y can be used instead.",
+      "textTablet": "The interaction menu is used to execute certain operations on the score and its signs.<br><br> The arrows are used to undo and redo actions.",
+      "buttonText": "Next",
+      "position": {"x": 0, "y": 0},
+      "highlightID": "interaction-menu",
+      "highlightElem": "interactionMenu"
+    },
+    {
+      "title": "The Interaction Menu - Multi-Select",
+      "text": "The middle icons are selection options. Clicking the “dashed line” icon with the three internal boxes enters the multi-select mode. This enables the selection of multiple signs at once. Alternatively, this can also be achieved by holding ctrl while clicking.",
+      "textTablet": "The middle icons are selection options. Tapping the “dashed line” icon with the three internal boxes enters the multi-select mode. This enables the selection of multiple signs at once. ",
+      "buttonText": "Next",
+      "position": {"x": 0, "y": 0},
+      "highlightID": "interaction-menu",
+      "highlightElem": "interactionMenu"
+    },
+    {
+      "title": "The Interaction Menu - Selection Options",
+      "text": "Hovering on the empty dashed icon opens a dropdown, from which certain selection options can be executed. Alternatively, ctrl + a can be used to select or unselect all and ctrl + i can be used to invert the selection.",
+      "textTablet": "Tapping on the empty dashed icon opens a dropdown, from which certain selection options can be executed.",
+      "buttonText": "Next",
+      "position": {"x": 0, "y": 0},
+      "highlightID": "interaction-menu",
+      "highlightElem": "interactionMenu"
+    },
+    {
+      "title": "The Interaction Menu - Delete",
+      "text": "The last item on the menu is used to delete all currently selected signs. Alternatively, the delete key can be used instead.",
+      "textTablet": "The last item on the menu is used to delete all currently selected signs.",
+      "buttonText": "Finish",
+      "position": {"x": 0, "y": 0},
+      "highlightID": "interaction-menu",
+      "highlightElem": "interactionMenu"
+    }
+  ]
+}

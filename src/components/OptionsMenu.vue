@@ -1,10 +1,10 @@
 <template>
   <div id="options-menu">
     <ul class="options-menu-list" ref="optionsList">
-      <FileMenu :showShortCuts="!(isTablet || isPhone)" @mouseleave="blurFocus()" @requestNewScore="requestNewScore" @requestUpload="requestUpload" @requestScoreDetails="requestScoreDetails"/>
-      <EditMenu :showShortCuts="!(isTablet || isPhone)" @mouseleave="blurFocus()"/>
-      <ViewMenu :showShortCuts="!(isTablet || isPhone)" @mouseleave="blurFocus()"/>
-      <HelpMenu :showShortCuts="!(isTablet || isPhone)" @mouseleave="blurFocus()" @startIntroduction="startIntroduction"/>
+      <FileMenu :showShortCuts="!(isTabletOrPhone)" @mouseleave="blurFocus()" @requestNewScore="requestNewScore" @requestUpload="requestUpload" @requestScoreDetails="requestScoreDetails"/>
+      <EditMenu :showShortCuts="!(isTabletOrPhone)" @mouseleave="blurFocus()"/>
+      <ViewMenu :showShortCuts="!(isTabletOrPhone)" @mouseleave="blurFocus()"/>
+      <HelpMenu :showShortCuts="!(isTabletOrPhone)" @mouseleave="blurFocus()" @startIntroduction="startIntroduction"/>
     </ul>
   </div>
 </template>
@@ -16,8 +16,12 @@
  */
 export default {
     name: 'OptionsMenu',
-    inject: ["isTablet", "isPhone"],
     emits: ["requestNewScore", "requestUpload", "requestScoreDetails", "startIntroduction"],
+    computed: {
+      isTabletOrPhone () {
+        return  (this.$store.state["isPhone"] || this.$store.state["isTablet"]);
+      }
+    },
     methods: {
       blurFocus() {
         document.activeElement.blur();
@@ -34,6 +38,7 @@ export default {
       startIntroduction (which) {
         this.$emit("startIntroduction", which);
       },
+
     }
 }
 </script>

@@ -143,6 +143,7 @@ export default {
   z-index: 1;
   box-sizing: border-box;
   border-right: 1px solid #c1c1c1;
+  background: #f4f4f4;
 }
 #cur-sign-container {
   background-color: #f4f4f4;

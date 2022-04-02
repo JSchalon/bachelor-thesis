@@ -1,8 +1,8 @@
 <laban:score xmlns:laban="http://www.example.org/labanotation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.example.org/labanotation labanotation.xsd">
   <laban:version>0.5</laban:version>
-  <laban:author>Julian Schalon</laban:author>
+  <laban:author></laban:author>
   <laban:title>A blank Score</laban:title>
-  <laban:description>A new score with no signs</laban:description>
+  <laban:description>An empty score with no signs</laban:description>
   <laban:staff>
     <laban:measures>2</laban:measures>
     <laban:timing>

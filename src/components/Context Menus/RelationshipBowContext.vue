@@ -4,7 +4,7 @@
       <RadioOption 
         :options="addressingTypes" 
         :initState="getAddressInitState()"
-        :optionText="'Definition'"
+        :optionText="'Addressing'"
         :active="signData.signType == 'address'"
         @switchState="changeAdressing"
       />

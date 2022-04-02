@@ -4,8 +4,8 @@
     <div class="modal-content">
       <form class="box" id="edit-form">
         
-        <h1 v-if="newScore" class="title">New Score <button class="delete is-large custom-close" aria-label="close" @click="disableModal"><img src="@/assets/images/interaction-menu/x.svg" class="option-img"></button></h1>
-        <h1 v-else class="title">Edit Score Parameters<button class="delete is-large custom-close" aria-label="close" @click="disableModal"><img src="@/assets/images/interaction-menu/x.svg" class="option-img"></button></h1>
+        <h1 v-if="newScore" class="title is-4">New Score <button class="delete is-large custom-close" aria-label="close" @click="disableModal"><img src="@/assets/images/interaction-menu/x.svg" class="option-img"></button></h1>
+        <h1 v-else class="title is-4">Edit Score Parameters<button class="delete is-large custom-close" aria-label="close" @click="disableModal"><img src="@/assets/images/interaction-menu/x.svg" class="option-img"></button></h1>
         <div class="field">
           <label class="label">Author</label>
           <div class="control">

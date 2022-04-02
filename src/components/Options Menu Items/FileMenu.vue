@@ -6,7 +6,7 @@
     <div class="option-box">
       <li class="option-item" @click="requestNewScore()">
         <div class="menu-option-container">
-          <img src="@/assets/images/interaction-menu/blank.svg" class="option-img">
+          <img src="@/assets/images/common/blank-file.svg" class="option-img">
           <p>New Score</p>
         </div>
       </li>
@@ -19,14 +19,14 @@
       </li>
       <li class="option-item">
         <div class="menu-option-container has-sub-menu">
-          <img src="@/assets/images/interaction-menu/blank.svg" class="option-img">
+          <img src="@/assets/images/common/download-cloud.svg" class="option-img">
           <p>Import from Cloud</p>
           <img src="@/assets/images/interaction-menu/triangle-left.svg" class="option-img dropdown">
           <ul class="option-nested sub-menu" tabIndex="0" role="button">
             <div class="option-box sub-menu">
               <li class="option-item" @click="dropboxImport()">
                 <div class="menu-option-container">
-                  <img src="@/assets/images/common/upload-drive.svg" class="option-img">
+                  <img src="@/assets/images/interaction-menu/blank.svg" class="option-img">
                   <p>Dropbox</p>
                 </div>
               </li>
@@ -51,7 +51,7 @@
               </li>
               <li class="option-item" @click="exportSVGDropBox()">
                 <div class="menu-option-container">
-                  <img src="@/assets/images/common/upload-drive.svg" class="option-img">
+                  <img src="@/assets/images/common/upload-cloud.svg" class="option-img">
                   <p>To Dropbox</p>
                 </div>
               </li>
@@ -75,7 +75,7 @@
               </li>
               <li class="option-item" @click="exportXMLDropBox()">
                 <div class="menu-option-container">
-                  <img src="@/assets/images/common/upload-drive.svg" class="option-img">
+                  <img src="@/assets/images/common/upload-cloud.svg" class="option-img">
                   <p>To Dropbox</p>
                 </div>
               </li>
@@ -182,8 +182,17 @@ export default {
         let options = {
           files: [{url: "data:text/html,"+encodeURIComponent(svg), filename: filename}],
           success: function () {
-              // Indicate to the user that the files have been saved.
-          },
+            this.$store.dispatch("setCloudAlert", "export-success");
+            setTimeout(function () {
+              this.$store.dispatch("setCloudAlert", "");
+            }.bind(this), 5000);
+          }.bind(this),
+          cancel: function () {
+            this.$store.dispatch("setCloudAlert", "export-failure");
+            setTimeout(function () {
+              this.$store.dispatch("setCloudAlert", "");
+            }.bind(this), 5000);
+          }.bind(this)
         }
         // disabling eslint temporarily because it identifies "Dropbox" as undefined, 
         // despite the fact that it is defined in the script defined in the mounted-hook
@@ -225,8 +234,18 @@ export default {
         let options = {
           files: [{url: "data:text/html,"+encodeURIComponent(xml), filename: filename}],
           success: function () {
-              // Indicate to the user that the files have been saved.
-          },
+            this.$store.dispatch("setCloudAlert", "export-success");
+            setTimeout(function () {
+              console.log(this.$store)
+              this.$store.dispatch("setCloudAlert", "");
+            }.bind(this), 5000);
+          }.bind(this),
+          cancel: function () {
+            this.$store.dispatch("setCloudAlert", "export-failure");
+            setTimeout(function () {
+              this.$store.dispatch("setCloudAlert", "");
+            }.bind(this), 5000);
+          }.bind(this)
         }
         // disabling eslint temporarily because it identifies "Dropbox" as undefined, 
         // despite the fact that it is defined in the script defined in the mounted-hook
@@ -239,27 +258,35 @@ export default {
       },
       dropboxImport() {
         let options = {
-          success: async files => {
-          let attachments = [];
-          for (let i = 0; i < files.length; i++) {
-            let attachment = {};
-            attachment._id = files[i].id;
-            attachment.title = files[i].name;
-            attachment.size = files[i].bytes;
-            attachment.iconURL = files[i].icon;
-            attachment.link = files[i].link;
-            attachment.extension = `. ${files[i].name.split(".")[1]}`;
-            attachments.push(attachment);
-          }
-          this.tempAttachments = attachments;
-          fetch(this.tempAttachments[0].link)
-            .then(res => res.blob())
-            .then(blob => {
-              this.uploadScore(blob);
-          });
-          },
-
-          cancel: function() {},
+          success: function (files) {
+            this.$store.dispatch("setCloudAlert", "import-success");
+            setTimeout(function () {
+              this.$store.dispatch("setCloudAlert", "");
+            }.bind(this), 5000);
+            let attachments = [];
+            for (let i = 0; i < files.length; i++) {
+              let attachment = {};
+              attachment._id = files[i].id;
+              attachment.title = files[i].name;
+              attachment.size = files[i].bytes;
+              attachment.iconURL = files[i].icon;
+              attachment.link = files[i].link;
+              attachment.extension = `. ${files[i].name.split(".")[1]}`;
+              attachments.push(attachment);
+            }
+            this.tempAttachments = attachments;
+            fetch(this.tempAttachments[0].link)
+              .then(res => res.blob())
+              .then(blob => {
+                this.uploadScore(blob);
+            });
+          }.bind(this),
+          cancel: function () {
+            this.$store.dispatch("setCloudAlert", "import-failure");
+            setTimeout(function () {
+              this.$store.dispatch("setCloudAlert", "");
+            }.bind(this), 5000);
+          }.bind(this),
 
           linkType: "direct",
 

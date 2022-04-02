@@ -1,30 +1,48 @@
 <template>
   <div ref="view" class="is-clipped">
-    <OptionsMenu @requestNewScore="openNewScoreDialog" @requestUpload="uploadScore" @requestScoreDetails="openScoreDetails" @startIntroduction="openIntroduction"/>
-    <SignLibrary @selectSignDrag="selectSignDrag"/>
+    <OptionsMenu :class="{highlighted: tutHighlight == 'optionsMenu'}" @requestNewScore="openNewScoreDialog" @requestUpload="uploadScore" @requestScoreDetails="openScoreDetails" @startIntroduction="openIntroduction"/>
+    <SignLibrary :class="{highlighted: tutHighlight == 'signLibrary'}" @selectSignDrag="selectSignDrag"/>
     <div id="interactionBox">
-      <InteractionMenu/>
-      <Score/>
+      <InteractionMenu :class="{highlighted: tutHighlight == 'interactionMenu'}"/>
+      <Score :class="{highlighted: tutHighlight == 'score'}"/>
     </div>
     <svg v-if="ghostActive" :width="ghostSignData.baseType == 'RelationshipBow' ? this.columnWidth * 2 : signWidth + 3" :height="ghostSignData.beatHeight * minHeight + 3" fill="white" class="ghost-svg" ref="ghost" :style="ghostTransform">
       <g transform="translate(1.5,1.5)">
         <component :is="ghostSignData.baseType" :isSelected="true" :height="ghostSignData.beatHeight * minHeight" :signData="ghostSignData" :class="ghostOverCanvas ? 'over-canvas' : ''"/>
       </g>
     </svg>
-    <ScoreEditModal :modalActive="modalActive" :newScore="newScore" :beatsPerBarDisabled="beatsPerBarDisabled" @disableModal="modalActive=false;newScore=false;" @checkBeatsPerBar="changeBeatsPerBarDisabled" @formSubmit="updateScore"/>
-    <ConfirmationModal :modalActive="confirmationModal" @disableModal="confirmationModal=false;newScore=false;" @confirm="makeNewScore">
-    </ConfirmationModal>
-    <ConfirmationModal :modalActive="uploadConfirm" @disableModal="uploadConfirm=false;this.curFile=null" @confirm="confirmUploadScore">
-      <template v-slot:title>Confirm importing Score</template>
-      <template v-slot:text>Importing a score will delete the current score, including any unsaved changes. This action is currently not reversible.</template>
-    </ConfirmationModal>
-    <div class="desc-box">
+    <div class="desc-box" :class="{highlighted: tutHighlight == 'score'}">
       <div class="box" v-if="storeDescActive">
         <h4 class="title is-5">Score Description <button class="delete is-large custom-close" aria-label="close" @click="this.$store.dispatch('changeSettings', {showScoreDescription: !storeDescActive});"><img src="@/assets/images/interaction-menu/x.svg" class="option-img"></button></h4>
         <p>{{$store.state["description"]}}</p>
       </div>
       <button v-else class="button has-background-white is-size-5 has-text-info" @click="this.$store.dispatch('changeSettings', {showScoreDescription: !storeDescActive});">!</button>
     </div>
+    <div class="highlight-overlay" :class="{active: tutHighlight != ''}"/>
+
+    <ScoreEditModal :modalActive="modalActive" :newScore="newScore" :beatsPerBarDisabled="beatsPerBarDisabled" @disableModal="modalActive=false;newScore=false;" @checkBeatsPerBar="changeBeatsPerBarDisabled" @formSubmit="updateScore"/>
+
+    <ConfirmationModal :modalActive="confirmationModal" @disableModal="confirmationModal=false;newScore=false;" @confirm="makeNewScore">
+    </ConfirmationModal>
+
+    <ConfirmationModal :modalActive="uploadConfirm" @disableModal="uploadConfirm=false;this.curFile=null" @confirm="confirmUploadScore">
+      <template v-slot:title>Confirm importing Score</template>
+      <template v-slot:text>Importing a score will delete the current score, including any unsaved changes. This action is currently not reversible.</template>
+    </ConfirmationModal>
+    
+    
+    <ConfirmationModal :modalActive="$store.state['isPhone']" :cancel="false" @confirm="phoneDone()">
+      <template v-slot:title>Small screen detected</template>
+      <template v-slot:text>We recommend using a Tablet or PC to use this editor. Using a smaller screen, like a smartphone is possible, but not advised.</template>
+    </ConfirmationModal>
+    <div class="is-justify-content-center is-flex alert-box-container" v-if="showCloudAlert != ''">
+      <div class="box has-background-primary-light has-text-primary-dark" v-if="showCloudAlert == 'import-success'">Successfully imported score from cloud service.</div>
+      <div class="box has-background-danger-light has-text-danger-dark" v-if="showCloudAlert == 'import-failure'">Could not import score from cloud service, please try again.</div>
+      <div class="box has-background-primary-light has-text-primary-dark" v-if="showCloudAlert == 'export-success'">Successfully exported file to cloud service.</div>
+      <div class="box has-background-danger-light has-text-danger-dark" v-if="showCloudAlert == 'export-failure'">Could not export file to cloud service, please try again.</div>
+    </div>
+    <EditorExplainModal :modalActive="showFirstIntro" @disableModal="firstIntroDone(false)" @startLabanIntro="firstIntroDone(true); openIntroduction('labanBasic')" @startEditorIntro="firstIntroDone(true); openIntroduction('editor')"/>
+    <IntroductionModal :modalActive="tutActive" :intro="intro" @disableModal="tutHighlight='';intro='';tutActive=false" @switchHighlight="changeTutHighlight"/>
   </div>
 </template>
 
@@ -50,6 +68,9 @@ export default {
       confirmationModal: false,
       newScoreData: null,
       uploadConfirm: false,
+      tutHighlight: "",
+      showFirstIntro: false,
+      intro: 'intro/editor-intro-',
     };
   },
   computed: {
@@ -83,6 +104,9 @@ export default {
     },
     storeDescActive () {
       return this.$store.state['showScoreDescription'];
+    },
+    showCloudAlert () {
+      return this.$store.state['cloudAlert'];
     }
   },
   mounted () {
@@ -93,9 +117,13 @@ export default {
     } else {
       this.$store.dispatch("newScore", "blank-score");
       this.$store.dispatch("clearHistory");
-      this.newScore = true;
-      this.modalActive = true;
-      
+      if (!this.$store.state['isPhone'] && this.$store.state['seenIntro']) {
+        this.newScore = true;
+        this.modalActive = true;
+      } 
+    }
+    if (!this.$store.state['isPhone'] && !this.$store.state['seenIntro']) {
+      this.showFirstIntro = true;
     }
     window.addEventListener('keydown', function (e) {
       if (e.key == "Escape") {
@@ -103,6 +131,10 @@ export default {
         this.newScore = false;
         this.confirmationModal = false;
         this.uploadConfirm = false;
+        this.showFirstIntro = false;
+        this.tutActive = false;
+        this.tutHighlight='';
+        this.intro='';
       }
     }.bind(this));
   },
@@ -126,7 +158,6 @@ export default {
           } else if ((!xInCanvas || !yInCanvas) && this.ghostOverCanvas) {
             this.$store.dispatch("setGhostOverCanvas", false);
           }
-          
         }
         //if x && y in canvas -> set libSignOverCanvas = true -> score handles interaction there 
         // if not x && y in canvas -> set libSignOverCanvas = false -> score handles interaction there
@@ -153,7 +184,6 @@ export default {
     },
     uploadScore (file) {
       if (file == "error") {
-        console.log("error")
         return;
       }
       if (this.signs.length > 1) {
@@ -172,7 +202,34 @@ export default {
       this.modalActive = true;
     },
     openIntroduction (which) {
-      console.log("open intro " + which);
+      if (which == "editor") {
+        this.tutHighlight = "optionsMenu";
+        this.intro = 'intro/editor-intro-';
+      } else if (which == "labanBasic") {
+        this.tutHighlight = "score";
+        this.intro = 'laban/laban-basic-';
+      } else {
+        console.log(which);
+      }
+      this.tutActive = true;
+    },
+    phoneDone () {
+      this.$store.dispatch('setIsPhone', false); 
+      if (!this.$store.state['seenIntro']) {
+        this.showFirstIntro = true;
+      }
+    },
+    firstIntroDone (introActive) {
+      this.$store.dispatch('changeSettings', {seenIntro: true}); 
+      this.showFirstIntro = false;
+      if (!introActive) {
+        this.modalActive = true;
+        this.newScore = true;
+      }
+    },
+    changeTutHighlight(str) {
+      console.log("here")
+      this.tutHighlight = str;
     },
     updateScore (data) {
       if (this.newScore) {
@@ -432,4 +489,47 @@ export default {
 html {
   overflow: hidden;
 }
+
+.highlighted {
+  z-index: 1001!important;
+  position: relative;
+}
+.desc-box.highlighted {
+  position: absolute;
+}
+
+.highlight-overlay {
+  z-index: 999;
+  width: 100%;
+  height: 100%;
+  display: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  background: rgba(0, 0, 0, .4);
+}
+
+.highlight-overlay.active {
+  display: block;
+}
+
+.alert-box-container {
+  position: absolute;
+  top: 1em;
+  left: 0;
+  z-index: 11;
+  width: 100%;
+}
+
+.nav-dot {
+  border-radius: 100%;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+}
+
+.tut-highlight {
+  border: 3px solid #ecbc1e!important;
+}
+
 </style>

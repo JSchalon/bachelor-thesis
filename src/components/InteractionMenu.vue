@@ -1,5 +1,5 @@
 <template>
-  <div id="menu">
+  <div id="interaction-menu">
     <ul class="interaction-menu-list">
       <li :class="undoPossible ? 'active':'inactive'" class="option-item" @click="undo()">
         <img src="@/assets/images/interaction-menu/undo-arrow.svg" class="option-img">
@@ -39,7 +39,6 @@
    */
   export default {
     name: 'InteractionMenu',
-    inject: ["isTablet", "isPhone"],
     data() {
       return {
         curSign: "---"
@@ -126,7 +125,7 @@
 
 
 <style scoped>
-#menu {
+#interaction-menu {
   width: 100%;
   height: 5vh;
   min-height: 38px;

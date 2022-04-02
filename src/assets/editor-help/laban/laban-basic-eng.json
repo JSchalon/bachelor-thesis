@@ -1,0 +1,93 @@
+{ 
+  "breakPoints": {"0": 4, "4": 7},
+  "introData": [
+    {
+      "title": "The Score - Basics",
+      "text": "In Labanotation, the score is used to note movements. It is read from bottom to top. Full horizontal lines define a bar, while shorter lines define a beat. Vertically, the score is split into columns that define the movement of a body part.",
+      "buttonText": "Next",
+      "position": {"x": 0, "y": 0},
+      "highlightID": "canvas",
+      "highlightElem": "score"
+    },
+    {
+      "title": "The Score - Important Lines",
+      "text": "The double line at the bottom defines the start of the movement. Below that the starting position before the movement is defined. The vertical middle line on the inner score separates movements of the left and right sides of the body.",
+      "buttonText": "Next",
+      "position": {"x": 0, "y": 0},
+      "highlightID": "canvas",
+      "highlightElem": "score"
+    },
+    {
+      "title": "The Score - The support Columns",
+      "text": "The first columns on either side of the center line are called the support columns. They indicate where the weight is placed on that respective side of the body. <br><br> If no sign is placed in this column at a given time, that side is not currently supported, with both columns being empty indicating a jump or fall.",
+      "buttonText": "Next",
+      "position": {"x": 0, "y": 0},
+      "highlightID": "canvas",
+      "highlightElem": "score"
+    },
+    {
+      "title": "The Score - Further Columns",
+      "text": "Beyond the inner score, defined by the black box, further columns can be placed, indicated by dotted lines in this editor. <br><br>Traditionally, the second column on either side is used for leg movements, the third for body movements and the fourth for the arms, with the fifth right-sided column being the “head” column. However, further columns can be defined with body part signs in between.",
+      "buttonText": "To the library",
+      "position": {"x": 0, "y": 0},
+      "highlightID": "canvas",
+      "highlightElem": "score"
+    },
+    {
+      "title": "Direction Signs",
+      "text": "To describe a movement in a specific direction, direction signs are used. They come in 9 variations which define the horizontal direction.<br><br>The vertical direction is defined by the inner pattern. To indicate a downwards direction, the sign is filled black. To indicate a purely horizontal direction, a dot is placed in the middle. An upwards direction is defined by diagonal lines.",
+      "buttonText": "Next",
+      "position": {"x": 0, "y": 0},
+      "highlightID": "library",
+      "highlightElem": "signLibrary"
+    },
+    {
+      "title": "Turn Signs",
+      "text": "Turn signs describe a turn in a given direction. There are signs for left or right turns, as well as a turn in any direction.<br><br>The degree of a turn can either be described by a relationship pin or a space measurement sign.",
+      "buttonText": "Next",
+      "position": {"x": 0, "y": 0},
+      "highlightID": "library",
+      "highlightElem": "signLibrary"
+    },
+    {
+      "title": "Relationship Bows",
+      "text": "Relationship bows are used to describe the relationship between two body parts or objects. They can define touching, addressing, being near and supporting. Rather than being resized vertically, they span multiple columns.",
+      "buttonText": "Next",
+      "position": {"x": 0, "y": 0},
+      "highlightID": "library",
+      "highlightElem": "signLibrary"
+    },
+    {
+      "title": "Space Measurement Signs",
+      "text": "Space measurement signs define flexion and extension of a body part. Alternatively, they can change the execution of a following movement, or the degree of a turn. There are five types, each with six degrees of strength. The types are narrow, wide, joining, spreading, and folding. <br><br>Additionally, the unfolding and neither-bent-nor-streched signs are used to cancel the other signs.",
+      "buttonText": "Next",
+      "position": {"x": 0, "y": 0},
+      "highlightID": "library",
+      "highlightElem": "signLibrary"
+    },
+    {
+      "title": "Path Signs",
+      "text": "Path signs are used to indicate a general movement in a direction. There are a straight path, left and right circular paths, as well as an undefined path.<br><br>Path signs are placed on the right side of the score, beyond the right-most column.",
+      "buttonText": "Next",
+      "position": {"x": 0, "y": 0},
+      "highlightID": "library",
+      "highlightElem": "signLibrary"
+    },
+    {
+      "title": "Body Part Signs",
+      "text": "Body part signs define a specific joint, limb, finger, toe or surface. They are either placed below a column, to indicate that all movements in said column apply to that body part, or placed below another sign to indicate that only that specific movement is done by said body part.",
+      "buttonText": "Next",
+      "position": {"x": 0, "y": 0},
+      "highlightID": "library",
+      "highlightElem": "signLibrary"
+    },
+    {
+      "title": "Miscellaneous Signs",
+      "text": "Signs that do not fit into another menu are placed in the miscellaneous category.<br><br>Room direction signs are used to indicate the body orientation in the room at a given time. They are placed beyond the left-most column.<br><br>The back-to-normal and release contact signs are used to cancel relationship bows and space measurement signs.<br><br>The vibration sign defines an oscillating motion.",
+      "buttonText": "Next",
+      "position": {"x": 0, "y": 0},
+      "highlightID": "library",
+      "highlightElem": "signLibrary"
+    }
+  ]
+}
