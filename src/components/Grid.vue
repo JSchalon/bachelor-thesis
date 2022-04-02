@@ -88,6 +88,9 @@ export default {
     },
     showHelpLines(){
       return this.$store.state["showHelpLines"];
+    },
+    gridSelection() {
+      return this.$store.state["gridSelected"];
     }
   },
   watch: {
@@ -110,12 +113,69 @@ export default {
       //if a column is added/removed, the highlighted column has to be changed
       //without a timeout, this does not work properly
       setTimeout(function () {this.barHighlightAfterAddRemove()}.bind(this), 1);
+    },
+    selectedColumn(value) {
+      if (value === false ) {
+        this.highlight();
+        this.$emit("removeGridHandles");
+        this.barSelected = false;
+        this.colSelected = false;
+      }
+    },
+    selectedBar(value) {
+      if (value === false ) {
+        this.highlight();
+        this.$emit("removeGridHandles");
+        this.barSelected = false;
+        this.colSelected = false;
+      }
+    },
+    gridSelection: {
+      deep: true,
+      handler(value) {
+        if (value == []) {
+          this.highlight();
+        } else {
+          this.$emit("removeGridHandles");
+          if (value.length == 1) {
+            if ("col" in value[0]) {
+              let col = value[0].col;
+              if ("selectBar" in value[0] && value[0].selectBar == true && "bar" in value[0]) {
+                let bar = value[0].bar;
+                const parent = this.$refs.grid.querySelector("#grid-column" + col);
+                this.$emit("getGridHandles", {type: "bar", x: parent.querySelector(".beat-rect.ba" + bar).getBoundingClientRect().x, y: parent.querySelector(".beat-rect.ba" + bar).getBoundingClientRect().y});
+                this.highlight(false, bar);
+              } else if ("selectCol" in value[0] && value[0].selectCol == true ) {
+                const parent = this.$refs.grid.querySelector("#grid-column" + col);
+                this.$emit("getGridHandles", {type: "col", x: parent.getBoundingClientRect().x, y: parent.getBoundingClientRect().y});
+                this.highlight(col);
+              }
+            }
+          } else {
+            this.highlight();
+            for (const elem of value) {
+              let col = false;
+              let bar = -2;
+              let beat = -1;
+              if ("col" in elem) {
+                col = elem.col;
+              }
+              if ("bar" in elem) {
+                bar = elem.bar;
+              }
+              if ("beat" in elem) {
+                beat = elem.beeat;
+              }
+              this.highlight(col, bar, beat, true, true);
+            }
+          }
+        }
+      }
     }
   },
   mounted () {
     interact(".beat-rect").on("tap", this.click);
     interact(".grid-line").on("tap", this.lineClick);
-    interact(".beat-rect").on("doubletap", this.doubleClick);
     interact(".lasso-able").draggable({
       inertia: false,
       autoScroll: false,
@@ -134,66 +194,64 @@ export default {
       if (!(this.selectedColumn === false)) {
         this.highlight();
         if (this.selectedColumn < -this.columnsLeft) {
-          this.highlightCol(this.selectedColumn + 1, true);
+          this.highlight(this.selectedColumn + 1);
+          const newHighlight = this.$refs.grid.querySelector("#grid-column" + (this.selectedColumn + 1));
+          this.$emit("getGridHandles", {type: "col", x: newHighlight.getBoundingClientRect().x, y: newHighlight.getBoundingClientRect().y});
         } else if (this.selectedColumn > this.columnsRight) {
-          
-          this.highlightCol(this.selectedColumn - 1, true);
+          this.highlight(this.selectedColumn - 1);
+          const newHighlight = this.$refs.grid.querySelector("#grid-column" + (this.selectedColumn - 1));
+          this.$emit("getGridHandles", {type: "col", x: newHighlight.getBoundingClientRect().x, y: newHighlight.getBoundingClientRect().y});
         } else {
-          this.highlightCol(this.selectedColumn, true);
+          this.highlight(this.selectedColumn);
+          const newHighlight = this.$refs.grid.querySelector("#grid-column" + this.selectedColumn);
+          this.$emit("getGridHandles", {type: "col", x: newHighlight.getBoundingClientRect().x, y: newHighlight.getBoundingClientRect().y});
         }
       } else {
         this.highlight();
-        this.$emit("removeGridHandles")
+        this.$emit("removeGridHandles");
       }
     },
     barHighlightAfterAddRemove() {
       if (!(this.selectedBar === false)) {
-        this.highlight(this.selectedBar);
+        this.highlight(false, this.selectedBar);
       } else {
         this.highlight();
-        this.$emit("removeGridHandles")
+        this.$emit("removeGridHandles");
       }
     },
     /**
      * When the grid is clicked -> unselect all signs
      */
     click (event) {
-      if (event.button == 2 || event.double || this.contextActive || this.signsSelected) {
+      if (event.button == 2 || this.contextActive || this.signsSelected) {
         this.$emit("unselect");
         this.$emit("removeGridHandles")
         this.highlight();
       } else if (event.button == 0){
-        if (event.target.parentElement.classList.contains("highlighted")) {
-          this.highlightCol(parseInt(event.target.getAttribute("col")), false);
-        } else {
+        if (this.colSelected === false && this.barSelected === false && parseInt(event.target.getAttribute("bar")) > -1) {
           this.$emit("removeGridHandles");
-          this.$emit("selectColumn", parseInt(event.target.getAttribute("col")));
-          this.highlightCol(parseInt(event.target.getAttribute("col")), true);
-        }
-        if (this.barSelected) {
-          this.barSelected = false;
-        }
-      }
-    },
-    doubleClick (event) {
-      if (event.button == 0) {
-        if (this.barSelected) {
-          this.highlight();
-          this.barSelected = false;
-          this.$emit("removeGridHandles");
-        } else {
-          this.highlightCol(parseInt(event.target.getAttribute("col")), false);
-          this.highlight(parseInt(event.target.getAttribute("bar")));
+          this.highlight(false, parseInt(event.target.getAttribute("bar")));
+          this.barSelected = parseInt(event.target.getAttribute("bar"));
           this.$emit("selectBar", parseInt(event.target.getAttribute("bar")));
-          if (parseInt(event.target.getAttribute("bar")) > -1) {
-            this.$emit("getGridHandles", {type: "bar", x: event.target.getBoundingClientRect().x, y: event.target.parentElement.querySelector(".beat-rect.ba" + event.target.getAttribute("bar")).getBoundingClientRect().y});
-          }
-          this.barSelected = true;
+          this.$emit("getGridHandles", {type: "bar", x: event.target.getBoundingClientRect().x, y: event.target.parentElement.querySelector(".beat-rect.ba" + event.target.getAttribute("bar")).getBoundingClientRect().y});
+        } else if (this.colSelected === false && this.barSelected == parseInt(event.target.getAttribute("bar")) && this.barSelected !== false) {
+           this.highlight(parseInt(event.target.getAttribute("col")));
+           this.colSelected = parseInt(event.target.getAttribute("col"));
+           this.$emit("removeGridHandles");
+           this.$emit("selectColumn", parseInt(event.target.getAttribute("col")));
+           this.$emit("getGridHandles", {type: "col", x: event.target.parentElement.getBoundingClientRect().x, y: event.target.parentElement.getBoundingClientRect().y});
+        } else {
+          this.barSelected = false;
+          this.colSelected = false;
+          this.highlight();
+          this.$emit("removeGridHandles");
         }
       }
     },
     lineClick () {
       this.$emit("unselect");
+      this.colSelected = false;
+      this.barSelected = false;
     },
     /**
      * Calculates the bar of a grid rect based on its' index
@@ -210,45 +268,50 @@ export default {
       return (this.totalBeats - nr) % this.beats;
     },
     /**
-     * Highlights all rects in the specified column
-     * @arg column the the column 
-     */
-    highlightCol (column, highlight) {
-      
-      let elem = this.$refs.grid.querySelector("#grid-column" + column);
-      let isHighlighted = elem.classList.contains("highlighted");
-      this.highlight();
-      if (highlight) {
-        if (!isHighlighted) {
-          elem.classList.toggle("highlighted");
-          this.$emit("getGridHandles", {type: "col", x: elem.getBoundingClientRect().x, y: elem.getBoundingClientRect().y});
-        }
-      } else {
-        elem.classList.remove("highlighted");
-        this.$emit("removeGridHandles");
-      }
-    },
-    /**
      * Highlights all width the specified beat and or bar
+     * @arg col the column to highlight, optional
      * @arg bar the bar to highlight, optional
      * @arg beat the bar to highlight, optional
+     * @arg multi if true, the selection does not get reset before (allows multi-selection)
+     * @arg green if true, changes the selection color to green (used when placing a sign)
      */
-    highlight (bar = -1, beat = -1) {
+    highlight (col = false, bar = -2, beat = -1, multi = false, green = false) {
+      if (!multi) {
+        for (let elem of this.$refs.grid.querySelectorAll(".highlighted")) {
+          elem.classList.remove("highlighted");
+          elem.classList.remove("green");
+        }
+      }
       let highl = "";
-      if (bar >= 0) {
+      if (bar >= -1) {
         highl = highl + ".ba" + bar;
       }
-      if (beat >= 0) {
+      if (beat >= 0 && this.beats > beat) {
         highl = highl + ".be" + beat;
       }
       if (highl != "") {
         let elems = this.$refs.grid.querySelectorAll(highl);
+        if (col !== false && typeof col == "number") {
+          elems = this.$refs.grid.querySelector("#grid-column" + col).querySelectorAll(highl);
+        }
         for (let el of elems) {
-          el.classList.toggle("highlighted");
+          el.classList.add("highlighted");
+          if (green) {
+            el.classList.add("green");
+          }
+        }
+      } else if (col !== false) {
+        let elems = this.$refs.grid.querySelector("#grid-column" + col).children;
+        for (let el of elems) {
+          el.classList.add("highlighted");
+          if (green) {
+            el.classList.add("green");
+          }
         }
       } else {
         for (let elem of this.$refs.grid.querySelectorAll(".highlighted")) {
           elem.classList.remove("highlighted");
+          elem.classList.remove("green");
         }
       }
     },
@@ -352,6 +415,10 @@ export default {
   }
 
   .highlighted {
-    fill: #ecbc1e;
+    fill: #84badb;
+  }
+
+  .highlighted.green {
+    fill: #94d481;
   }
 </style>

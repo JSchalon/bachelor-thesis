@@ -77,20 +77,20 @@
       </li>
       <li class="option-item spacer"/>
       <li class="option-item">
-        <router-link to="/imprint">
+        <a href="https://www.itm.uni-luebeck.de/service/imprint.html" target="blank">
           <div class="menu-option-container">
             <img src="@/assets/images/interaction-menu/blank.svg" class="option-img">
             <p>Imprint</p>
           </div>
-        </router-link>
+        </a>
       </li>
       <li class="option-item">
-        <router-link to="/data">
+        <a href="https://www.itm.uni-luebeck.de/service/datenschutzerkaerung.html" target="blank">
           <div class="menu-option-container">
             <img src="@/assets/images/interaction-menu/blank.svg" class="option-img">
             <p>Privacy Policy</p>
           </div>
-        </router-link>
+        </a>
       </li>
     </div>
   </ul>

@@ -32,7 +32,7 @@ export default {
       signWidth: 40,
       barHeight: this.barHeight,
       startBarOffset: 5,
-      columnWidth: 80,
+      columnWidth: 70,
       beatLineWidth: 25,
       addRemoveHeight: 40,
       addRemoveWidth: 10,

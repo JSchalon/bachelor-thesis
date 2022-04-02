@@ -11,7 +11,8 @@ Git Repo zur Bachelorarbeit zur Entwicklung eines webbasierten Interaktionsedito
 
 ## Versions
 
-### Version 0.6.0
-- Mostly implemented laban/editor introductions (missing proper placement)
-- Added more modals
+### Version 0.6.1
+- Redid bar/column selection
+- Added grid selection via state
+- Added repositioning to introductions
 - Fixed some bugs

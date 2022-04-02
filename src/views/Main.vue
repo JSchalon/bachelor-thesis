@@ -8,7 +8,7 @@
     </div>
     <svg v-if="ghostActive" :width="ghostSignData.baseType == 'RelationshipBow' ? this.columnWidth * 2 : signWidth + 3" :height="ghostSignData.beatHeight * minHeight + 3" fill="white" class="ghost-svg" ref="ghost" :style="ghostTransform">
       <g transform="translate(1.5,1.5)">
-        <component :is="ghostSignData.baseType" :isSelected="true" :height="ghostSignData.beatHeight * minHeight" :signData="ghostSignData" :class="ghostOverCanvas ? 'over-canvas' : ''"/>
+        <component :is="ghostSignData.baseType" :isSelected="false" :height="ghostSignData.beatHeight * minHeight" :signData="ghostSignData" :class="ghostOverCanvas ? 'over-canvas' : ''"/>
       </g>
     </svg>
     <div class="desc-box" :class="{highlighted: tutHighlight == 'score'}">
@@ -145,17 +145,18 @@ export default {
         this.$store.dispatch("setGhostActive", true);
         this.ghostSignData = this.libSign;
         this.$store.dispatch("setGhostPos", {x: Math.round(data.pos.x), y: Math.round(data.pos.y)});
+        
       } else if (data.type == "move") {
         this.$store.dispatch("setGhostPos", {x: this.ghostPos.x + data.delta.x, y: this.ghostPos.y + data.delta.y});
         if (this.$refs.ghost) {
-          
           const rect = this.$refs.ghost.getBoundingClientRect();
           const canvasRect = document.getElementById("canvas").getBoundingClientRect();
+          const xInLibrary = document.getElementById("library").getBoundingClientRect().width >= rect.x;
           const xInCanvas = ((rect.x + rect.width >= canvasRect.x && rect.x <= canvasRect.x + canvasRect.width));
           const yInCanvas = (rect.y + rect.height >= canvasRect.y&& rect.y <= canvasRect.y + canvasRect.height);
-          if (xInCanvas && yInCanvas && !this.ghostOverCanvas) {
+          if (xInCanvas && yInCanvas && !this.ghostOverCanvas && !xInLibrary) {
             this.$store.dispatch("setGhostOverCanvas", true);
-          } else if ((!xInCanvas || !yInCanvas) && this.ghostOverCanvas) {
+          } else if ((!xInCanvas || !yInCanvas || xInLibrary) && this.ghostOverCanvas) {
             this.$store.dispatch("setGhostOverCanvas", false);
           }
         }
@@ -228,7 +229,6 @@ export default {
       }
     },
     changeTutHighlight(str) {
-      console.log("here")
       this.tutHighlight = str;
     },
     updateScore (data) {
@@ -270,7 +270,7 @@ export default {
     z-index: 1001;
   }
   .over-canvas .draggable {
-    stroke: #f1c232!important;
+    stroke: #5e9fc7!important;
   }
 
   .option-item, .option-divider {
@@ -529,7 +529,7 @@ html {
 }
 
 .tut-highlight {
-  border: 3px solid #ecbc1e!important;
+  border: 3px solid #5e9fc7!important;
 }
 
 </style>

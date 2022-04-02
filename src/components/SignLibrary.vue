@@ -104,7 +104,20 @@ export default {
       const obj = JSON.parse(JSON.stringify(json));
       const nameElem = obj.names.find(elem => this.signs[catIndex][index].signData.signType == elem.signType);
       this.updateCurSign({catIndex: catIndex, index: index, name: nameElem.name, signData: this.signs[catIndex][index].signData, updateSign: true});
-      this.$emit("selectSignDrag", {type: "start", pos: {x: event.target.firstChild.getBoundingClientRect().x, y: event.target.firstChild.getBoundingClientRect().y}})
+      this.$emit("selectSignDrag", {type: "start", pos: {x: event.target.firstChild.getBoundingClientRect().x, y: event.target.firstChild.getBoundingClientRect().y}});
+      if (this.signs[catIndex][index].signData.baseType == "RoomDirectionSign") {
+        this.$store.dispatch("addToGridSelect", {col: -this.$store.state["columnsLeft"] - 1});
+      } else if (this.signs[catIndex][index].signData.baseType == "PathSign") {
+        this.$store.dispatch("addToGridSelect", {col: this.$store.state["columnsRight"]});
+      } else if (this.signs[catIndex][index].signData.baseType == "BodyPartSign") {
+        for (let col = -this.$store.state["columnsLeft"]; col < this.$store.state["columnsRight"]; col++) {
+          this.$store.dispatch("addToGridSelect", {col: col, bar: -1, beat: 0});
+        }
+      } else {
+        for (let col = -this.$store.state["columnsLeft"]; col < this.$store.state["columnsRight"]; col++) {
+          this.$store.dispatch("addToGridSelect", {col: col});
+        }
+      }
     },
 
     selectSignMove (event) {
@@ -116,6 +129,7 @@ export default {
       const index = parseInt(event.target.getAttribute("index"));
       this.updateCurSign({catIndex: catIndex, index: index, name: this.categories[catIndex].category, signData: this.signs[catIndex][index].signData});
       this.$emit("selectSignDrag", {type: "end"});
+      this.$store.dispatch("clearGridSelect");
     },
   },
   watch: {

@@ -681,6 +681,7 @@ export default {
       if (event.key == "e") {
         console.log(this.signs)
         console.log(this.xmlScore);
+        this.$store.dispatch("addToGridSelect", {col: 1, bar: 1, selectCol: true});
         return;
       }
       if ((event.key == "s" || event.key == "p") && (event.ctrlKey || event.metaKey )) {
@@ -1522,6 +1523,7 @@ svg text {
   align-items: center;
   transform: translateX(-20px);
   z-index: 1;
+  pointer-events: none;
 }
 
 .bar-handles {
@@ -1529,6 +1531,7 @@ svg text {
   height: var(--barHeight);
   position: absolute;
   z-index: 1;
+  pointer-events: none;
 }
 
 .add-remove-container {
@@ -1555,6 +1558,8 @@ svg text {
   background-repeat:no-repeat;
 
   transform: translateY(var(--move)) rotateZ(var(--rotate));
+
+  pointer-events: all;
 }
 
 .column-handles > .add-remove-container {
@@ -1567,12 +1572,12 @@ svg text {
 }
 
 .add-remove-container.red {
-  --c2:#ff3e3e;
+  --c2:#ff4b4b;
   --rotate: 45deg;
 }
 
 .add-remove-container.green {
-  --c2:green;
+  --c2:#4bb331;
 }
 .add-remove-container.invisible {
   opacity: 0.9;

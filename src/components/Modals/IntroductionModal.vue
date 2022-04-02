@@ -1,9 +1,9 @@
 <template>
-<div class="modal" :class="modalActive ? 'is-active' : ''">
+<div class="modal" :class="modalActive ? 'is-active' : ''" :style="getPosition">
   <div class="modal-content">
     <div class="box">
       <div class="is-flex is-align-items-top">
-        <h1 class="title is-flex is-align-items-center is-4">{{introData[curIndex]["title"]}}</h1>
+        <h1 class="title is-flex is-align-items-center is-4" v-html="introData[curIndex]['title']"></h1>
         <button class="delete is-large custom-close mb-4" aria-label="close" @click="$emit('disableModal')"><img src="@/assets/images/interaction-menu/x.svg" class="option-img"></button>
       </div>
       <p v-if="!$store.state['isTablet'] || !('textTablet' in introData[curIndex])" class="mb-4" v-html="introData[curIndex]['text']"></p>
@@ -80,6 +80,15 @@ export default {
     }
   },
   computed: {
+    getPosition () {
+      if (!("position" in this.introData[this.curIndex])) {
+        return "";
+      } else {
+        const pos = this.introData[this.curIndex].position;
+        let elemRect = document.getElementById(pos.elem).getBoundingClientRect();
+        return "transform: translate(" + elemRect[pos.hSide] + "px, " + elemRect[pos.vSide] + "px);";
+      }
+    }
   },
   mounted () {
     let lang = this.$store.state["language"];
@@ -126,17 +135,20 @@ export default {
 <style scoped>
 .modal {
   z-index: 1001;
+  transition: transform 0.4s ease;
 }
 
 .modal-content {
   position: absolute;
   left: 0;
-  bottom: 0em;
+  top: 0;
   margin: 0;
   max-width: 400px;
+  box-shadow: 0 0px 6px 3px rgb(0 0 0 / 15%);
 }
 
 .box {
   max-width: 400px;
+  
 }
 </style>

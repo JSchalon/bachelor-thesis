@@ -588,8 +588,8 @@ export default createStore({
         sign.col = parseInt(elem.getElementsByTagName("laban:index")[0].innerHTML);
         if (sign.col < -state["columnsLeft"]) {
           state["columnsLeft"] = Math.abs(sign.col);
-        } else if (sign.col > state["columnsRight"]) {
-          state["columnsRight"] = sign.col;
+        } else if (sign.col >= state["columnsRight"]) {
+          state["columnsRight"] = sign.col + 1;
         }
         sign.bar = -1;
         sign.beat = 0;
@@ -789,7 +789,7 @@ export default createStore({
         }
         if (sign.col < -state["columnsLeft"] && sign.baseType != "RoomDirectionSign") {
           state["columnsLeft"] = Math.abs(sign.col);
-        } else if (sign.col > state["columnsRight"] - 1 && sign.baseType != "PathSign") {
+        } else if (sign.col >= state["columnsRight"] - 1 && sign.baseType != "PathSign") {
           state["columnsRight"] = sign.col + 1;
         }
         if (sign.beat >= state["beatsPerBar"]) {
@@ -809,7 +809,7 @@ export default createStore({
       }
       for (let elem of state["signs"]) {
         if (elem.baseType == "PathSign" && elem.col < state["columnsRight"]) {
-          elem.col == state["columnsRight"];
+          state["signs"][state["signs"].indexOf(elem)].col = state["columnsRight"];
         } else if (elem.baseType == "RoomDirectionSign" && elem.col >= state["columnsLeft"]) {
           elem.col == -state["columnsLeft"] - 1;
         }
@@ -996,6 +996,7 @@ export default createStore({
       context.commit("clearSelectedSigns");
       context.commit("setSelectedBar", false);
       context.commit("setSelectedColumn", false);
+      context.commit("clearGridSelect");
       context.commit("saveScoreToLocalStorage");
     },
     redoChanges(context) {
@@ -1003,6 +1004,7 @@ export default createStore({
       context.commit("clearSelectedSigns");
       context.commit("setSelectedBar", false);
       context.commit("setSelectedColumn", false);
+      context.commit("clearGridSelect");
       context.commit("saveScoreToLocalStorage");
     },
     setIsPhone (context, bool) {
