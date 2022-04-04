@@ -21,7 +21,7 @@ export default {
     id: Number,
     degree: Number,
   },
-  inject: ["signWidth","borderWidth", "barHeight"],
+  inject: ["signWidth","borderWidth"],
   data() {
     return {
       path: "M 5,40 L 20,0 L 35,40 M 0,30 L 40,30"

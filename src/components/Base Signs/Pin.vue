@@ -53,14 +53,14 @@ export default {
       default: false
     }
   },
-  inject: ["signWidth","borderWidth", "barHeight"],
+  inject: ["signWidth","borderWidth"],
   data() {
     return {
     };
   },
   computed: {
     beatHeight () {
-      return this.barHeight / this.$store.state["beatsPerBar"];
+      return this.barHeight() / this.$store.state["beatsPerBar"];
     },
     calculateStick () {
       let degree = this.signData.degree;

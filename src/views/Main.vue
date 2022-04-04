@@ -13,7 +13,7 @@
     </svg>
     <div class="desc-box" :class="{highlighted: tutHighlight == 'score'}">
       <div class="box" v-if="storeDescActive">
-        <h4 class="title is-5">Score Description <button class="delete is-large custom-close" aria-label="close" @click="this.$store.dispatch('changeSettings', {showScoreDescription: !storeDescActive});"><img src="@/assets/images/interaction-menu/x.svg" class="option-img"></button></h4>
+        <h2 class="title is-5">{{$store.state["title"]}} <button class="delete is-large custom-close" aria-label="close" @click="this.$store.dispatch('changeSettings', {showScoreDescription: !storeDescActive});"><img src="@/assets/images/interaction-menu/x.svg" class="option-img"></button> </h2>
         <p>{{$store.state["description"]}}</p>
       </div>
       <button v-else class="button has-background-white is-size-5 has-text-info" @click="this.$store.dispatch('changeSettings', {showScoreDescription: !storeDescActive});">!</button>
@@ -88,7 +88,7 @@ export default {
       return this.$store.state["beatsPerBar"];
     },
     minHeight () {
-      return this.barHeight / this.beats;
+      return this.barHeight() / this.beats;
     },
     ghostOverCanvas () {
       return this.$store.state["ghostOverCanvas"];
@@ -270,7 +270,7 @@ export default {
     z-index: 1001;
   }
   .over-canvas .draggable {
-    stroke: #5e9fc7!important;
+    stroke: var(--selected)!important;
   }
 
   .option-item, .option-divider {
@@ -301,35 +301,35 @@ export default {
 
 .option-item * {
   display: block;
-  color: #343434;
+  color: var(--text-options);
   text-decoration: none;
   padding: 0 0.5em;
 }
 
 .option-item:hover {
-  background-color: #e5e5e5;
+  background-color: var(--bg-light);
 }
 
 .option-item:focus {
-  background-color: #e5e5e5;
+  background-color: var(--bg-light);
 }
 
 .option-item:active {
-  background-color: #e5e5e5;
+  background-color: var(--bg-light);
 }
 
 .option-item.enabled {
-  background-color: #e5e5e5;
+  background-color: var(--bg-light);
 }
 .option-item.enabled p {
-  color: #446f97;
+  color: var(--selected-darker);
 }
 
 .option-divider p {
   display: block;
   width: 2px;
   height: 75%;
-  background-color: #d6d6d6;
+  background-color: var(--bg-light-less);
   margin: 0 0.5em;
 }
 
@@ -363,19 +363,19 @@ export default {
 }
 
 .option-nested:hover .option-dropdown-top {
-  background-color: #e5e5e5;
+  background-color: var(--bg-light);
   border-bottom-left-radius: 0;
   border-bottom-right-radius: 0;
 }
 
 .option-nested:focus .option-dropdown-top {
-  background-color: #e5e5e5;
+  background-color: var(--bg-light);
   border-bottom-left-radius: 0;
   border-bottom-right-radius: 0;
 }
 
 .option-nested:active .option-dropdown-top {
-  background-color: #e5e5e5;
+  background-color: var(--bg-light);
   border-bottom-left-radius: 0;
   border-bottom-right-radius: 0;
 }
@@ -428,12 +428,12 @@ export default {
 }
 
 .option-box li:hover {
-  background-color: #e9e9e9;
+  background-color: var(--bg-lighter);
 }
 
 .shortcut {
   font-size: 0.9em;
-  color: #808080;
+  color: var(--text-shortcut);
   margin-left: auto!important;
   order: 2;
   transform: none;
@@ -447,19 +447,19 @@ export default {
   border-radius: 5px;
 }
 .custom-close::before,.custom-close::after {
-  background: #ff4b4b;
+  background: var(--delete);
 }
 
 .custom-close:hover .custom-close::before {
-  background: #ca3737;
+  background: var(--delete);
 }
 
 .custom-close:hover .custom-close::after {
-  background: #ca3737;
+  background: var(--delete);
 }
 
 .custom-close:hover {
-  background: #e5e5e5;
+  background: var(--bg-light);
 }
 
 .title {
@@ -480,6 +480,11 @@ export default {
   max-width: 300px;
   white-space: pre-wrap;
   overflow-wrap: break-word;
+}
+.desc-box h2 {
+  min-width: 200px;
+  max-width: 300px;
+  padding-right: 30px;
 }
 
 .desc-box .button {
@@ -529,7 +534,7 @@ html {
 }
 
 .tut-highlight {
-  border: 3px solid #5e9fc7!important;
+  border: 3px solid var(--selected)!important;
 }
 
 </style>

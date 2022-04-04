@@ -35,9 +35,9 @@ export default {
   data() {
     return {
       addressingTypes: [
-        {text: 'Right', img: false},
-        {text: 'Left', img:  false},
-        {text: 'Both', img:  false}
+        {text: 'Right', img: "/bows/addressing-right.svg"},
+        {text: 'Left', img:  "/bows/addressing-left.svg"},
+        {text: 'Both', img:  "/bows/addressing-both.svg"}
       ]
     };
   },

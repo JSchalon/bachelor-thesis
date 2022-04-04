@@ -43,7 +43,7 @@ export default {
       return obj;
     },
     minHeight () {
-      return this.barHeight / this.$store.state["beatsPerBar"];
+      return this.barHeight() / this.$store.state["beatsPerBar"];
     }
   },
   mounted () {

@@ -19,7 +19,6 @@
  */
 export default {
   name: 'LibraryItemContainer',
-  inject: ["barHeight"],
   emits: ["expand", "emitSigns", "selectSign"],
   props: {
     active: Boolean,

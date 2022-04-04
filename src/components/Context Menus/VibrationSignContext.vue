@@ -3,7 +3,7 @@
       <RadioOption 
       :options="pinType" 
       :initState="signData.upperPin.signType"
-      :optionText="'First Pin'"
+      :optionText="'Upper Angle Level'"
       :active="displayPinOptions"
       @switchState="this.changeupperPin"
       />
@@ -14,7 +14,7 @@
       <RadioOption 
         :options="pinType" 
         :initState="signData.lowerPin.signType"
-        :optionText="'Second Pin'"
+        :optionText="'Lower Angle Level'"
         :active="displayPinOptions"
         @switchState="this.changelowerPin"
       />
@@ -46,9 +46,9 @@ export default {
   data() {
     return {
       pinType: [
-        {text: 'Low', img: false},
-        {text: 'Middle', img: false},
-        {text: 'High', img: false}
+        {text: 'Low', img: "/pin-low-forward.svg"},
+        {text: 'Middle', img: "/pin-middle.svg"},
+        {text: 'High', img: "/pin-high.svg"}
       ],
       displayPinOptions: false
     };

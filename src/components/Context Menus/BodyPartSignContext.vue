@@ -2,9 +2,9 @@
     <div>
       <SignCategoryContainer :optionText="'Type'" :category="'body-part-signs'" :parentY="y" :active="true" @updateSignData="newSignData"/>
       <OnOffOption :optionText="'Limb'" :initState="signData.limb" :active="signData.canBeLimb" @switchState="changeLimb"/>
-      <RadioOption :optionText="'Top Surface'" :options="surfaceInnerOuter" :initState="signData.surface" :active="signData.limb && signData.canBeLimb" @switchState="this.changeTopSurface"/>
-      <RadioOption :optionText="'Side Surface'" :options="surfaceSides" :initState="signData.surface" :active="signData.limb && signData.canBeLimb" @switchState="this.changeSideSurface"/>
-      <OnOffOption :optionText="'Finger/Toe Definition'" :initState="'digit' in signData && signData.digit >= 0 && signData.digit !== false" :active="signData.signType == 'Fingers' || signData.signType == 'Toes'" @switchState="changeJointDefined"/>
+      <RadioOption :optionText="'Vertical Surface'" :options="surfaceInnerOuter" :initState="signData.surface" :active="signData.limb && signData.canBeLimb" @switchState="this.changeTopSurface"/>
+      <RadioOption :optionText="'Horizontal Surface'" :options="surfaceSides" :initState="signData.surface" :active="signData.limb && signData.canBeLimb" @switchState="this.changeSideSurface"/>
+      <OnOffOption :optionText="'Digit definition'" :initState="'digit' in signData && signData.digit >= 0 && signData.digit !== false" :active="signData.signType == 'Fingers' || signData.signType == 'Toes'" @switchState="changeJointDefined"/>
       <SignCategoryContainer v-if="signData.signType != 'Toes'" :optionText="'Digit'" :category="'finger-digits'" :parentY="y" :active="(signData.signType == 'Fingers' || signData.signType == 'Toes') && jointDefined" @updateSignData="changeDigit"/>
       <SignCategoryContainer v-else :optionText="'Digit'" :category="'toe-digits'" :parentY="y" :active="(signData.signType == 'Fingers' || signData.signType == 'Toes') && jointDefined" @updateSignData="changeDigit"/>
       <SignCategoryContainer v-if="signData.signType != 'Toes'" :optionText="'Joint'" :category="'finger-joints'" :parentY="y" :active="(signData.signType == 'Fingers' || signData.signType == 'Toes') && jointDefined" @updateSignData="changeJoint"/>
@@ -34,13 +34,13 @@ export default {
     return {
       surfaceInnerOuter: [
         {text: "---", img: false},
-        {text: 'inner', img: false},
-        {text: 'outer', img: false}
+        {text: 'inner', img: "/body-parts/vertical-surface-inner.svg"},
+        {text: 'outer', img: "/body-parts/vertical-surface-outer.svg"}
       ],
       surfaceSides: [
         {text: "---", img: false},
-        {text: 'littleFinger', img: false},
-        {text: 'thumb', img: false}
+        {text: 'littleFinger', img: "/body-parts/horizontal-surface-little.svg"},
+        {text: 'thumb', img: "/body-parts/horizontal-surface-thumb.svg"}
       ],
       surfaceTop: "",
       surfaceSide: "",

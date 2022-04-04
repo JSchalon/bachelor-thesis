@@ -11,8 +11,11 @@ Git Repo zur Bachelorarbeit zur Entwicklung eines webbasierten Interaktionsedito
 
 ## Versions
 
-### Version 0.6.1
-- Redid bar/column selection
-- Added grid selection via state
-- Added repositioning to introductions
-- Fixed some bugs
+### Version 0.6.2
+- Now keeping constant beat height and adjusting bar height 
+	-(change from bar height being constant and adjusting beat height)
+- Restyled shadow sign to a uniform object for better visibility
+- Added color variables
+- Added images to context radio options
+- Restyled context menu options
+- Rewrote context menu option texts

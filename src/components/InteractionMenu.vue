@@ -130,9 +130,9 @@
   height: 5vh;
   min-height: 38px;
   max-height: 50px;
-  background-color: #f4f4f4;
+  background-color: var(--bg-lightest);
   box-sizing: border-box;
-  border-bottom: 1px solid #c1c1c1;
+  border-bottom: 1px solid var(--bg-light-less-2);
 }
 
 .options-tool-tip {

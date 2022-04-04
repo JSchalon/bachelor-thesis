@@ -75,7 +75,7 @@ export default {
       default: 160
     }
   },
-  inject: ["signWidth","borderWidth", "barHeight"],
+  inject: ["signWidth","borderWidth"],
   data() {
     return {
     };

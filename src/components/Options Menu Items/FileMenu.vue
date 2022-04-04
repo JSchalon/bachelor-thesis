@@ -133,7 +133,6 @@ export default {
         }
       },
       uploadScore (score) {
-        console.log()
         if (score.type.includes("xml")) {
           const reader = new FileReader();
           reader.onload = function () {
@@ -236,7 +235,6 @@ export default {
           success: function () {
             this.$store.dispatch("setCloudAlert", "export-success");
             setTimeout(function () {
-              console.log(this.$store)
               this.$store.dispatch("setCloudAlert", "");
             }.bind(this), 5000);
           }.bind(this),

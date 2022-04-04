@@ -115,7 +115,8 @@ export default {
         }
       } else {
         for (let col = -this.$store.state["columnsLeft"]; col < this.$store.state["columnsRight"]; col++) {
-          this.$store.dispatch("addToGridSelect", {col: col});
+          this.$store.dispatch("addToGridSelect", {col: col, bar: -2});
+          this.$store.dispatch("addToGridSelect", {col: col, bar: -1, beat: 0});
         }
       }
     },
@@ -156,12 +157,13 @@ export default {
   position: relative;
   z-index: 1;
   box-sizing: border-box;
-  border-right: 1px solid #c1c1c1;
-  background: #f4f4f4;
+  border-right: 1px solid var(--bg-light-less-2);
+  background: var(--bg-lightest);
+  color: var(--text-options);
 }
 #cur-sign-container {
-  background-color: #f4f4f4;
-  border-bottom: 1px solid #c1c1c1;
+  background-color: var(--bg-lightest);
+  border-bottom: 1px solid var(--bg-light-less-2);
   height: 5vh;
   min-height: 38px;
   max-height: 50px;

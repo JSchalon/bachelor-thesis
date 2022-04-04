@@ -5,7 +5,7 @@
       <RadioOption 
         :options="dimensions" 
         :initState="signData.dimension"
-        :optionText="'Dimension'"
+        :optionText="'Vertical Level'"
         :active="true"
         @switchState="this.changeDimension"
       />
@@ -16,11 +16,11 @@
         :active="true"
         @switchState="this.changePosition"
       />
-      <OnOffOption :optionText="'Angle Definition'" :initState="definitionActive" :active="true" @switchState="changeDefinition"/>
+      <OnOffOption :optionText="'Angle definition'" :initState="definitionActive" :active="true" @switchState="changeDefinition"/>
       <RadioOption 
         :options="definitions" 
         :initState="signData.definition ? signData.definition.signType : false"
-        :optionText="'Pin Dimension'"
+        :optionText="'Angle level'"
         :active="signData.definition ? true : false"
         @switchState="changeDefinitionPin"
       />
@@ -57,14 +57,14 @@ export default {
         {text: 'High', img: '/direction-sign-radio/layer-up.svg'}
       ],
       definitions: [
-        {text: 'Low', img: false},
-        {text: 'Middle', img:  false},
-        {text: 'High', img:  false}
+        {text: 'Low', img: "/pin-low-forward.svg"},
+        {text: 'Middle', img:  "/pin-middle.svg"},
+        {text: 'High', img:  "/pin-high.svg"}
       ],
       positions: [
         {text: '---', img: false},
-        {text: 'Infront', img: false},
-        {text: 'Behind', img: false}
+        {text: 'Infront', img: "/pin-low-forward.svg"},
+        {text: 'Behind', img: "/pin-low-backward.svg"}
       ],
       definitionActive: false,
     };

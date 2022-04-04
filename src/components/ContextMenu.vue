@@ -55,7 +55,7 @@ export default {
   }
 
   .context-item-interact-img.active {
-    border: 2px solid blue;
+    border: 2px solid var(--selected);
   }
 
   .context-menu {
@@ -84,6 +84,7 @@ export default {
     }
     .center-vertically.small {
       height: auto;
+      float: right;
     }
 
     .context-item-interact-box {
@@ -111,6 +112,7 @@ export default {
 
   .unusable {
     opacity: 0.3;
+    cursor: not-allowed;
   }
 
   .blocker {

@@ -78,7 +78,7 @@ export default {
       return baseSigns;
     },
     beatHeight () {
-      return this.barHeight / this.$store.state["beatsPerBar"];
+      return this.barHeight() / this.$store.state["beatsPerBar"];
     },
     transform() {
       let transformString = "";
@@ -120,7 +120,11 @@ export default {
       } else if (this.signData.dimension == "High") {
         if (this.signData.signType == "backward" || this.signData.signType == "forward") {
           return "url(#direction-high-" + this.signData.side + ")";
-        }
+        } else if (this.signData.signType.includes("right")) {
+          return "url(#direction-high-left)";
+        } else if (this.signData.signType.includes("left")) {
+          return "url(#direction-high-right)";
+        } 
         return "url(#direction-high-left)";
       } else {
         return "white";

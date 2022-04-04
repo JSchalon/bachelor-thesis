@@ -66,7 +66,7 @@ export default {
       return this.$store.state["beatsPerBar"];
     },
     height () {
-      let height = this.barHeight / this.beats;
+      let height = this.barHeight() / this.beats;
       if (this.localData != undefined) {
         height = this.localData.height;
       }
@@ -115,7 +115,7 @@ export default {
 
   .dragging .draggable {
     opacity: 0.5;
-    stroke:#5e9fc7;
+    stroke:var(--selected);
     z-index: 100;
   }
 
@@ -125,6 +125,6 @@ export default {
 }
 
   .draggable.active {
-    stroke:#5e9fc7;
+    stroke: var(--selected);
   }
 </style>

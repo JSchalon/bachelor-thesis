@@ -980,6 +980,7 @@ export default createStore({
     },
     openScore (context, xml) {
       context.commit("loadScoreFromTemplate", {file: xml});
+      context.commit("clearGridSelect");
       context.commit("saveScoreToLocalStorage");
     },
     changeSettings(context, data) {

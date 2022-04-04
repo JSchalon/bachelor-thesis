@@ -56,7 +56,7 @@ export default {
       return points;
     },
     beatHeight () {
-      return this.barHeight / this.$store.state["beatsPerBar"];
+      return this.barHeight() / this.$store.state["beatsPerBar"];
     },
     transform() {
       let transformString = "";

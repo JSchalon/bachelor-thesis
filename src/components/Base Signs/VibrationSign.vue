@@ -42,10 +42,10 @@ export default {
   },
   computed: {
     beatHeight () {
-      return this.barHeight / this.$store.state["beatsPerBar"];
+      return this.barHeight() / this.$store.state["beatsPerBar"];
     },
     squiggleStep () {
-      return this.barHeight / 10;
+      return this.barHeight() / 10;
     },
     squiggleAmplitude () {
       return this.signWidth / 3;

@@ -48,11 +48,11 @@ export default {
 #options-menu {
   width: 100%;
   height: 8vh;
-  background-color: #ffffff;
+  background-color: white;
   display: flex;
   align-items: flex-end;
   box-sizing: border-box;
-  border-bottom: 1px solid #c1c1c1;
+  border-bottom: 1px solid var(--bg-light-less-2);
 }
 .options-menu-list {
   list-style-type: none;
@@ -64,11 +64,11 @@ export default {
 }
 
 .menu-option:hover .option-dropdown-top {
-  background-color: #e9e9e9;
+  background-color: var(--bg-lighter);
 }
 
 .menu-option:focus .option-dropdown-top {
-  background-color: #e9e9e9;
+  background-color: var(--bg-lighter);
 }
 
 .menu-option-container .option-img:not(.dropdown) {
@@ -104,13 +104,13 @@ export default {
 }
 
 .menu-option:active .option-dropdown-top {
-  background-color: #e9e9e9;
+  background-color: var(--bg-lighter);
 }
 
 .option-item.spacer {
   height: 1px;
   box-sizing: border-box;
-  border-bottom: 1px solid #d6d6d6;
+  border-bottom: 1px solid var(--bg-light-less);
   width: calc(100%);
   margin: 0.25em 0;
 }

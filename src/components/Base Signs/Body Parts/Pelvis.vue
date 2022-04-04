@@ -41,7 +41,7 @@ export default {
     signData: Object,
     height: Number,
   },
-  inject: ["signWidth", "borderWidth", "barHeight"],
+  inject: ["signWidth", "borderWidth"],
   data() {
     return {
       textWidth: 0,

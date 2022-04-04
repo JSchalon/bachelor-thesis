@@ -96,6 +96,9 @@ export default {
     signs () {
       return this.$store.state["signs"];
     },
+    barH () {
+      return this.barHeight();
+    },
     contextActive() {
       return this.$store.state["contextActive"];
     },
@@ -136,28 +139,28 @@ export default {
       return this.$store.state["signsXML"];
     },
     minHeight () {
-      return this.barHeight / this.beats;
+      return this.barH / this.beats;
     },
     blocksizeX () {
       return this.columnWidth;
     },
     blocksizeY () {
-      return this.barHeight / this.beats;
+      return this.barH / this.beats;
     },
     canvasDimensions () {
       return {
         x: this.columnWidth * (this.columnsLeft + this.columnsRight + 2) + 2 * this.outerCanvasMargin, 
-        y: this.barHeight * (this.bars + 0.5) + this.minHeight + this.outerCanvasMargin + this.startBarOffset
+        y: this.barH * this.bars+ 3 * this.minHeight + this.outerCanvasMargin + this.startBarOffset
       };
     },
     innerCanvasDimFull () {
-      return {x: this.columnWidth * (this.columnsLeft + this.columnsRight + 2), y: this.barHeight * (this.bars + 0.5) + this.minHeight + this.startBarOffset};
+      return {x: this.columnWidth * (this.columnsLeft + this.columnsRight + 2), y: this.barH * this.bars+ 3 * this.minHeight + this.startBarOffset};
     },
     innerCanvasDimRight () {
-      return {x: this.columnWidth * (this.columnsLeft + this.columnsRight + 1), y: this.barHeight * (this.bars + 0.5) + this.minHeight + this.startBarOffset};
+      return {x: this.columnWidth * (this.columnsLeft + this.columnsRight + 1), y: this.barH * this.bars+ 3 * this.minHeight + this.startBarOffset};
     },
     innerCanvasDim () {
-      return {x: this.columnWidth * (this.columnsLeft + this.columnsRight), y: this.barHeight * (this.bars + 0.5) + this.minHeight + this.startBarOffset};
+      return {x: this.columnWidth * (this.columnsLeft + this.columnsRight), y: this.barH * this.bars+ 3 * this.minHeight + this.startBarOffset};
     },
     canvasMarginTop () {
       return this.outerCanvasMargin / 2;
@@ -236,7 +239,7 @@ export default {
   methods: {
     getScroll (event) {
       if (this.canvasScroll.x != event.target.scrollLeft && this.columnHandlesActive) {
-        this.placeGridHandles({type: "col", x: this.selectedColumnTranslate.x + (this.canvasScroll.x - event.target.scrollLeft), y: this.selectedColumnTranslate.y - document.getElementById("canvasContainer").scrollTop - (this.barHeight / 2 - 15)})
+        this.placeGridHandles({type: "col", x: this.selectedColumnTranslate.x + (this.canvasScroll.x - event.target.scrollLeft), y: this.selectedColumnTranslate.y - document.getElementById("canvasContainer").scrollTop - (this.barH / 2 - 15)})
       }
       if (this.canvasScroll.y != event.target.scrollTop && this.barHandlesActive) {
         this.placeGridHandles({type: "bar", x: this.selectedBarTranslate.x - (this.columnWidth - this.signWidth - 15), y: this.selectedBarTranslate.y + (this.canvasScroll.y - event.target.scrollTop)})
@@ -273,8 +276,8 @@ export default {
       }
       const totalCol = signX / this.columnWidth;
       let col = totalCol - this.columnsLeft - 1;
-      let bar = this.bars - Math.floor(signY / this.barHeight);
-      let beat = this.beats - Math.round((signY - (this.bars-bar) * this.barHeight) / this.minHeight) - this.curLibrarySign.signData.beatHeight;
+      let bar = this.bars - Math.floor(signY / this.barH);
+      let beat = this.beats - Math.round((signY - (this.bars-bar) * this.barH) / this.minHeight) - this.curLibrarySign.signData.beatHeight;
       if (this.curLibrarySign.signData.baseType == "BodyPartSign") {
         bar = -1;
         beat = 0;
@@ -306,21 +309,21 @@ export default {
           elemData.x = (this.columnsLeft + 1 + elem.col) * this.columnWidth + (this.columnWidth - this.signWidth) / 2;
           
           if (elem.bar > 0) {
-            elemData.y = (this.bars - elem.bar) * this.barHeight + (this.beats - elem.beat) * this.minHeight - elemData.height;
+            elemData.y = (this.bars - elem.bar) * this.barH + (this.beats - elem.beat) * this.minHeight - elemData.height;
           } else if (elem.bar == 0) {
             elemData.canResize = false;
             if (elem.resizable && elem.baseType != "RelationshipBow") {
-              elemData.y = this.bars * this.barHeight + this.startBarOffset;
+              elemData.y = this.bars * this.barH + this.startBarOffset;
               if (elem.beatHeight != 2) {
                 this.interacting = true;
                 this.$store.dispatch("editSigns", {type: "changeSignData", index: this.signs.indexOf(elem), data: {beatHeight: 2}});
                 this.interacting = false;
               }
             } else {
-              elemData.y = this.bars * this.barHeight + this.startBarOffset + this.minHeight;
+              elemData.y = this.bars * this.barH + this.startBarOffset + this.minHeight;
             }
           } else if (elem.bar == -1) {
-            elemData.y = this.bars * this.barHeight + 2 * this.minHeight + this.startBarOffset * 2;
+            elemData.y = this.bars * this.barH + 2 * this.minHeight + this.startBarOffset * 2;
             elemData.canResize = false;
           }
 
@@ -339,7 +342,7 @@ export default {
       this.$store.dispatch("changeContextMenu", false);
       if (data.type == "col") {
         this.columnHandlesActive = true;
-        this.selectedColumnTranslate = {x: data.x, y: (data.y + document.getElementById("canvasContainer").scrollTop) + this.barHeight / 2 - 15};
+        this.selectedColumnTranslate = {x: data.x, y: (data.y + document.getElementById("canvasContainer").scrollTop) + this.barH / 2 - 15};
       } else {
         //special case for bar 0 -> only add, topside
         this.barHandlesActive = true;
@@ -462,13 +465,13 @@ export default {
       this.$store.dispatch("changeContextMenu", false);
       this.contextSign = 0;
       if (beforeIndex > this.selectedBar) {
-        this.selectedBarTranslate.y = this.selectedBarTranslate.y + this.barHeight;
+        this.selectedBarTranslate.y = this.selectedBarTranslate.y + this.barH;
       } else {
         this.updateSelectedBar (this.selectedBar + 1)
       }
       for (let elem of this.signs) {
         if (elem.bar < beforeIndex) {
-          this.localSignData[this.signs.indexOf(elem)].y = this.localSignData[this.signs.indexOf(elem)].y + this.barHeight;
+          this.localSignData[this.signs.indexOf(elem)].y = this.localSignData[this.signs.indexOf(elem)].y + this.barH;
         } else if (elem.bar >= beforeIndex) {
           this.$store.dispatch("editSigns", {type: "changeSignData", index: this.signs.indexOf(elem), data: {bar: (elem.bar + 1), beat: elem.beat}});
         }
@@ -491,7 +494,7 @@ export default {
       if (bar == this.bars) {
         this.$store.dispatch("setSelectedBar", (bar - 1));
       } else {
-        this.selectedBarTranslate.y = this.selectedBarTranslate.y - this.barHeight
+        this.selectedBarTranslate.y = this.selectedBarTranslate.y - this.barH
       }
       for (let elem of this.signs) {
         const index = this.signs.indexOf(elem);
@@ -499,12 +502,12 @@ export default {
           if (elem.bar == bar) {
             remove.push(this.signs.indexOf(elem));
           } else if (elem.bar < bar) {
-            const offset = Math.abs(this.barHeight - this.localSignData[index].y);
+            const offset = Math.abs(this.barH - this.localSignData[index].y);
             
-            if ((this.localSignData[index].y - this.barHeight) >= 0) {
-              this.localSignData[index].y = this.localSignData[index].y - this.barHeight;
+            if ((this.localSignData[index].y - this.barH) >= 0) {
+              this.localSignData[index].y = this.localSignData[index].y - this.barH;
             } else if (elem.beatHeight > 1) {
-              this.localSignData[index].y = this.localSignData[index].y + offset - this.barHeight;
+              this.localSignData[index].y = this.localSignData[index].y + offset - this.barH;
               this.localSignData[index].height = this.localSignData[index].height - offset;
               this.$store.dispatch("editSigns", {type: "changeSignData", index: index, data: {beatHeight: (this.localSignData[index].height / this.minHeight)}});
             }
@@ -679,9 +682,8 @@ export default {
         return false;
       }
       if (event.key == "e") {
-        console.log(this.signs)
+        console.log(this.signs);
         console.log(this.xmlScore);
-        this.$store.dispatch("addToGridSelect", {col: 1, bar: 1, selectCol: true});
         return;
       }
       if ((event.key == "s" || event.key == "p") && (event.ctrlKey || event.metaKey )) {
@@ -1044,12 +1046,15 @@ export default {
         shadow[key] = value;
       }
       shadow.isShadow = true;
+      shadow.isSelected = false;
+      shadow.baseType = "GenericSign";
+      shadow.signType = "GenericSign";
       this.$store.dispatch("editSigns", {type: "add", data: shadow});
       this.makeLocalSignData();
     },
 
     checkStartingPos(y, height) {
-      if (y + height > (this.innerCanvasDimFull.y - this.minHeight - this.barHeight / this.beats * 2- this.startBarOffset)) {
+      if (y + height > (this.innerCanvasDimFull.y - this.minHeight - this.barH / this.beats * 2- this.startBarOffset)) {
         return true;
       } else {
         return false;
@@ -1207,7 +1212,6 @@ export default {
       const targetID = target.getAttribute("signID");
       const shadowID = this.signs.length - 1;
       let targetElem = this.localSignData[targetID];
-      let shadowElem = this.localSignData[shadowID];
       let x = (parseFloat(target.getAttribute("data-x")) || 0);
 
       // keep the same position when resizing from the left
@@ -1220,14 +1224,9 @@ export default {
 
       // update the element width (-14 for the handles)
       this.localSignData[targetID].width = (event.rect.width - this.handleDiam * 2);
-      //check if the element was resized from the left
-      if (event.deltaRect.left != 0) {
-        //top handle -> adjust x position to nearest grid position
-        this.localSignData[shadowID].x = actualX;
-        this.localSignData[shadowID].y = shadowElem.y;
 
-      }
-
+      //adjust shadow to neares grid pos
+      this.localSignData[shadowID].x = actualX;
       this.localSignData[shadowID].width = actualW;
 
       //set new x data
@@ -1302,7 +1301,9 @@ export default {
       target.setAttribute("start-h", this.localSignData[targetID].height);
 
       this.makeShadow(this.signs[targetID]);
-
+      if (this.signs[targetID].baseType == "RelationshipBow") {
+        this.localSignData[this.signs.length - 1].width = this.localSignData[targetID].width;
+      }
       //apply dragging styling to group
       target.classList.add("dragging");
 
@@ -1356,15 +1357,15 @@ export default {
       //check if the current position is above (below in actual browser) the starting line -> snap there
       if (this.checkStartingPos(actualY, this.localSignData[targetID].height)) {
         if (isBow) {
-          actualY = this.innerCanvasDimFull.y - this.minHeight - this.barHeight / this.beats * 2 + this.blocksizeY;
+          actualY = this.innerCanvasDimFull.y - this.minHeight - this.barH / this.beats * 2 + this.blocksizeY;
         } else if (isBodyPart) {
-          actualY = this.innerCanvasDimFull.y - this.minHeight - this.barHeight / this.beats * 2 + this.blocksizeY * 2 + this.startBarOffset;
+          actualY = this.innerCanvasDimFull.y - this.minHeight - this.barH / this.beats * 2 + this.blocksizeY * 2 + this.startBarOffset;
         } else if (!this.signs[targetID].resizable) {
-          actualY = this.innerCanvasDimFull.y - this.barHeight / this.beats * 2 - this.minHeight + this.blocksizeY;
+          actualY = this.innerCanvasDimFull.y - this.barH / this.beats * 2 - this.minHeight + this.blocksizeY;
         } else {
-          this.localSignData[shadowID].height = (this.barHeight / this.beats * 2);
+          this.localSignData[shadowID].height = (this.barH / this.beats * 2);
           //this.$store.dispatch("editSigns", {type: "changeSignData", index: shadowID, data: {beatHeight: (this.localSignData[shadowID].height / this.minHeight)}});
-          actualY = this.innerCanvasDimFull.y - this.minHeight - this.barHeight / this.beats * 2;
+          actualY = this.innerCanvasDimFull.y - this.minHeight - this.barH / this.beats * 2;
         }
       }
 
@@ -1420,14 +1421,14 @@ export default {
       //check if the current position is above (below in actual browser) the starting line -> snap there
       if (this.checkStartingPos(screenY, this.localSignData[targetID].height)) {
         if (isBodyPart) {
-          screenY = this.innerCanvasDimFull.y - this.minHeight - this.barHeight / this.beats * 2 + this.blocksizeY * 2;
+          screenY = this.innerCanvasDimFull.y - this.minHeight - this.barH / this.beats * 2 + this.blocksizeY * 2;
           bodyPartBelowScore = true;
         } else if (!this.signs[targetID].resizable || isBow) {
-          screenY = this.innerCanvasDimFull.y - this.barHeight / this.beats * 2;
+          screenY = this.innerCanvasDimFull.y - this.barH / this.beats * 2;
         } else {
-          this.localSignData[targetID].height = (this.barHeight / this.beats * 2);
+          this.localSignData[targetID].height = (this.barH / this.beats * 2);
           this.$store.dispatch("editSigns", {type: "changeSignData", index: targetID, data: {beatHeight: (this.localSignData[targetID].height / this.minHeight)}});
-          screenY = this.innerCanvasDimFull.y - this.barHeight / this.beats * 2 - this.minHeight;
+          screenY = this.innerCanvasDimFull.y - this.barH / this.beats * 2 - this.minHeight;
           this.localSignData[targetID].canResize = false;
         }
       } else {
@@ -1492,7 +1493,7 @@ export default {
 #canvasContainer {
   width: 100%;
   height: 87vh;
-  background-color: #e4e4e4;
+  background-color: var(--bg-light);
   overflow: auto;
 }
 
@@ -1500,7 +1501,7 @@ export default {
   margin: auto auto;
   display: block;
   box-sizing: border-box;
-  border: 1px solid #c1c1c1;
+  border: 1px solid var(--bg-light-less-2);
   border-top: none;
 }
 
@@ -1508,15 +1509,8 @@ svg text {
   user-select: none;
 }
 
-.shadow {
-  fill: #a42a42;
-  stroke-width: 2;
-  stroke: rgb(0,0,0);
-  
-}
-
 .column-handles {
-  width: 135px;
+  width: 108px;
   height: 30px;
   position: absolute;
   display: flex;
@@ -1563,26 +1557,26 @@ svg text {
 }
 
 .column-handles > .add-remove-container {
-  margin: 10px 5px;
+  margin: 10px 3px;
 }
 
 .bar-handles > .add-remove-container {
-  margin: 0 0 calc(var(--barHeight) / 3 + 3px) 0;
+  margin: 0 0 calc(var(--barHeight) / 3 + var(--barHeight) / 6 - 30px) 0;
   --move: -15px;
 }
 
 .add-remove-container.red {
-  --c2:#ff4b4b;
+  --c2: var(--delete);
   --rotate: 45deg;
 }
 
 .add-remove-container.green {
-  --c2:#4bb331;
+  --c2:var(--add-darker);
 }
 .add-remove-container.invisible {
   opacity: 0.9;
   cursor: not-allowed;
-  --c2: #a3a3a3;
+  --c2: var(--bg-light-least);
 }
 
 .invis {

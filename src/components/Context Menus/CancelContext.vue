@@ -30,8 +30,8 @@ export default {
   data() {
     return {
       types: [
-        {text: 'Back To Normal', img: false},
-        {text: 'Release Contact', img: false},
+        {text: 'Back To Normal', img: "/cancel/cancel-back.svg"},
+        {text: 'Release Contact', img: "/cancel/cancel-release.svg"},
       ],
     };
   },

@@ -13,7 +13,7 @@
         <RadioOption 
           :options="definitions" 
           :initState="signData.definition ? signData.definition.signType : false"
-          :optionText="'Pin Dimension'"
+          :optionText="'Angle level'"
           :active="signData.definition && signData.definition.baseType == 'Pin'"
           @switchState="changeDefinitionPin"
         />
@@ -53,20 +53,15 @@ export default {
   emits: ["updateSignData", "delete"],
   data() {
     return {
-      types: [
-        {text: 'Left turn', img: false},
-        {text: 'Right turn', img: false},
-        {text: 'Any turn', img: false},
-      ],
       definitions: [
-        {text: 'Low', img: false},
-        {text: 'Middle', img:  false},
-        {text: 'High', img:  false}
+        {text: 'Low', img: "/pin-low-forward.svg"},
+        {text: 'Middle', img: "/pin-middle.svg"},
+        {text: 'High', img: "/pin-high.svg"}
       ],
       definitionTypes: [
         {text: '---', img: false},
-        {text: 'Pin', img:  false},
-        {text: 'Space Measurement', img:  false}
+        {text: 'Pin', img: "/pin-low-forward.svg"},
+        {text: 'Space Measurement', img: "/space-measurement-sign.svg"}
       ],
     };
   },
