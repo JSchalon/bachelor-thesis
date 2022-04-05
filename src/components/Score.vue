@@ -90,6 +90,11 @@ export default {
       interactingSigns: [],
       localSignData: [],
       canMoveGhost: false,
+      interactBox: {x: 0, y: 0, x2: 0, y2: 0},
+      interactBoxHasPath: false,
+      interactBoxHasRoomDir: false,
+      multiInteract: false,
+      interactOverflow: {x: 0, y: 0},
     };
   },
   computed: {
@@ -215,15 +220,20 @@ export default {
     window.addEventListener('keydown', this.keyEvent);
     window.addEventListener('resize', this.initInteractListeners);
     
-    
     this.makeLocalSignData();
     this.initInteractListeners();
+    this.$store.dispatch("changeCurSign", {signData: {isSelected: false, holding: false, baseType: "TurnSign", beatHeight: 2, signType: "counterClockwise", definition: false, resizable: true}});
+    
     setTimeout(() => {
+      this.addSign({bar: 1, beat: 0,  col: 2, side: "right", }, false);
+    }, 10);
+    setTimeout(() => {  
+      this.removeSign(this.signs.length - 1);
       this.addBar(this.bars+1);
       this.removeBar(this.bars);
       this.makeLocalSignData();
       this.$store.dispatch("clearHistory");
-    }, 10);
+    }, 15);
     
 },
   unmounted () {
@@ -527,7 +537,7 @@ export default {
     /**
      * Method for adding a sign to the score
      * @arg obj contains the col, bar and beat, where the sign is supposed to be placed 
-     * @arg permanent whether or not the sign will be permanently placed. If not, don't delete the current library sign
+     * @arg permanent whether or not the sign will be permanently placed. If not, delete the current library sign
      */
     addSign (obj, permanent = true) {
       let signData = {};
@@ -852,6 +862,7 @@ export default {
       this.initSignClick();
     },
     initSignListeners (elem) {
+      console.log(elem)
       elem.addEventListener("contextmenu", this.openContextMenu, false);
       ["touchstart", "touchmove", "touchend"].forEach((et) => elem.addEventListener(et, this.ignoreTouch));
       if (elem.classList.contains("normal")) {
@@ -1053,6 +1064,39 @@ export default {
       this.makeLocalSignData();
     },
 
+    makeInteractBox() {
+      if (this.interactingSigns.length <= 0) {
+        return false;
+      }
+      this.interactBox = {x: this.canvasDimensions.x, y: this.canvasDimensions.y, x2: 0, y2: 0};
+      this.interactBoxHasPath = false;
+      this.interactBoxHasRoomDir = false;
+      this.interactOverflow = {x: 0, y: 0};
+      for (let index of this.interactingSigns) {
+        if (this.signs[index].baseType == "RoomDirectionSign") {
+          this.interactBoxHasRoomDir = true;
+        } else if (this.signs[index].baseType == "PathSign") {
+          this.interactBoxHasPath = true;
+        }
+        let elem = this.localSignData[index];
+        if (elem.x <= this.interactBox.x) {
+          this.interactBox.x = elem.x;
+        }
+        if (elem.y <= this.interactBox.y) {
+          this.interactBox.y = elem.y
+        }
+        if (elem.x + (elem.width || this.signWidth) >= this.interactBox.x2) {
+          this.interactBox.x2 = elem.x + (elem.width || this.signWidth);
+        }
+        if (elem.y + elem.height >= this.interactBox.y2) {
+          this.interactBox.y2 = elem.y + elem.height;
+        }
+        this.interactBox.x = Math.round(this.interactBox.x / this.blocksizeX) * this.blocksizeX;
+        this.interactBox.x2 = Math.round(this.interactBox.x2 / this.blocksizeX) * this.blocksizeX;
+      }
+      return true;
+    },
+
     checkStartingPos(y, height) {
       if (y + height > (this.innerCanvasDimFull.y - this.minHeight - this.barH / this.beats * 2- this.startBarOffset)) {
         return true;
@@ -1075,19 +1119,54 @@ export default {
       this.$store.dispatch("changeContextMenu", false);
       
       const targetID = target.getAttribute("signID");
-      
-      //get current element position
-      let y = (this.localSignData[targetID].y || 0) + event.dy;
-      target.setAttribute("start-y", y);
-      target.setAttribute("start-h", this.localSignData[targetID].height);
-
       this.makeShadow(this.signs[targetID]);
+      if (this.selectedSigns.length <= 1) {
+        this.interactingSigns.push(targetID);
+        //get current element position
+        let y = (this.localSignData[targetID].y || 0) + event.dy;
+        target.setAttribute("start-y", y);
+        target.setAttribute("start-h", this.localSignData[targetID].height);
 
-      //apply dragging styling to group
-      target.classList.add("dragging");
+        //apply dragging styling to group
+        target.classList.add("dragging");
 
-       //move element to top of Render
-      this.placeSignOnTop(targetID);
+        //move element to top of Render
+        this.placeSignOnTop(targetID);
+      } else {
+        let select = [];
+        for (let index of this.selectedSigns) {
+          if (this.signs[index].baseType == "RelationshipBow" || !this.localSignData[index].canResize || !this.signs[index].resizable) {
+            select.push(index);
+          } else {
+            this.interactingSigns.push(index);
+          }
+        }
+        for (let index of select) {
+          this.$store.dispatch("removeFromSelectedSigns", index);
+        }
+        
+        if (this.interactingSigns.length > 1) {
+          this.makeInteractBox();
+          this.multiInteract = true;
+          this.localSignData[this.signs.length - 1].x = this.interactBox.x;
+          this.localSignData[this.signs.length - 1].y = this.interactBox.y;
+          this.localSignData[this.signs.length - 1].width = this.interactBox.x2 - this.interactBox.x;
+          this.localSignData[this.signs.length - 1].height = this.interactBox.y2 - this.interactBox.y;
+        }
+        this.localSignData[this.signs.length - 1].x = this.interactBox.x;
+        this.localSignData[this.signs.length - 1].y = this.interactBox.y;
+        this.localSignData[this.signs.length - 1].width = this.interactBox.x2 - this.interactBox.x;
+        this.localSignData[this.signs.length - 1].height = this.interactBox.y2 - this.interactBox.y;
+        let signsLength = this.$refs.bounding.querySelectorAll(".sign-container").length;
+        for (let index = 0; index < this.interactingSigns.length; index++) {
+          this.placeSignOnTop(this.interactingSigns[index]);
+          let sign = this.$refs.bounding.querySelectorAll(".sign-container")[signsLength-1];
+          sign.classList.add("dragging");
+          let y = (this.localSignData[parseInt(sign.getAttribute("signID"))].y || 0) + event.dy;
+          sign.setAttribute("start-y", y);
+          sign.setAttribute("start-h", this.localSignData[parseInt(sign.getAttribute("signID"))].height);
+        }
+      }
     },
 
     /**
@@ -1095,43 +1174,76 @@ export default {
      * @arg event the resize-move event
      */
     resizeMove (event) {
-      //get the saved x and y data
-      let target = event.target;
-      const targetID = target.getAttribute("signID");
       const shadowID = this.signs.length - 1;
-      let targetElem = this.localSignData[targetID];
-      let shadowElem = this.localSignData[shadowID];
-      let y = (parseFloat(target.getAttribute("data-y")) || 0);
-
-      // keep the same position when resizing from the top
-      y += event.deltaRect.top;
-      
-
-      let actualY = Math.round(y / this.blocksizeY) * this.blocksizeY;
-      let newHeight = targetElem.height + y - actualY;
-      let actualH = Math.round(newHeight / this.blocksizeY) * this.blocksizeY;
-
-      // update the element height (-14 for the handles)
-      this.localSignData[targetID].height = (event.rect.height - this.handleDiam * 2);
-      //this.$store.dispatch("editSigns", {type: "changeSignData", index: targetID, data: {beatHeight: (this.localSignData[targetID].height / this.minHeight)}});
-      //check if the element was resized from the top
-      if (event.deltaRect.top != 0) {
-        //top handle -> adjust y position to nearest grid position
-        this.localSignData[shadowID].x = shadowElem.x;
+      if (this.multiInteract) {
+        //check y out of bounds
+        for (let index of this.interactingSigns) {
+          if (this.localSignData[index].height + event.deltaRect.height < this.minHeight) {
+            return;
+          }
+        }
+        if (this.interactBox.y + event.deltaRect.top < 0) {
+          this.interactBox.y = 0;
+          this.interactOverflow.y = this.interactOverflow.y + event.deltaRect.top;
+          return;
+        } else if (this.checkStartingPos(this.interactBox.y, this.interactBox.y2 - this.interactBox.y + (event.deltaRect.height + event.deltaRect.top))) {
+          this.interactOverflow.y = this.interactOverflow.y - (event.deltaRect.height + event.deltaRect.top);
+          return;
+        } else if (this.interactOverflow.y < 0) {
+          this.interactOverflow.y = this.interactOverflow.y + Math.abs(event.deltaRect.top) + Math.abs(event.deltaRect.height);
+          return;
+        } else {
+          if (event.deltaRect.top) {
+            this.interactBox.y = this.interactBox.y + event.deltaRect.top;
+          } else {
+            this.interactBox.y2 = this.interactBox.y2 + event.deltaRect.height;
+          }
+        }
+        let actualY = Math.round(this.interactBox.y / this.blocksizeY) * this.blocksizeY;
+        let newHeight = this.interactBox.y2 - this.interactBox.y;
+        let actualH = Math.round(newHeight / this.blocksizeY) * this.blocksizeY;
         this.localSignData[shadowID].y = actualY;
-      }
-
-      //stop resizing at the starting line
-      if (!this.checkStartingPos(actualY, actualH)) {
         this.localSignData[shadowID].height = actualH;
-        //this.$store.dispatch("editSigns", {type: "changeSignData", index: shadowID, data: {beatHeight: (this.localSignData[shadowID].height / this.minHeight)}});
-      }
+        
+        for (let index of this.interactingSigns) {
+          this.localSignData[index].y = this.localSignData[index].y + event.deltaRect.top;
+          this.localSignData[index].height = this.localSignData[index].height + event.deltaRect.height;
+          let sign = this.$refs.bounding.querySelector(".sign-container[signID='" + index + "']");
+          sign.setAttribute("data-y", this.localSignData[index].y + event.deltaRect.top);
+        }
+      } else {
+        let target = event.target;
+        const targetID = target.getAttribute("signID");
+        
+        let targetElem = this.localSignData[targetID];
+        let y = (parseFloat(target.getAttribute("data-y")) || 0);
+        // keep the same position when resizing from the top
+        y += event.deltaRect.top;
+        
+        let actualY = Math.round(y / this.blocksizeY) * this.blocksizeY;
+        let newHeight = targetElem.height + y - actualY;
+        let actualH = Math.round(newHeight / this.blocksizeY) * this.blocksizeY;
 
-      //set new y data
-      target.setAttribute("data-y", y);
-      
-      //translate group
-      this.localSignData[targetID].y = this.localSignData[targetID].y + event.deltaRect.top;
+        // update the element height (-14 for the handles)
+        this.localSignData[targetID].height = (event.rect.height - this.handleDiam * 2);
+        //this.$store.dispatch("editSigns", {type: "changeSignData", index: targetID, data: {beatHeight: (this.localSignData[targetID].height / this.minHeight)}});
+        //check if the element was resized from the top
+        if (event.deltaRect.top != 0) {
+          //top handle -> adjust y position to nearest grid position
+          this.localSignData[shadowID].y = actualY;
+        }
+        //stop resizing at the starting line
+        if (!this.checkStartingPos(actualY, actualH)) {
+          this.localSignData[shadowID].height = actualH;
+          //this.$store.dispatch("editSigns", {type: "changeSignData", index: shadowID, data: {beatHeight: (this.localSignData[shadowID].height / this.minHeight)}});
+        }
+
+        //set new y data
+        target.setAttribute("data-y", y);
+        
+        //translate group
+        this.localSignData[targetID].y = this.localSignData[targetID].y + event.deltaRect.top;
+      }
     },
 
     /**
@@ -1141,35 +1253,48 @@ export default {
     resizeEnd (event) {
       this.keyCommandsEnabled = true;
       let target = event.target;
-      const targetID = target.getAttribute("signID");
       const shadowID = this.signs.length - 1;
-      let shadowElem = this.localSignData[shadowID];
-
+      this.removeSign(shadowID);
       let y = parseFloat(target.getAttribute("data-y"));
       let actualY = Math.round(y / this.blocksizeY) * this.blocksizeY;
-
-      //check if the element was resized from the top
-      if (event.deltaRect.top != 0) {
-        //top handle -> adjust y position to nearest grid position
+      if (this.multiInteract) {
+        let signsLength = this.$refs.bounding.querySelectorAll(".sign-container").length;
+        for (let index = 0; index < this.interactingSigns.length; index++) {
+          this.$refs.bounding.querySelectorAll(".sign-container")[signsLength-1 - index].classList.remove("dragging");
+        }
+      } else {
+        target.classList.remove("dragging");
+        if (this.contextWasActive) {
+          this.openContextMenu(event, 0, actualY - y);
+          this.contextWasActive = false;
+        }
+      }
+      
+      for (let targetID of this.interactingSigns) {
+        target = this.$refs.bounding.querySelector(".sign-container[signID='" + targetID + "']");
+        y = parseFloat(target.getAttribute("data-y"));
+        if (this.checkStartingPos(y, this.localSignData[targetID].height)) {
+          this.localSignData[targetID].height = this.bars * this.beats * this.minHeight - y;
+        }
+        actualY = Math.round(y / this.blocksizeY) * this.blocksizeY;
+        let actualH = Math.round(this.localSignData[targetID].height / this.blocksizeY) * this.blocksizeY;
+        
         target.setAttribute("data-y", actualY);
         this.localSignData[targetID].y = actualY;
+        this.localSignData[targetID].height = actualH;
+        this.$store.dispatch("editSigns", {type: "changeSignData", index: targetID, data: {beatHeight: (this.localSignData[targetID].height / this.minHeight)}});
+        
+        if (actualY == 0 && this.localSignData[targetID].y != 0) {
+          this.localSignData[targetID].y = 0;
+        }
+        this.calcBeatMove (targetID, parseFloat(target.getAttribute("start-y")), parseFloat(target.getAttribute("start-h")), this.localSignData[targetID].y, this.localSignData[targetID].height);
+        this.selectSign(targetID, true);
       }
-      this.localSignData[targetID].height = shadowElem.height;
-      this.$store.dispatch("editSigns", {type: "changeSignData", index: targetID, data: {beatHeight: (this.localSignData[targetID].height / this.minHeight)}});
       
-      if (actualY == 0 && this.localSignData[targetID].y != 0) {
-        this.localSignData[targetID].y = 0;
-      }
-      this.calcBeatMove (targetID, parseFloat(target.getAttribute("start-y")), parseFloat(target.getAttribute("start-h")), this.localSignData[targetID].y, this.localSignData[targetID].height);
-      this.removeSign(shadowID);
-      target.classList.remove("dragging");
       this.interacting = false;
-      this.makeLocalSignData();
-      this.selectSign(targetID);
-      if (this.contextWasActive) {
-        this.openContextMenu(event, 0, actualY - y);
-        this.contextWasActive = false;
-      }
+      this.multiInteract = false;
+      this.interactingSigns = [];
+      
       this.$store.dispatch("saveStateInHistory");
     },
 
@@ -1178,8 +1303,8 @@ export default {
      * @arg event the resize-start event
      */
     bowResizeStart (event) {
-      this.keyCommandsEnabled = false;
       this.interacting = true;
+      this.keyCommandsEnabled = false;
       let target = event.target;
       if (this.contextActive) {
         this.contextWasActive = true;
@@ -1187,19 +1312,49 @@ export default {
       this.$store.dispatch("changeContextMenu", false);
       
       const targetID = target.getAttribute("signID");
-      
-      //get current element position
-      let x = (this.localSignData[targetID].x || 0) + event.dx;
-      target.setAttribute("start-x", x);
-      target.setAttribute("start-w", this.localSignData[targetID].width);
-
       this.makeShadow(this.signs[targetID]);
+      if (this.selectedSigns.length <= 1) {
+        this.interactingSigns.push(targetID);
+        //get current element position
+        let x = (this.localSignData[targetID].x || 0) + event.dx;
+        target.setAttribute("start-x", x);
+        target.setAttribute("start-w", this.localSignData[targetID].width);
 
-      //apply dragging styling to group
-      target.classList.add("dragging");
+        //apply dragging styling to group
+        target.classList.add("dragging");
 
-       //move element to top of Render
-      this.placeSignOnTop(targetID);
+        //move element to top of Render
+        this.placeSignOnTop(targetID);
+      } else {
+        let select = [];
+        for (let index of this.selectedSigns) {
+          if (this.signs[index].baseType != "RelationshipBow" || !this.localSignData[index].canResize) {
+            select.push(index);
+          } else {
+            this.interactingSigns.push(index);
+          }
+        }
+        for (let index of select) {
+          this.$store.dispatch("removeFromSelectedSigns", index);
+        }
+        this.makeInteractBox();
+        if (this.interactingSigns.length > 1) {
+          this.multiInteract = true;
+          this.localSignData[this.signs.length - 1].x = this.interactBox.x;
+          this.localSignData[this.signs.length - 1].y = this.interactBox.y;
+          this.localSignData[this.signs.length - 1].width = this.interactBox.x2 - this.interactBox.x;
+          this.localSignData[this.signs.length - 1].height = this.interactBox.y2 - this.interactBox.y;
+        }
+        let signsLength = this.$refs.bounding.querySelectorAll(".sign-container").length;
+        for (let index = 0; index < this.interactingSigns.length; index++) {
+          this.placeSignOnTop(this.interactingSigns[index]);
+          let sign = this.$refs.bounding.querySelectorAll(".sign-container")[signsLength-1];
+          sign.classList.add("dragging");
+          let x = (this.localSignData[parseInt(sign.getAttribute("signID"))].x || 0) + event.dx;
+          sign.setAttribute("start-x", x);
+          sign.setAttribute("start-w", this.localSignData[parseInt(sign.getAttribute("signID"))].width);
+        }
+      }
     },
 
     /**
@@ -1207,33 +1362,73 @@ export default {
      * @arg event the resize-move event
      */
     bowResizeMove (event) {
-      //get the saved x and y data
+      //get the saved x data
       let target = event.target;
       const targetID = target.getAttribute("signID");
       const shadowID = this.signs.length - 1;
-      let targetElem = this.localSignData[targetID];
-      let x = (parseFloat(target.getAttribute("data-x")) || 0);
+      if (this.multiInteract) {
+        //check width out of bounds
+        for (let index of this.interactingSigns) {
+          if (this.localSignData[index].width + event.deltaRect.width < 2 * this.columnWidth) {
+            return;
+          }
+        }
+        //check x out of bounds
+        if (this.interactBox.x + event.deltaRect.left < 70) {
+          this.interactBox.x = 70;
+          this.interactOverflow.x = this.interactOverflow.x + event.deltaRect.left;
+          return;
+        } else if (this.interactBox.x2 + (event.deltaRect.width + event.deltaRect.left) > this.innerCanvasDimFull.x - 70) {
+          this.interactOverflow.x = this.interactOverflow.x - (event.deltaRect.width + event.deltaRect.left);
+          this.interactBox.x2 = this.innerCanvasDimFull.x - 70;
+          return;
+        } else if (this.interactOverflow.x < 0) {
+          this.interactOverflow.x = this.interactOverflow.x + Math.abs(event.deltaRect.left) + Math.abs(event.deltaRect.width);
+          return;
+        } else {
+          if (event.deltaRect.left) {
+            this.interactBox.x = this.interactBox.x + event.deltaRect.left;
+          } else {
+            this.interactBox.x2 = this.interactBox.x2 + event.deltaRect.width;
+          }
+        }
+        let actualX = Math.round(this.interactBox.x / this.blocksizeX) * this.blocksizeX;
+        let newWidth = this.interactBox.x2 - this.interactBox.x;
+        let actualW = Math.round(newWidth / this.blocksizeX) * this.blocksizeX;
+        this.localSignData[shadowID].x = actualX;
+        this.localSignData[shadowID].width = actualW;
+        
+        for (let index of this.interactingSigns) {
+          this.localSignData[index].x = this.localSignData[index].x + event.deltaRect.left;
+          this.localSignData[index].width = this.localSignData[index].width + event.deltaRect.width;
+          let sign = this.$refs.bounding.querySelector(".sign-container[signID='" + index + "']");
+          sign.setAttribute("data-x", this.localSignData[index].x + event.deltaRect.left);
+        }
+      } else {
+        let targetElem = this.localSignData[targetID];
+        let x = (parseFloat(target.getAttribute("data-x")) || 0);
 
-      // keep the same position when resizing from the left
-      x += event.deltaRect.left;
-      
+        // keep the same position when resizing from the left
+        x += event.deltaRect.left;
+        
 
-      let actualX = Math.round(x / this.blocksizeX) * this.blocksizeX;
-      let newWidth = targetElem.width + x - actualX;
-      let actualW = Math.round(newWidth / this.blocksizeX) * this.blocksizeX;
+        let actualX = Math.round(x / this.blocksizeX) * this.blocksizeX;
+        let newWidth = targetElem.width + x - actualX;
+        let actualW = Math.round(newWidth / this.blocksizeX) * this.blocksizeX;
 
-      // update the element width (-14 for the handles)
-      this.localSignData[targetID].width = (event.rect.width - this.handleDiam * 2);
+        // update the element width (-14 for the handles)
+        this.localSignData[targetID].width = (event.rect.width - this.handleDiam * 2);
 
-      //adjust shadow to neares grid pos
-      this.localSignData[shadowID].x = actualX;
-      this.localSignData[shadowID].width = actualW;
+        //adjust shadow to neares grid pos
+        this.localSignData[shadowID].x = actualX;
+        this.localSignData[shadowID].width = actualW;
 
-      //set new x data
-      target.setAttribute("data-x", x);
-      
-      //translate group
-      this.localSignData[targetID].x = targetElem.x + event.deltaRect.left;
+        //set new x data
+        target.setAttribute("data-x", x);
+        
+        //translate group
+        this.localSignData[targetID].x = targetElem.x + event.deltaRect.left;
+      }
     },
 
     /**
@@ -1243,35 +1438,45 @@ export default {
     bowResizeEnd (event) {
       this.keyCommandsEnabled = true;
       let target = event.target;
-      const targetID = target.getAttribute("signID");
       const shadowID = this.signs.length - 1;
-      let shadowElem = this.localSignData[shadowID];
-
+      this.removeSign(shadowID);
       let x = parseFloat(target.getAttribute("data-x"));
       let actualX = Math.round(x / this.blocksizeX) * this.blocksizeX;
+      if (this.multiInteract) {
+        let signsLength = this.$refs.bounding.querySelectorAll(".sign-container").length;
+        for (let index = 0; index < this.interactingSigns.length; index++) {
+          this.$refs.bounding.querySelectorAll(".sign-container")[signsLength-1 - index].classList.remove("dragging");
+        }
+      } else {
+        target.classList.remove("dragging");
+        if (this.contextWasActive) {
+          this.openContextMenu(event, actualX - x);
+          this.contextWasActive = false;
+        }
+      }
+      
+      for (let targetID of this.interactingSigns) {
+        target = this.$refs.bounding.querySelector(".sign-container[signID='" + targetID + "']");
+        x = parseFloat(target.getAttribute("data-x"));
+        actualX = Math.round(x / this.blocksizeX) * this.blocksizeX;
+        let actualW = Math.round(this.localSignData[targetID].width / this.blocksizeY) * this.blocksizeY;
 
-      //check if the element was resized from the left
-      if (event.deltaRect.left != 0) {
-        //left handle -> adjust x position to nearest grid position
         target.setAttribute("data-x", actualX);
         this.localSignData[targetID].x = actualX;
-      }
-      this.localSignData[targetID].width = shadowElem.width;
+        this.localSignData[targetID].width = actualW;
 
-      if (actualX == this.columnWidth && this.localSignData[targetID].x != this.columnWidth) {
-        this.localSignData[targetID].x = this.columnWidth;
+        if (actualX == this.columnWidth && this.localSignData[targetID].x != this.columnWidth) {
+          this.localSignData[targetID].x = this.columnWidth;
+        }
+        //calculate new column
+        this.calcColumnMove(targetID, parseFloat(target.getAttribute("start-x")), parseFloat(target.getAttribute("start-w")), this.localSignData[targetID].x, this.localSignData[targetID].width);
+        this.selectSign(targetID, true);
       }
-      //calculate new column
-      this.calcColumnMove(targetID, parseFloat(target.getAttribute("start-x")), parseFloat(target.getAttribute("start-w")), this.localSignData[targetID].x, this.localSignData[targetID].width);
-      this.removeSign(shadowID);
-      target.classList.remove("dragging");
+      
       this.interacting = false;
-      this.makeLocalSignData();
-      this.selectSign(targetID);
-      if (this.contextWasActive) {
-        this.openContextMenu(event, actualX - x);
-        this.contextWasActive = false;
-      }
+      this.multiInteract = false;
+      this.interactingSigns = [];
+      
       this.$store.dispatch("saveStateInHistory");
     },
 
@@ -1282,38 +1487,65 @@ export default {
     dragStart (event) {
       this.keyCommandsEnabled = false;
       this.interacting = true;
-
       let target = event.target;
       const targetID = target.getAttribute("signID");
-      this.interactingSigns.push(targetID);
       if (this.contextActive) {
         this.contextWasActive = true;
       }
 
       //fire a selection request to the score component for proper styling
-      this.selectSign(-1);
+      if (this.selectedSigns.length <= 1) {
+        this.interactingSigns.push(targetID);
+        this.selectSign(-1);
+        //get current element position
+        let  x = (this.localSignData[targetID].x || 0) + event.dx;
+        let  y = (this.localSignData[targetID].y || 0) + event.dy;
+        target.setAttribute("start-x", x);
+        target.setAttribute("start-y", y);
+        target.setAttribute("start-h", this.localSignData[targetID].height);
+      } else {
+        for (let index of this.selectedSigns) {
+          this.interactingSigns.push(index);
+        }
+        this.selectSign(-1);
+        this.makeInteractBox();
+        this.multiInteract = true;
+      }
       
-      //get current element position
-      let  x = (this.localSignData[targetID].x || 0) + event.dx;
-      let  y = (this.localSignData[targetID].y || 0) + event.dy;
-      target.setAttribute("start-x", x);
-      target.setAttribute("start-y", y);
-      target.setAttribute("start-h", this.localSignData[targetID].height);
-
+      
+      
       this.makeShadow(this.signs[targetID]);
       if (this.signs[targetID].baseType == "RelationshipBow") {
         this.localSignData[this.signs.length - 1].width = this.localSignData[targetID].width;
       }
-      //apply dragging styling to group
-      target.classList.add("dragging");
-
-       //move element to top of Render
-      this.placeSignOnTop(targetID);
+      if (this.multiInteract) {
+        this.localSignData[this.signs.length - 1].x = this.interactBox.x;
+        this.localSignData[this.signs.length - 1].y = this.interactBox.y;
+        this.localSignData[this.signs.length - 1].width = this.interactBox.x2 - this.interactBox.x;
+        this.localSignData[this.signs.length - 1].height = this.interactBox.y2 - this.interactBox.y;
+        let signsLength = this.$refs.bounding.querySelectorAll(".sign-container").length;
+        for (let index = 0; index < this.interactingSigns.length; index++) {
+          this.placeSignOnTop(this.interactingSigns[index]);
+          let sign = this.$refs.bounding.querySelectorAll(".sign-container")[signsLength-1];
+          sign.classList.add("dragging");
+          let x = (this.localSignData[parseInt(sign.getAttribute("signID"))].x || 0) + event.dx;
+          let y = (this.localSignData[parseInt(sign.getAttribute("signID"))].y || 0) + event.dy;
+          sign.setAttribute("start-x", x);
+          sign.setAttribute("start-y", y);
+          sign.setAttribute("start-h", this.localSignData[parseInt(sign.getAttribute("signID"))].height);
+        }
+        
+      } else {
+        target.classList.add("dragging");
+        //move element to top of Render
+        this.placeSignOnTop(targetID);
+      }
     },
 
     /**
      * The drag-move event listener, moves the sign and the shadow element
      * @arg event the drag-move event
+     * @arg delta the drag move delta, for if it is called from within
      */
     dragMove: function(event) {
       let target = event.target;
@@ -1321,7 +1553,55 @@ export default {
       const targetID = target.getAttribute("signID");
       const shadowID = this.signs.length - 1;
       let targetElem = this.localSignData[targetID];
-      this.localSignData[shadowID].height = targetElem.height;
+      
+      const columnOffset = (this.columnWidth - this.signWidth) / 2;
+      let multiStopX = false;
+      let multiStopY = false;
+      if (!this.multiInteract) {
+        this.localSignData[shadowID].height = targetElem.height;
+      } else {
+        let xOffset = 70;
+        let x2Offset = 70;
+        if (this.interactBoxHasRoomDir) {
+          xOffset = 0;
+        }
+        if (this.interactBoxHasPath) {
+          x2Offset = 0;
+        }
+        //check x out of bounds
+        if (this.interactBox.x - xOffset + event.dx < 0) {
+          this.interactBox.x = xOffset;
+          this.interactOverflow.x = this.interactOverflow.x + event.dx;
+          multiStopX = true;
+        } else if (this.interactBox.x2 + x2Offset + event.dx > this.innerCanvasDimFull.x) {
+          this.interactBox.x2 = this.innerCanvasDimFull.x - x2Offset;
+          this.interactOverflow.x = this.interactOverflow.x - event.dx;
+          multiStopX = true;
+        } else if (this.interactOverflow.x < 0) {
+           
+          this.interactOverflow.x = this.interactOverflow.x + Math.abs(event.dx);
+          multiStopX = true;
+        } else {
+          this.interactBox.x = this.interactBox.x + event.dx;
+          this.interactBox.x2 = this.interactBox.x2 + event.dx;
+        }
+        //check y out of bounds
+        if (this.interactBox.y + event.dy < 0) {
+          this.interactBox.y = 0;
+          this.interactOverflow.y = this.interactOverflow.y + event.dy;
+          multiStopY = true;
+        } else if (this.interactBox.y2 + event.dy > this.innerCanvasDimFull.y) {
+          this.interactBox.y2 = this.innerCanvasDimFull.y;
+          this.interactOverflow.y = this.interactOverflow.y - event.dy;
+          multiStopY = true;
+        } else if (this.interactOverflow.y < 0) {
+          this.interactOverflow.y = this.interactOverflow.y + Math.abs(event.dy);
+          multiStopY = true;
+        } else {
+          this.interactBox.y = this.interactBox.y + event.dy;
+          this.interactBox.y2 = this.interactBox.y2 + event.dy;
+        }
+      }
       //this.$store.dispatch("editSigns", {type: "changeSignData", index: shadowID, data: {beatHeight: (this.localSignData[shadowID].height / this.minHeight)}});
       const isBow = (this.signs[targetID].baseType == "RelationshipBow");
       const isBodyPart = (this.signs[targetID].baseType == "BodyPartSign");
@@ -1332,10 +1612,12 @@ export default {
       let  x = (this.localSignData[targetID].x || 0) + event.dx;
       let  y = (this.localSignData[targetID].y || 0) + event.dy;
 
-      const columnOffset = (this.columnWidth - this.signWidth) / 2;
-
       let actualX = Math.round(x / this.blocksizeX) * this.blocksizeX + columnOffset;
       let actualY = Math.round(y / this.blocksizeY) * this.blocksizeY;
+      if (this.multiInteract) {
+        actualX = Math.round(((this.interactBox.x + columnOffset || 0) + event.dx) / this.blocksizeX) * this.blocksizeX;
+        actualY = Math.round(((this.interactBox.y || 0) + event.dy) / this.blocksizeY) * this.blocksizeY;
+      }
       if (isRoomSign && actualX >= this.$refs.boundingOuterLeft.getBBox().x + this.$refs.boundingOuterLeft.getBBox().width) {
         
         actualX = actualX - this.columnWidth;
@@ -1353,29 +1635,73 @@ export default {
       if (isBow) {
         actualX = actualX - columnOffset;
       }
-      
-      //check if the current position is above (below in actual browser) the starting line -> snap there
-      if (this.checkStartingPos(actualY, this.localSignData[targetID].height)) {
-        if (isBow) {
-          actualY = this.innerCanvasDimFull.y - this.minHeight - this.barH / this.beats * 2 + this.blocksizeY;
-        } else if (isBodyPart) {
-          actualY = this.innerCanvasDimFull.y - this.minHeight - this.barH / this.beats * 2 + this.blocksizeY * 2 + this.startBarOffset;
-        } else if (!this.signs[targetID].resizable) {
-          actualY = this.innerCanvasDimFull.y - this.barH / this.beats * 2 - this.minHeight + this.blocksizeY;
+      if (this.multiInteract) {
+        if (this.checkStartingPos(actualY, this.interactBox.y2 - this.interactBox.y)) {
+          this.interactBox.y2 == this.innerCanvasDimFull.y - this.minHeight;
+          this.localSignData[shadowID].height = this.innerCanvasDimFull.y - actualY - this.minHeight;
+          if (this.localSignData[shadowID].height < 2 * this.minHeight) {
+            this.localSignData[shadowID].height = 2 * this.minHeight;
+          }
         } else {
-          this.localSignData[shadowID].height = (this.barH / this.beats * 2);
-          //this.$store.dispatch("editSigns", {type: "changeSignData", index: shadowID, data: {beatHeight: (this.localSignData[shadowID].height / this.minHeight)}});
-          actualY = this.innerCanvasDimFull.y - this.minHeight - this.barH / this.beats * 2;
+          this.localSignData[shadowID].height = this.interactBox.y2 - this.interactBox.y;
+          if (this.localSignData[shadowID].y + this.localSignData[shadowID].height > this.innerCanvasDimFull.y - this.minHeight) {
+            this.localSignData[shadowID].height = this.localSignData[shadowID].height - 50;
+          }
         }
-      }
-
+        //set new element position
+        let allinStart = true;
+        let noneInStart = true;
+        for (let index of this.interactingSigns) {
+          if (!multiStopX && !(this.signs[index].baseType == "PathSign" || this.signs[index].baseType == "RoomDirectionSign")) {
+            this.localSignData[index].x = (this.localSignData[index].x || 0) + event.dx;
+          }
+          if (!multiStopY && this.signs[index].baseType != "BodyPartSign") {
+            this.localSignData[index].y = (this.localSignData[index].y || 0) + event.dy;
+            let yCorrect = Math.round(((this.localSignData[index].y || 0) + event.dy) / this.blocksizeY) * this.blocksizeY;
+            if (allinStart && !this.checkStartingPos(yCorrect, this.localSignData[index].height)) {
+              allinStart = false;
+            } else if (noneInStart && this.checkStartingPos(yCorrect, this.localSignData[index].height)) {
+              noneInStart = false;
+            }
+          }
+        }
+        if (!multiStopY && allinStart) {
+          this.localSignData[shadowID].height = 2 * this.minHeight;
+          actualY = this.innerCanvasDimFull.y - this.minHeight * 3;
+        } 
+        if (!multiStopY && noneInStart && this.checkStartingPos(this.localSignData[shadowID].y,this.localSignData[shadowID].height)) {
+          this.localSignData[shadowID].height = this.localSignData[shadowID].height - 2 * this.minHeight;
+          if (this.localSignData[shadowID].height >= this.startBarOffset) {
+            this.localSignData[shadowID].height = this.localSignData[shadowID].height - this.startBarOffset;
+          }
+        }
+      } else {
+        //check if the current position is above (below in actual browser) the starting line -> snap there
+        if (this.checkStartingPos(actualY, this.localSignData[targetID].height)) {
+          if (isBow) {
+            actualY = this.innerCanvasDimFull.y - this.barH / this.beats * 2;
+          } else if (isBodyPart) {
+            actualY = this.innerCanvasDimFull.y - this.barH / this.beats * 2 + this.blocksizeY + this.startBarOffset;
+          } else if (!this.signs[targetID].resizable) {
+            actualY = this.innerCanvasDimFull.y - this.barH / this.beats * 2;
+          } else {
+            this.localSignData[shadowID].height = (this.barH / this.beats * 2);
+            //this.$store.dispatch("editSigns", {type: "changeSignData", index: shadowID, data: {beatHeight: (this.localSignData[shadowID].height / this.minHeight)}});
+            actualY = this.innerCanvasDimFull.y - this.minHeight - this.barH / this.beats * 2;
+          }
+        }
         //set new element position
         this.localSignData[targetID].x = x;
         this.localSignData[targetID].y = y;
+      }
 
-        //set new shadow element position
+      //set new shadow element position
+      if (!multiStopX) {
         this.localSignData[shadowID].x = actualX;
+      }
+      if (!multiStopY) {
         this.localSignData[shadowID].y = actualY;
+      }
     },
     
     /**
@@ -1386,88 +1712,99 @@ export default {
       this.keyCommandsEnabled = true;
       let target = event.target;
 
-      const targetID = target.getAttribute("signID");
-
-      const isBow = (this.signs[targetID].baseType == "RelationshipBow");
-      const isBodyPart = (this.signs[targetID].baseType == "BodyPartSign");
-      const isPath = (this.signs[targetID].baseType == "PathSign");
-      const isRoomSign = (this.signs[targetID].baseType == "RoomDirectionSign");
-      let bodyPartBelowScore = false;
-
-      target.classList.remove("dragging");
-
-      //get the new x and y chords
-      let x = this.localSignData[targetID].x;
-      let y = this.localSignData[targetID].y;
-
+      if (this.multiInteract) {
+        let signsLength = this.$refs.bounding.querySelectorAll(".sign-container").length;
+        for (let index = 0; index < this.interactingSigns.length; index++) {
+          this.$refs.bounding.querySelectorAll(".sign-container")[signsLength-1 - index].classList.remove("dragging");
+        }
+      } else {
+        target.classList.remove("dragging");
+      }
       const columnOffset = (this.columnWidth - this.signWidth) / 2;
-      let screenX = Math.round(x / this.blocksizeX) * this.blocksizeX + columnOffset;
-      let screenY = Math.round(y /this.blocksizeY) * this.blocksizeY;
-      if (isRoomSign && screenX >= this.$refs.boundingOuterLeft.getBBox().x + this.$refs.boundingOuterLeft.getBBox().width) {
-        screenX = screenX - this.columnWidth;
-      } else if (!isRoomSign && !isPath && screenX >= this.$refs.boundingOuterRight.getBBox().x) {
-        screenX = screenX - this.columnWidth;
-      } else if (isPath) {
-        if (screenX >= this.$refs.boundingOuterRight.getBBox().x + this.$refs.boundingOuterRight.getBBox().width) {
+      for (let targetID of this.interactingSigns) {
+        target = this.$refs.bounding.querySelector(".sign-container[signID='" + targetID + "']");
+        let isBow = (this.signs[targetID].baseType == "RelationshipBow");
+        let isBodyPart = (this.signs[targetID].baseType == "BodyPartSign");
+        let isPath = (this.signs[targetID].baseType == "PathSign");
+        let isRoomSign = (this.signs[targetID].baseType == "RoomDirectionSign");
+        let bodyPartBelowScore = false;
+        //get the new x and y chords
+        let x = this.localSignData[targetID].x;
+        let y = this.localSignData[targetID].y;
+
+        let screenX = Math.round(x / this.blocksizeX) * this.blocksizeX + columnOffset;
+        let screenY = Math.round(y /this.blocksizeY) * this.blocksizeY;
+
+        if (isRoomSign && screenX >= this.$refs.boundingOuterLeft.getBBox().x + this.$refs.boundingOuterLeft.getBBox().width) {
           screenX = screenX - this.columnWidth;
-        } else if (screenX < this.$refs.boundingOuterRight.getBBox().x) {
-          screenX = screenX + this.columnWidth;
+        } else if (!isRoomSign && !isPath && screenX >= this.$refs.boundingOuterRight.getBBox().x) {
+          screenX = screenX - this.columnWidth;
+        } else if (isPath) {
+          if (screenX >= this.$refs.boundingOuterRight.getBBox().x + this.$refs.boundingOuterRight.getBBox().width) {
+            screenX = screenX - this.columnWidth;
+          } else if (screenX < this.$refs.boundingOuterRight.getBBox().x) {
+            screenX = screenX + this.columnWidth;
+          }
+        } else if (isBow) {
+          screenX = screenX - columnOffset;
         }
-      } else if (isBow) {
-        screenX = screenX - columnOffset;
-      }
-      
-      
-      //check if the current position is above (below in actual browser) the starting line -> snap there
-      if (this.checkStartingPos(screenY, this.localSignData[targetID].height)) {
-        if (isBodyPart) {
-          screenY = this.innerCanvasDimFull.y - this.minHeight - this.barH / this.beats * 2 + this.blocksizeY * 2;
-          bodyPartBelowScore = true;
-        } else if (!this.signs[targetID].resizable || isBow) {
-          screenY = this.innerCanvasDimFull.y - this.barH / this.beats * 2;
+        
+        
+        //check if the current position is above (below in actual browser) the starting line -> snap there
+        if (this.checkStartingPos(screenY, this.localSignData[targetID].height)) {
+          if (isBodyPart) {
+            screenY = this.innerCanvasDimFull.y - this.minHeight - this.barH / this.beats * 2 + this.blocksizeY * 2;
+            bodyPartBelowScore = true;
+          } else if (!this.signs[targetID].resizable || isBow) {
+            screenY = this.innerCanvasDimFull.y - this.barH / this.beats * 2;
+          } else {
+            this.localSignData[targetID].height = (this.barH / this.beats * 2);
+            this.$store.dispatch("editSigns", {type: "changeSignData", index: targetID, data: {beatHeight: (this.localSignData[targetID].height / this.minHeight)}});
+            screenY = this.innerCanvasDimFull.y - this.barH / this.beats * 2 - this.minHeight;
+            this.localSignData[targetID].canResize = false;
+          }
         } else {
-          this.localSignData[targetID].height = (this.barH / this.beats * 2);
-          this.$store.dispatch("editSigns", {type: "changeSignData", index: targetID, data: {beatHeight: (this.localSignData[targetID].height / this.minHeight)}});
-          screenY = this.innerCanvasDimFull.y - this.barH / this.beats * 2 - this.minHeight;
-          this.localSignData[targetID].canResize = false;
+          this.localSignData[targetID].canResize = true;
         }
-      } else {
-        this.localSignData[targetID].canResize = true;
-      }
 
-      this.localSignData[targetID].x = screenX;
-      this.localSignData[targetID].y = screenY;
-      target.setAttribute("data-y", screenY);
+        this.localSignData[targetID].x = screenX;
+        this.localSignData[targetID].y = screenY;
+        target.setAttribute("data-y", screenY);
 
-      let columnsMoved = (parseFloat(target.getAttribute("start-x")) - this.localSignData[targetID].x) / -this.blocksizeX;
-      if (isBow) {
-        this.$store.dispatch("editSigns", {type: "changeSignData", index: targetID, data: {col: (this.signs[targetID].col + columnsMoved), colRight: (this.signs[targetID].colRight + columnsMoved)}});
-      } else {
-        this.$store.dispatch("editSigns", {type: "changeSignData", index: targetID, data: {col: (this.signs[targetID].col + columnsMoved)}});
-      }
-      
-      if (this.signs[targetID].col >= 0 ) {
-        this.$store.dispatch("editSigns", {type: "changeSignData", index: targetID, data: {side: "right"}});
-      } else {
-        this.$store.dispatch("editSigns", {type: "changeSignData", index: targetID, data: {side: "left"}});
-      }
+        let columnsMoved = (parseFloat(target.getAttribute("start-x")) - this.localSignData[targetID].x) / -this.blocksizeX;
+        if (isBow) {
+          this.$store.dispatch("editSigns", {type: "changeSignData", index: targetID, data: {col: (this.signs[targetID].col + columnsMoved), colRight: (this.signs[targetID].colRight + columnsMoved)}});
+        } else {
+          this.$store.dispatch("editSigns", {type: "changeSignData", index: targetID, data: {col: (this.signs[targetID].col + columnsMoved)}});
+        }
+        
+        if (this.signs[targetID].col >= 0 ) {
+          this.$store.dispatch("editSigns", {type: "changeSignData", index: targetID, data: {side: "right"}});
+        } else {
+          this.$store.dispatch("editSigns", {type: "changeSignData", index: targetID, data: {side: "left"}});
+        }
 
-      this.calcBeatMove(targetID, parseFloat(target.getAttribute("start-y")), parseFloat(target.getAttribute("start-h")), this.localSignData[targetID].y, this.localSignData[targetID].height);
-      if (isBodyPart && bodyPartBelowScore) {
-        this.$store.dispatch("editSigns", {type: "changeSignData", index: targetID, data: {bar: -1, beat: 0}});
+        this.calcBeatMove(targetID, parseFloat(target.getAttribute("start-y")), parseFloat(target.getAttribute("start-h")), this.localSignData[targetID].y, this.localSignData[targetID].height);
+        if (isBodyPart && bodyPartBelowScore) {
+          this.$store.dispatch("editSigns", {type: "changeSignData", index: targetID, data: {bar: -1, beat: 0}});
+        }
       }
       const shadowID = this.signs.length - 1;
       this.removeSign(shadowID);
       this.interacting = false;
-      this.makeLocalSignData();
+      this.multiInteract = false;
+      for (let index of this.interactingSigns) {
+        this.selectSign(index, true);
+      }
       this.interactingSigns = [];
-      this.selectSign(targetID);
+
+      let x = this.localSignData[target.getAttribute("signID")].x;
+      let y = this.localSignData[target.getAttribute("signID")].y;
       if (this.contextWasActive) {
         this.openContextMenu(event, screenX - x, screenY - y - this.handleDiam);
         this.contextWasActive = false;
       }
 
-      
       this.$store.dispatch("saveStateInHistory");
     },
 

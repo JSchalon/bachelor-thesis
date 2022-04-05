@@ -11,11 +11,12 @@ Git Repo zur Bachelorarbeit zur Entwicklung eines webbasierten Interaktionsedito
 
 ## Versions
 
-### Version 0.6.2
-- Now keeping constant beat height and adjusting bar height 
-	-(change from bar height being constant and adjusting beat height)
-- Restyled shadow sign to a uniform object for better visibility
-- Added color variables
-- Added images to context radio options
-- Restyled context menu options
-- Rewrote context menu option texts
+### Version 0.8.0
+- Implemented multi-drag and resize
+- Changed drag/resize background element styling
+- Fixed some bugs
+
+### Version Jump explanation (0.6.2 -> 0.8.0)
+- Feature set 6 not entirely finished
+- Feature set 7 fully implemented
+- Feature set 8 partly implemented (multi-drag/resize)

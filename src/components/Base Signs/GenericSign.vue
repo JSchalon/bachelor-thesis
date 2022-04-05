@@ -59,6 +59,6 @@ export default {
   fill: var(--selected-lighter);
   stroke-width: 2;
   stroke: black;
-  
+  opacity: 0.7;
 }
 </style>

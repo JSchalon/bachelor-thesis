@@ -114,7 +114,6 @@ export default {
 }
 
   .dragging .draggable {
-    opacity: 0.5;
     stroke:var(--selected);
     z-index: 100;
   }
