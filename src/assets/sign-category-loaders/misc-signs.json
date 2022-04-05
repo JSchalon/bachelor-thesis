@@ -38,6 +38,12 @@
       "upperPin": {"signType": "Low", "degree": -1},
       "lowerPin": {"signType": "Low", "degree": -1},
       "beatHeight": 2
+    },
+    {
+      "baseType": "PropSign",
+      "signType": "SmartPhone",
+      "resizable": false,
+      "beatHeight": 0.8
     }
   ]
 }

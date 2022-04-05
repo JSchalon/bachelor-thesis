@@ -649,6 +649,11 @@ export default createStore({
         } else {
           sign.baseType = "PropSign";
           sign.signType = elem.getElementsByTagName("laban:name")[0].innerHTML;
+          if (sign.col < 0) {
+            sign.side = "left";
+          } else {
+            sign.side = "right";
+          }
         }
         state["signs"].push(sign);
       }

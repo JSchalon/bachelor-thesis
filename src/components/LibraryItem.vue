@@ -1,5 +1,5 @@
 <template>
-  <div v-show="active" class="library-item-container" :id="'lib-item' + catIndex">
+  <div v-if="active" class="library-item-container" :id="'lib-item' + catIndex">
     <div class="library-item" :key="index" v-for="(elem, index) of signs" @click="selectSign(index)">
       <svg width="100%" :height="'beatHeight' in elem.signData ? elem.signData.beatHeight * minHeight + 2: height + 2" fill="white" class="library-sign-svg" :cat-index="catIndex" :index="index">
         <g :transform="'translate('+ offset + ',1)'">
@@ -49,9 +49,12 @@ export default {
   watch: {
     active (value) {
       if (value) {
-      for (let elem of document.getElementById("lib-item" + this.catIndex).getElementsByClassName("library-sign-svg")) {
-      ["touchstart", "touchmove", "touchend"].forEach((et) => elem.addEventListener(et, this.ignoreTouch));
-    }
+        setTimeout(function () {
+          for (let elem of document.getElementById("lib-item" + this.catIndex).getElementsByClassName("library-sign-svg")) {
+            ["touchstart", "touchmove", "touchend"].forEach((et) => elem.addEventListener(et, this.ignoreTouch));
+          }
+        }.bind(this), 10);
+        
       }
     }
   },

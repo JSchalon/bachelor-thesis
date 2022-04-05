@@ -109,7 +109,7 @@ export default {
         this.$store.dispatch("addToGridSelect", {col: -this.$store.state["columnsLeft"] - 1});
       } else if (this.signs[catIndex][index].signData.baseType == "PathSign") {
         this.$store.dispatch("addToGridSelect", {col: this.$store.state["columnsRight"]});
-      } else if (this.signs[catIndex][index].signData.baseType == "BodyPartSign") {
+      } else if (this.signs[catIndex][index].signData.baseType == "BodyPartSign" || this.signs[catIndex][index].signData.baseType == "PropSign") {
         for (let col = -this.$store.state["columnsLeft"]; col < this.$store.state["columnsRight"]; col++) {
           this.$store.dispatch("addToGridSelect", {col: col, bar: -1, beat: 0});
         }

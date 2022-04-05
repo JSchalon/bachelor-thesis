@@ -16,6 +16,10 @@
     {
       "name": "Vibration",
       "signType": "VibrationSign"
+    },
+    {
+      "name": "Smartphone Prop",
+      "signType": "SmartPhone"
     }
   ]
 }

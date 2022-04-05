@@ -5,7 +5,8 @@
         signData.baseType == 'RoomDirectionSign' ? 'room-direction' : '',
         signData.baseType == 'PathSign' ? 'path' : '',
         signData.baseType == 'BodyPartSign' ? 'body-part' : '',
-        signData.baseType != 'PathSign' && signData.baseType != 'RoomDirectionSign' && signData.baseType != 'BodyPartSign' ? 'bound-inner' : ''
+        signData.baseType == 'PropSign' ? 'body-part' : '',
+        signData.baseType != 'PathSign' && signData.baseType != 'RoomDirectionSign' && !(signData.baseType == 'BodyPartSign' || signData.baseType == 'PropSign') ? 'bound-inner' : ''
       ]" 
       :x="x" :y="y" 
       :data-y="y"

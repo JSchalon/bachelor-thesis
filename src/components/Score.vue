@@ -229,14 +229,14 @@ export default {
     
     setTimeout(() => {
       this.addSign({bar: 1, beat: 0,  col: 2, side: "right", }, false);
-    }, 10);
+    }, 5);
     setTimeout(() => {  
       this.removeSign(this.signs.length - 1);
       this.addBar(this.bars+1);
       this.removeBar(this.bars);
       this.makeLocalSignData();
       this.$store.dispatch("clearHistory");
-    }, 15);
+    }, 8);
     
 },
   unmounted () {
@@ -291,7 +291,7 @@ export default {
       let col = totalCol - this.columnsLeft - 1;
       let bar = this.bars - Math.floor(signY / this.barH);
       let beat = this.beats - Math.round((signY - (this.bars-bar) * this.barH) / this.minHeight) - this.curLibrarySign.signData.beatHeight;
-      if (this.curLibrarySign.signData.baseType == "BodyPartSign") {
+      if (this.curLibrarySign.signData.baseType == "BodyPartSign" || this.curLibrarySign.signData.baseType == "PropSign") {
         bar = -1;
         beat = 0;
       } else if (this.checkStartingPos(signY, this.curLibrarySign.signData.beatHeight * this.minHeight)) {
@@ -766,7 +766,7 @@ export default {
                 }
               }
             //if the key id is even -> up / down arrow key, move the sign up or down one beat if possible 
-            } else if (elem.baseType != "BodyPartSign") {
+            } else if (elem.baseType != "BodyPartSign" && elem.baseType != "PropSign") {
               let startY = this.localSignData[index].y;
               let startH = this.localSignData[index].height;
               if (move.beat > 0) {
@@ -1626,7 +1626,7 @@ export default {
       }
       //this.$store.dispatch("editSigns", {type: "changeSignData", index: shadowID, data: {beatHeight: (this.localSignData[shadowID].height / this.minHeight)}});
       const isBow = (this.signs[targetID].baseType == "RelationshipBow");
-      const isBodyPart = (this.signs[targetID].baseType == "BodyPartSign");
+      const isBodyPart = (this.signs[targetID].baseType == "BodyPartSign" || this.signs[targetID].baseType == "PropSign");
       const isPath = (this.signs[targetID].baseType == "PathSign");
       const isRoomSign = (this.signs[targetID].baseType == "RoomDirectionSign");
      
@@ -1677,7 +1677,7 @@ export default {
           if (!multiStopX && !(this.signs[index].baseType == "PathSign" || this.signs[index].baseType == "RoomDirectionSign")) {
             this.localSignData[index].x = (this.localSignData[index].x || 0) + event.dx;
           }
-          if (!multiStopY && this.signs[index].baseType != "BodyPartSign") {
+          if (!multiStopY && !(this.signs[index].baseType == "BodyPartSign" || this.signs[index].baseType == "PropSign")) {
             this.localSignData[index].y = (this.localSignData[index].y || 0) + event.dy;
             let yCorrect = Math.round(((this.localSignData[index].y || 0) + event.dy) / this.blocksizeY) * this.blocksizeY;
             if (allinStart && !this.checkStartingPos(yCorrect, this.localSignData[index].height)) {
@@ -1746,7 +1746,7 @@ export default {
       for (let targetID of this.interactingSigns) {
         target = this.$refs.bounding.querySelector(".sign-container[signID='" + targetID + "']");
         let isBow = (this.signs[targetID].baseType == "RelationshipBow");
-        let isBodyPart = (this.signs[targetID].baseType == "BodyPartSign");
+        let isBodyPart = (this.signs[targetID].baseType == "BodyPartSign" || this.signs[targetID].baseType == "PropSign");
         let isPath = (this.signs[targetID].baseType == "PathSign");
         let isRoomSign = (this.signs[targetID].baseType == "RoomDirectionSign");
         let bodyPartBelowScore = false;

@@ -11,7 +11,7 @@ Git Repo zur Bachelorarbeit zur Entwicklung eines webbasierten Interaktionsedito
 
 ## Versions
 
-### Version 0.8.1
-- Implemented sign duplication (one or more signs)
-- Fixed touch controls for lasso select, sign library
-- Fixed some bugs
+### Version 0.8.2
+- Added smartphone prop
+- Added neck limb sign
+- Fixed head sign "C" positioning
