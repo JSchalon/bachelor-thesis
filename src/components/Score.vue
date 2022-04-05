@@ -113,6 +113,9 @@ export default {
     multiselectActive () {
       return this.$store.state["multiselectActive"];
     },
+    duplicateSign () {
+      return this.$store.state["duplicateSignActive"];
+    },
     columnHandleTranslate () {
       return "left: " + this.selectedColumnTranslate.x + "px; top: " + this.selectedColumnTranslate.y + "px;";
     },
@@ -366,6 +369,9 @@ export default {
       this.$store.dispatch("setSelectedBar", data);
     },
     lassoSelect (data) {
+      if (this.multiselectActive) {
+        this.$store.dispatch("toggleMultiSelect");
+      }
       this.selectSign(-1);
       for (let index = 1; index < this.localSignData.length; index++) {
         let elem = this.localSignData[index];
@@ -674,6 +680,7 @@ export default {
      */
     placeSignOnTop (index) {
       let elem = this.$refs.bounding.querySelector(".sign-container[signID='"+ index + "']");
+
       this.$refs.bounding.appendChild(elem);
     },
 
@@ -862,7 +869,6 @@ export default {
       this.initSignClick();
     },
     initSignListeners (elem) {
-      console.log(elem)
       elem.addEventListener("contextmenu", this.openContextMenu, false);
       ["touchstart", "touchmove", "touchend"].forEach((et) => elem.addEventListener(et, this.ignoreTouch));
       if (elem.classList.contains("normal")) {
@@ -929,7 +935,7 @@ export default {
       this.$store.dispatch("changeContextMenu", false);
       this.contextSign = 0;
       let target = event.target;
-      const targetID = target.getAttribute("signID");
+      const targetID = parseInt(target.getAttribute("signID"));
       this.contextSign = targetID;
       let boundingRect = this.getSignRect(targetID);
 
@@ -1026,7 +1032,14 @@ export default {
      */
     initSignClick () {
       interact(".sign-container").on("tap", this.clickSign)
-      .on("doubletap", this.doubleClickSign);
+      .on("doubletap", this.doubleClickSign)
+      .on('hold',
+        function () {
+          if (!this.duplicateSign) {
+            this.$store.dispatch("toggleDuplicateSignActive");
+          }
+        }.bind(this)
+      );
     },
 
     /**
@@ -1035,7 +1048,7 @@ export default {
      */
     clickSign (event) {
       if (event.button == 0) {
-        const targetID = event.target.getAttribute("signID")
+        const targetID = parseInt(event.target.getAttribute("signID"));
         this.placeSignOnTop(targetID);
         this.selectSign(targetID, (event.ctrlKey || event.metaKey));
       }
@@ -1046,7 +1059,7 @@ export default {
      * @arg event the double click event
      */
     doubleClickSign (event) {
-      this.openContextMenu(event)
+      this.openContextMenu(event);
     },
 
 
@@ -1488,15 +1501,27 @@ export default {
       this.keyCommandsEnabled = false;
       this.interacting = true;
       let target = event.target;
-      const targetID = target.getAttribute("signID");
+      let targetID = parseInt(target.getAttribute("signID"));
+      if (event.shiftKey || this.duplicateSign) {
+        if (this.selectedSigns.length == 0 || !this.selectedSigns.includes(parseInt(targetID))) {
+          this.$store.dispatch("clearSelectedSigns");
+          this.selectSign(targetID);
+        } 
+        for (let index of this.selectedSigns) {
+          let elem = Object.assign({}, this.signs[index]);
+          elem.isSelected = false;
+          this.$store.dispatch("changeCurSign", {signData: elem});
+          this.addSign({bar: elem.bar, beat: elem.beat, col: elem.col, side: elem.side });
+        }
+      } 
       if (this.contextActive) {
         this.contextWasActive = true;
       }
 
       //fire a selection request to the score component for proper styling
-      if (this.selectedSigns.length <= 1) {
+      if (this.selectedSigns.length <= 1 || !this.selectedSigns.includes(parseInt(targetID))) {
         this.interactingSigns.push(targetID);
-        this.selectSign(-1);
+        this.$store.dispatch("clearSelectedSigns");
         //get current element position
         let  x = (this.localSignData[targetID].x || 0) + event.dx;
         let  y = (this.localSignData[targetID].y || 0) + event.dy;
@@ -1507,13 +1532,10 @@ export default {
         for (let index of this.selectedSigns) {
           this.interactingSigns.push(index);
         }
-        this.selectSign(-1);
+        this.$store.dispatch("clearSelectedSigns");
         this.makeInteractBox();
         this.multiInteract = true;
       }
-      
-      
-      
       this.makeShadow(this.signs[targetID]);
       if (this.signs[targetID].baseType == "RelationshipBow") {
         this.localSignData[this.signs.length - 1].width = this.localSignData[targetID].width;
@@ -1797,14 +1819,15 @@ export default {
         this.selectSign(index, true);
       }
       this.interactingSigns = [];
-
+      if (this.duplicateSign) {
+        this.$store.dispatch("toggleDuplicateSignActive");
+      }
       let x = this.localSignData[target.getAttribute("signID")].x;
       let y = this.localSignData[target.getAttribute("signID")].y;
       if (this.contextWasActive) {
         this.openContextMenu(event, screenX - x, screenY - y - this.handleDiam);
         this.contextWasActive = false;
       }
-
       this.$store.dispatch("saveStateInHistory");
     },
 

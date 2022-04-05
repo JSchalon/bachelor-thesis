@@ -94,7 +94,10 @@ export default {
     },
     gridSelection() {
       return this.$store.state["gridSelected"];
-    }
+    },
+    multiselectActive () {
+      return this.$store.state["multiselectActive"];
+    },
   },
   watch: {
     columnsLeft () {
@@ -188,9 +191,16 @@ export default {
       onmove: this.lassoScale,
       onend: this.lassoEnd
     }).styleCursor(false);
-    this.$refs.grid.addEventListener("contextmenu", function (event) {
-      event.preventDefault();
-    });
+    interact(".lasso-able").on('hold',
+      function () {
+        if (!this.multiselectActive) {
+          this.$store.dispatch("toggleMultiSelect");
+        }
+      }.bind(this)
+    );
+    for (let elem of document.getElementsByClassName("lasso-able")) {
+      ["touchstart", "touchmove", "touchend"].forEach((et) => elem.addEventListener(et, this.ignoreTouch));
+    }
   },
   methods: {
     colHighlightAfterAddRemove() {
@@ -402,6 +412,18 @@ export default {
     lassoEnd () {
       this.$emit("lassoSelect", {x: this.lasso.x, y: this.lasso.y, w: this.lasso.w, h: this.lasso.h});
       this.lasso = {x: 0, y: 0, startY: 0, startX: 0, w: 0, h: 0};
+      if (this.multiselectActive) {
+         this.$store.dispatch("toggleMultiSelect");
+      }
+    },
+    /**
+     * InteractJS workaround: touch events immediately end resize and drag events -> cancel them before that happens and implement scrolling elsewhere
+     * @arg event the drag-move event
+     */
+    ignoreTouch (event) {
+      if (event.cancelable && this.multiselectActive) {
+        event.preventDefault();
+      } 
     },
   },
 };

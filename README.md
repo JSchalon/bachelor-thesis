@@ -11,12 +11,7 @@ Git Repo zur Bachelorarbeit zur Entwicklung eines webbasierten Interaktionsedito
 
 ## Versions
 
-### Version 0.8.0
-- Implemented multi-drag and resize
-- Changed drag/resize background element styling
+### Version 0.8.1
+- Implemented sign duplication (one or more signs)
+- Fixed touch controls for lasso select, sign library
 - Fixed some bugs
-
-### Version Jump explanation (0.6.2 -> 0.8.0)
-- Feature set 6 not entirely finished
-- Feature set 7 fully implemented
-- Feature set 8 partly implemented (multi-drag/resize)

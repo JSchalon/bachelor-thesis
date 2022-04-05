@@ -24,6 +24,10 @@
           <li :class="selectedSigns.length > 0 ? 'active':'inactive'" class="option-item" @click="invertSelection()"><p>Invert Selection</p></li>
         </div>
       </ul>
+      <li :class="duplicateActive ? 'enabled':'disabled'" class="option-item" @click="activateDuplicate()">
+        <img v-show="duplicateActive" src="@/assets/images/common/duplicate-active.svg" class="option-img">
+        <img v-show="!duplicateActive" src="@/assets/images/common/duplicate-inactive.svg" class="option-img">
+      </li>
       <li class="option-divider"><p></p></li>
       <li :class="selectedSigns.length > 0 ? 'active':'inactive'" class="option-item" @click="deleteSelection()">
         <img src="@/assets/images/interaction-menu/x.svg" class="option-img">
@@ -57,6 +61,9 @@
       multiSelect () {
         return this.$store.state["multiselectActive"];
       },
+      duplicateActive () {
+        return this.$store.state["duplicateSignActive"];
+      },
       signs () {
         return this.$store.state["signs"];
       }
@@ -88,6 +95,9 @@
       },
       activateMultiSelect () {
         this.$store.dispatch("toggleMultiSelect");
+      },
+      activateDuplicate () {
+        this.$store.dispatch("toggleDuplicateSignActive");
       },
       selectAll () {
         this.$store.dispatch("clearSelectedSigns");
@@ -130,9 +140,11 @@
   height: 5vh;
   min-height: 38px;
   max-height: 50px;
-  background-color: var(--bg-lightest);
+  background: var(--bg-lightest);
   box-sizing: border-box;
   border-bottom: 1px solid var(--bg-light-less-2);
+  position: relative;
+  z-index: 5;
 }
 
 .options-tool-tip {

@@ -22,6 +22,7 @@ export default createStore({
     cloudAlert: "",
     contextActive: false,
     multiselectActive: false, 
+    duplicateSignActive: false,
       //first sign is a dummy sign:
       //Else there are problems with context menu errors
       //A relationship bow is used, since the interact listener for their resize function does not work unless there is a bow on the score upon mount (not fixable, maybe a interact.js bug?)
@@ -106,6 +107,9 @@ export default createStore({
     },
     toggleMultiSelect (state) {
       state["multiselectActive"] = !state["multiselectActive"];
+    },
+    toggleDuplicateSignActive (state) {
+      state["duplicateSignActive"] = !state["duplicateSignActive"];
     },
     addSignToObj(state, data) {
       state["signs"].push(data);
@@ -926,7 +930,6 @@ export default createStore({
         context.commit("addSignToObj", obj.data);
         if (!("isShadow" in obj.data && obj.data.isShadow)) {
           context.commit("addSignToXML", {obj: obj.data, index: -1});
-          context.commit("clearSelectedSigns");
         }
       } else if (obj.type == "changeSignData") {
         context.commit("changeSignData", {index: obj.index, data: obj.data});
@@ -965,6 +968,9 @@ export default createStore({
     },
     toggleMultiSelect(context) {
       context.commit("toggleMultiSelect");
+    },
+    toggleDuplicateSignActive (context) {
+      context.commit("toggleDuplicateSignActive");
     },
     newScore (context, template) {
       if (template) { 

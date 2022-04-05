@@ -58,6 +58,13 @@
           </ul>
         </div>
       </li>
+      <li class="option-item" @click="activateDuplicate()">
+        <div class="menu-option-container">
+          <img v-show="duplicateActive" src="@/assets/images/common/duplicate-active.svg" class="option-img">
+          <img v-show="!duplicateActive" src="@/assets/images/common/duplicate-inactive.svg" class="option-img">
+          <p>Duplication Mode</p>
+        </div>
+      </li>
       <li :class="selectedSigns.length > 0 ? 'active':'inactive'" class="option-item" @click="deleteSelection()">
         <div class="menu-option-container">
           <img src="@/assets/images/interaction-menu/x.svg" class="option-img">
@@ -92,6 +99,9 @@ export default {
       multiSelect () {
         return this.$store.state["multiselectActive"];
       },
+      duplicateActive () {
+        return this.$store.state["duplicateSignActive"];
+      },
       signs () {
         return this.$store.state["signs"];
       }
@@ -105,6 +115,9 @@ export default {
       },
       activateMultiSelect () {
         this.$store.dispatch("toggleMultiSelect");
+      },
+      activateDuplicate () {
+        this.$store.dispatch("toggleDuplicateSignActive");
       },
       deleteSelection () {
         if (this.selectedSigns.length == 0) {

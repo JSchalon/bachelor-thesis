@@ -1,5 +1,5 @@
 <template>
-  <div v-show="active" class="library-item-container">
+  <div v-show="active" class="library-item-container" :id="'lib-item' + catIndex">
     <div class="library-item" :key="index" v-for="(elem, index) of signs" @click="selectSign(index)">
       <svg width="100%" :height="'beatHeight' in elem.signData ? elem.signData.beatHeight * minHeight + 2: height + 2" fill="white" class="library-sign-svg" :cat-index="catIndex" :index="index">
         <g :transform="'translate('+ offset + ',1)'">
@@ -46,6 +46,15 @@ export default {
       return this.barHeight() / this.$store.state["beatsPerBar"];
     }
   },
+  watch: {
+    active (value) {
+      if (value) {
+      for (let elem of document.getElementById("lib-item" + this.catIndex).getElementsByClassName("library-sign-svg")) {
+      ["touchstart", "touchmove", "touchend"].forEach((et) => elem.addEventListener(et, this.ignoreTouch));
+    }
+      }
+    }
+  },
   mounted () {
     //load signs and add click functionality
     let json = require('@/assets/sign-category-loaders/' + this.category + '.json');
@@ -72,6 +81,18 @@ export default {
     selectSign (index) {
       let nameElem = this.langStrings.names.find(elem => this.signs[index].signData.signType == elem.signType);
       this.$emit("selectSign", {catIndex: this.catIndex, name: nameElem.name, index: index, height: this.baseHeight, signData: this.signs[index].signData, updateSign: false});
+    },
+    /**
+     * InteractJS workaround: touch events immediately end resize and drag events -> cancel them before that happens and implement scrolling elsewhere
+     * @arg event the drag-move event
+     */
+    ignoreTouch (event) {
+      if (event.cancelable) {
+        event.preventDefault();
+      } else {
+        console.warn(`The following event couldn't be canceled:`);
+        console.dir(event);
+      }
     },
   },
 }

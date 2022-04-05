@@ -167,6 +167,8 @@ export default {
         this.$store.dispatch("setGhostOverCanvas", false);
         if (this.signsLength != this.signs.length) {
           this.$store.dispatch("saveStateInHistory");
+          this.$store.dispatch("clearSelectedSigns");
+          this.$store.dispatch("addToSelectedSigns", this.signs.length - 1);
         }
         // if libSignOverCanvas = true -> score keeps the sign
         // else the sign is already deleted

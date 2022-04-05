@@ -53,6 +53,8 @@ export default {
   align-items: flex-end;
   box-sizing: border-box;
   border-bottom: 1px solid var(--bg-light-less-2);
+  position: relative;
+  z-index: 6;
 }
 .options-menu-list {
   list-style-type: none;
@@ -60,7 +62,6 @@ export default {
   padding: 0;
   height: 4.5vh;
   min-height: 30px;
-  z-index: 3;
 }
 
 .menu-option:hover .option-dropdown-top {

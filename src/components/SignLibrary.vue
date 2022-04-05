@@ -155,7 +155,7 @@ export default {
   
   float: left;
   position: relative;
-  z-index: 1;
+  z-index: 5;
   box-sizing: border-box;
   border-right: 1px solid var(--bg-light-less-2);
   background: var(--bg-lightest);

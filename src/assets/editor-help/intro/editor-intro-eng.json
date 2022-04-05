@@ -1,5 +1,5 @@
 { 
-  "breakPoints": {"0": 1, "1": 1, "2": 4, "6": 4},
+  "breakPoints": {"0": 1, "1": 1, "2": 5, "6": 5},
   "introData": [
     {
       "title": "The Options Menu",
@@ -11,16 +11,16 @@
     },
     {
       "title": "The Sign Library",
-      "text": "The sign library is used to place signs on the score. You can click a category to open it and then click a desired sign to display its name in the “Current Selected Sign” box. <br><br>To place a sign, click and drag it over the score. To abort placing the sign, drag it back into the sign library.",
-      "textTablet": "The sign library is used to place signs on the score. You can tap on a category to open it and then tap on a desired sign to display its name in the “Current Selected Sign” box. <br><br>To place a sign, tap and drag it over the score. To abort placing the sign, drag it back into the sign library.",
+      "text": "The sign library is used to place signs on the score. You can click on a category to open it and then click on a desired sign to display its name in the “Current Selected Sign” box. <br><br>To place a sign, click on it and drag it over the score. To abort placing the sign, drag it back into the sign library.",
+      "textTablet": "The sign library is used to place signs on the score. You can tap on a category to open it and then tap on a desired sign to display its name in the “Current Selected Sign” box. <br><br>To place a sign, tap on it and drag it over the score. To abort placing the sign, drag it back into the sign library.",
       "buttonText": "Next Interface Element",
       "position": {"elem": "library", "hSide": "right", "vSide": "top"},
       "highlightID": "library",
       "highlightElem": "signLibrary"
     },
     {
-      "title": "The Score - Moving and Resizing",
-      "text": "After placing a sign it can be moved by clicking it and then dragging it around. Signs will automatically snap to a column and a beat after letting go.<br><br>To resize a sign, click on it to select it. If it is resizable, two resize handles will appear which can be used to change its size.",
+      "title": "The Score - Moving and <br>Resizing",
+      "text": "After placing a sign it can be moved by clicking on it and then dragging it around. Signs will automatically snap to a column and a beat after letting go.<br><br>To resize a sign, click on it to select it. If it is resizable, two resize handles will appear which can be used to change its size. ",
       "textTablet": "After placing a sign it can be moved by tapping on it and then dragging it around. Signs will automatically snap to a column and a beat after letting go.<br><br>To resize a sign, tap on it to select it. If it is resizable, two resize handles will appear which can be used to change its size.",
       "buttonText": "Next",
       "position": {"elem": "library", "hSide": "left", "vSide": "top"},
@@ -28,9 +28,18 @@
       "highlightElem": "score"
     },
     {
+      "title": "The Score - Duplicating and <br> multi-Selection",
+      "text": "To duplicate a sign, select it, press shift and then drag it around. This also works when multiple signs are selected. In that case the entire selection will be duplicated.<br><br> Multiple signs can also be moved and resized at the same time, although there are some restrictions on resizing different sign types.",
+      "textTablet": "To duplicate a sign, tap and hold it until the “double box” icon in the interaction menu is selected and then drag it around. This also works when multiple signs are selected. In that case the entire selection will be duplicated.<br><br> Multiple signs can also be moved and resized at the same time, although there are some restrictions on resizing different sign types.",
+      "buttonText": "Next",
+      "position": {"elem": "library", "hSide": "left", "vSide": "top"},
+      "highlightID": "canvas",
+      "highlightElem": "score"
+    },
+    {
       "title": "The Score - Selection Box",
-      "text": "To select multiple signs at once, click on an empty place on the score and drag. This will create a selection box. Stop dragging to confirm the selection. All signs within the box at that time will be selected.",
-      "textTablet": "To select multiple signs at once, tap on an empty place on the score and drag. This will create a selection box. Stop dragging to confirm the selection. All signs within the box will be selected.",
+      "text": "To select multiple signs at once, click and drag  on an empty place on the score. This will create a selection box. Stop dragging to confirm the selection. All signs within the box at that time will be selected.",
+      "textTablet": "To select multiple signs at once, tap and hold on an empty place on the score until the multi-select icon in the interaction menu is selected and then drag. This will create a selection box. Stop dragging to confirm the selection. All signs within the box at that time will be selected.",
       "buttonText": "Next",
       "position": {"elem": "library", "hSide": "left", "vSide": "top"},
       "highlightID": "canvas",
@@ -64,9 +73,9 @@
       "highlightElem": "interactionMenu"
     },
     {
-      "title": "The Interaction Menu - Multi-Select",
-      "text": "The middle icons are selection options. Clicking the “dashed line” icon with the three internal boxes enters the multi-select mode. This enables the selection of multiple signs at once. Alternatively, this can also be achieved by holding ctrl while clicking.",
-      "textTablet": "The middle icons are selection options. Tapping the “dashed line” icon with the three internal boxes enters the multi-select mode. This enables the selection of multiple signs at once. ",
+      "title": "The Interaction Menu -<br> Multi-Select",
+      "text": "The middle icons are selection options. By clicking the “dashed line” icon with the three boxes the editor enters the multi-select mode. This enables the selection of multiple signs at once. Alternatively, this can also be achieved by holding ctrl while clicking signs.",
+      "textTablet": "The middle icons are selection options. By tapping the “dashed line” icon with the three boxes the editor enters the multi-select mode. This enables the selection of multiple signs at once. ",
       "buttonText": "Next",
       "position": {"elem": "interaction-menu", "hSide": "left", "vSide": "bottom"},
       "highlightID": "interaction-menu",
@@ -76,6 +85,15 @@
       "title": "The Interaction Menu - <br>Selection Options",
       "text": "Hovering on the empty dashed icon opens a dropdown, from which certain selection options can be executed. Alternatively, ctrl + a can be used to select or unselect all and ctrl + i can be used to invert the selection.",
       "textTablet": "Tapping on the empty dashed icon opens a dropdown, from which certain selection options can be executed.",
+      "buttonText": "Next",
+      "position": {"elem": "interaction-menu", "hSide": "left", "vSide": "bottom"},
+      "highlightID": "interaction-menu",
+      "highlightElem": "interactionMenu"
+    },
+    {
+      "title": "The Interaction Menu - <br>Duplication Mode",
+      "text": "Clicking the “double box” icon enters the sign duplication mode. While in this mode, drag a sign to duplicate it. To duplicate multiple signs, select and drag them. Alternatively, this can also be achieved by holding shift while dragging a sign.",
+      "textTablet": "Tapping the “double box” icon enters the sign duplication mode. While in this mode, drag a sign to duplicate it. To duplicate multiple signs, select and drag them. ",
       "buttonText": "Next",
       "position": {"elem": "interaction-menu", "hSide": "left", "vSide": "bottom"},
       "highlightID": "interaction-menu",
