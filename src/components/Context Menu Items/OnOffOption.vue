@@ -64,20 +64,20 @@ export default {
     transition: transform 0.2s ease;
     transform: translate(-2px,-2px);
     box-sizing: border-box;
-    border: 2px solid var(--text-options);
+    border: 2px solid var(--bg-dark);
   }
   .outer-on-off {
     width: calc(var(--contextItemImageSize) * 2);
     height: var(--contextItemImageSize);
     border-radius: 2000px;
-    background: var(--text-options);
+    background: var(--bg-dark);
     box-sizing: border-box;
-    border: 2px solid var(--text-options);
+    border: 2px solid var(--bg-dark);
     transition: background-color 0.2s ease;
   }
 
   .outer-on-off.on {
-    background: var(--add);
+    background: var(--selected);
   }
 
   .inner-on-off.on {

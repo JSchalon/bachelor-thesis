@@ -9,9 +9,9 @@
       <p v-if="!$store.state['isTablet'] || !('textTablet' in introData[curIndex])" class="mb-4" v-html="introData[curIndex]['text']"></p>
       <p v-else class="mb-4" v-html="introData[curIndex]['textTablet']"></p>
       <div class="is-flex is-justify-content-center mb-4">
-        <button v-if="curIndex > 0" class="button has-text-info is-white" @click="back()">Back</button>
-        <button v-if="curIndex < introData.length - 1" class="button has-text-info is-white" @click="next()">{{introData[curIndex]["buttonText"]}}</button>
-        <button v-else class="button has-text-info is-white" @click="$emit('disableModal')">{{introData[curIndex]["buttonText"]}}</button>
+        <button v-if="curIndex > 0" class="button nav-btn has-text-white mr-2" @click="back()">Back</button>
+        <button v-if="curIndex < introData.length - 1" class="button nav-btn has-text-white" @click="next()">{{introData[curIndex]["buttonText"]}}</button>
+        <button v-else class="button nav-btn has-text-white" @click="$emit('disableModal')">{{introData[curIndex]["buttonText"]}}</button>
       </div>
       <div class="is-flex is-justify-content-center">
         <div 
@@ -24,7 +24,7 @@
         >
           <button 
             class="button nav-dot mx-2" 
-            :class="curIndex - parseInt(Object.keys(breakPoints)[index]) + 1 == elem ? 'is-info':''"
+            :class="curIndex - parseInt(Object.keys(breakPoints)[index]) + 1 == elem ? 'active':''"
             @click="switchIndex((parseInt(Object.keys(breakPoints)[index]) - 1 + elem))" 
             :key="elem" 
             v-for="elem in breakPoints[Object.keys(breakPoints)[index]]"
@@ -150,5 +150,30 @@ export default {
 .box {
   max-width: 400px;
   
+}
+
+.nav-btn {
+  color: white;
+  background-color: var(--selected);
+}
+
+.nav-btn:focus {
+  box-shadow: 0 0 0 0.125em rgb(68 111 151 / 25%);
+  outline-color: var(--selected-darker)!important;
+  border-color: var(--selected)!important;
+}
+
+.nav-dot {
+  background-color: white;
+}
+
+.active {
+  background-color: var(--selected);
+}
+
+.nav-dot:focus {
+  box-shadow: 0 0 0 0.125em rgb(68 111 151 / 25%);
+  outline-color: var(--selected-darker)!important;
+  border-color: var(--selected)!important;
 }
 </style>

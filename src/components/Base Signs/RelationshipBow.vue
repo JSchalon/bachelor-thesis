@@ -85,18 +85,18 @@ export default {
       const type = this.signData.signType;
       let path = "";
       if (type == "touch") {
-        path = "M 40,10 Q " + (this.width / 2) + ",40," + (this.width - 40) + ",10";
+        path = "M 35,10 Q " + (this.width / 2) + ",40," + (this.width - 35) + ",10";
       } else if (type == "address") {
-        path = "M 40,10 H " + (this.width - 80) + " Q " + (this.width - 60) + ",40," + (this.width - 40) + ",10";
+        path = "M 35,10 H " + (this.width - 70) + " Q " + (this.width - 55) + ",40," + (this.width - 35) + ",10";
         if (this.signData.addressing == "left") {
-          path = "M 40,10 Q 60,40,80,10 H " + (this.width - 40) ;
+          path = "M 35,10 Q 55,40,70,10 H " + (this.width - 35) ;
         } else if (this.signData.addressing == "both") {
-          path = " M 40,10 Q 60,40,80,10 H " + (this.width - 80) + " Q " + (this.width - 60) + ",40," + (this.width - 40) + ",10";
+          path = " M 35,10 Q 55,40,70,10 H " + (this.width - 70) + " Q " + (this.width - 55) + ",40," + (this.width - 35) + ",10";
         }
       } else if (type == "near") {
-        path = "M 40,10 Q " + (this.width / 2) + ",40," + (this.width - 40) + ",10";
+        path = "M 35,10 Q " + (this.width / 2) + ",40," + (this.width - 35) + ",10";
       } else if (type == "support") {
-        path = "M 40,10 L 70, 30 H " + (this.width - 70) + " L " + (this.width - 40) + ",10";
+        path = "M 35,10 L 60, 30 H " + (this.width - 60) + " L " + (this.width - 35) + ",10";
       }
       return path; 
     },

@@ -2,7 +2,7 @@
     <div>
       <RadioOption 
       :options="pinType" 
-      :initState="signData.upperPin.signType"
+      :initState="pinType.findIndex(obj => obj.text == signData.upperPin.signType)"
       :optionText="'Upper Angle Level'"
       :active="displayPinOptions"
       @switchState="this.changeupperPin"
@@ -13,7 +13,7 @@
       <SignCategoryContainer v-else-if="signData.upperPin && signData.upperPin.signType == 'High'" :optionText="'Angle'" category="pins-high" :parentY="y" :active="signData.upperPin ? true : false" @updateSignData="changeupperPinAngle"/>
       <RadioOption 
         :options="pinType" 
-        :initState="signData.lowerPin.signType"
+        :initState="pinType.findIndex(obj => obj.text == signData.lowerPin.signType)"
         :optionText="'Lower Angle Level'"
         :active="displayPinOptions"
         @switchState="this.changelowerPin"
@@ -69,9 +69,9 @@ export default {
       }
       
     },
-    changeupperPin (data) {
+    changeupperPin (index) {
       let obj = JSON.parse(JSON.stringify(this.signData.upperPin)) || {signType: "Low", degree: 0};
-      obj.signType = data.text;
+      obj.signType = this.pinType[index].text;
       this.newSignData ({upperPin: obj});
     },
     changeupperPinAngle (data) {
@@ -82,9 +82,9 @@ export default {
         this.newSignData ({upperPin: obj});
       }
     },
-    changelowerPin (data) {
+    changelowerPin (index) {
       let obj = JSON.parse(JSON.stringify(this.signData.lowerPin)) || {signType: "Low", degree: 0};
-      obj.signType = data.text;
+      obj.signType = this.pinType[index].text;
       this.newSignData ({lowerPin: obj});
     },
     changelowerPinAngle (data) {

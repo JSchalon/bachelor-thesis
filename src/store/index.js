@@ -629,6 +629,7 @@ export default createStore({
             sign.digit = sign.digit + 1;
             sign.joint = parseInt(elemWrapper.getElementsByTagName("laban:joint")[0].innerHTML);
           } else if (elemWrapper.nodeName == "laban:limb") {
+            sign.canBeLimb = true;
             const limbName = elemWrapper.children[0].getElementsByTagName("laban:limb")[0].innerHTML;
             sign.limb = true;
             for (let [key, value] of Object.entries(state["limbNames"])) {
@@ -638,7 +639,8 @@ export default createStore({
             }
           } else if (elemWrapper.nodeName == "laban:surface") {
             sign.limb = true;
-            sign.surface = elemWrapper.getElementsByTagName("laban:side").innerHTML;
+            sign.canBeLimb = true;
+            sign.surface = elemWrapper.getElementsByTagName("laban:side")[0].innerHTML;
             const limbName = elemWrapper.children[0].getElementsByTagName("laban:limb")[0].innerHTML;
             for (let [key, value] of Object.entries(state["limbNames"])) {
               if (value == limbName) {

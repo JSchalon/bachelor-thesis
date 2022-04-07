@@ -16,7 +16,7 @@
         <h2 class="title is-5">{{$store.state["title"]}} <button class="delete is-large custom-close" aria-label="close" @click="this.$store.dispatch('changeSettings', {showScoreDescription: !storeDescActive});"><img src="@/assets/images/interaction-menu/x.svg" class="option-img"></button> </h2>
         <p>{{$store.state["description"]}}</p>
       </div>
-      <button v-else class="button has-background-white is-size-5 has-text-info" @click="this.$store.dispatch('changeSettings', {showScoreDescription: !storeDescActive});">!</button>
+      <button v-else class="button has-background-white is-size-5 desc-btn" @click="this.$store.dispatch('changeSettings', {showScoreDescription: !storeDescActive});">!</button>
     </div>
     <div class="highlight-overlay" :class="{active: tutHighlight != ''}"/>
 
@@ -489,6 +489,16 @@ export default {
   padding-right: 30px;
 }
 
+.desc-btn:focus {
+  box-shadow: 0 0 0 0.125em rgb(68 111 151 / 25%);
+  outline-color: var(--selected-darker)!important;
+  border-color: var(--selected)!important;
+}
+
+.desc-btn:hover {
+  border-color: var(--selected)!important;
+}
+
 .desc-box .button {
   box-shadow: 0 1px 3px 1px rgb(0 0 0 / 15%);
 }
@@ -537,6 +547,18 @@ html {
 
 .tut-highlight {
   border: 3px solid var(--selected)!important;
+}
+
+div.select:after {
+  border-color: var(--selected)!important;
+}
+
+.help.is-info {
+  color: var(--selected)!important;
+}
+
+.button.is-info {
+  background-color: var(--selected)!important;
 }
 
 </style>

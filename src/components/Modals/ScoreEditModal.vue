@@ -61,8 +61,8 @@
             <input class="input" type="number" placeholder="1-1000" min="1" max="1000" value="1" name="beatDuration" required>
           </div>
         </div>
-        <button v-if="newScore" class="button is-success">Create Score</button>
-        <button v-else class="button is-success">Update Score Parameters</button>
+        <button v-if="newScore" class="button is-info">Create Score</button>
+        <button v-else class="button is-info">Update Score Parameters</button>
         <button class="button ml-3" type="reset" @click="disableModal">Cancel</button>
       </form>
     </div>

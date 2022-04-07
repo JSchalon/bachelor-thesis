@@ -9,7 +9,7 @@
         </div>
       </div>
       <div class="category" :class="{left: side == 'left'}" :style="'top: ' + top + 'px; left: ' + xOffset + 'px'">
-        <LibraryItem :active="true" :category="category" :catIndex="0" :selected="selected" :offset="itemOffset"  @selectSign="selectSign"/>
+        <LibraryItem :active="true" :category="category" :catIndex="0" :selected="selected" :offset="itemOffset" :inLibrary="false" @selectSign="selectSign"/>
       </div>
       <div v-if="!active" class="blocker" :style="'height: ' + itemHeight + 'px'"/>
     </div>

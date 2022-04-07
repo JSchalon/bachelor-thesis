@@ -4,22 +4,22 @@
       <OnOffOption :optionText="'Hold'" :initState="signData.holding" :active="true" @switchState="changeHolding"/>
       <RadioOption 
         :options="dimensions" 
-        :initState="signData.dimension"
+        :initState="dimensions.findIndex(obj => obj.text == signData.dimension)"
         :optionText="'Vertical Level'"
         :active="true"
-        @switchState="this.changeDimension"
+        @switchState="changeDimension"
       />
       <RadioOption 
         :options="positions" 
-        :initState="signData.position"
+        :initState="positions.findIndex(obj => obj.text == signData.position)"
         :optionText="'Position'"
         :active="true"
-        @switchState="this.changePosition"
+        @switchState="changePosition"
       />
       <OnOffOption :optionText="'Angle definition'" :initState="definitionActive" :active="true" @switchState="changeDefinition"/>
       <RadioOption 
         :options="definitions" 
-        :initState="signData.definition ? signData.definition.signType : false"
+        :initState="signData.definition ? definitions.findIndex(obj => obj.text == signData.definition.signType) : 0"
         :optionText="'Angle level'"
         :active="signData.definition ? true : false"
         @switchState="changeDefinitionPin"
@@ -80,9 +80,9 @@ export default {
      * An example function changing the border color based of an radio Option, as an example for the actual radio funcitionality
      * @arg color the boolean changing the color 
      */
-    changeDimension(data) {
+    changeDimension(index) {
       let newSignData = this.signData;
-      newSignData.dimension = data.text;
+      newSignData.dimension = this.dimensions[index].text;
 
       this.newSignData (newSignData);
     },
@@ -92,9 +92,9 @@ export default {
     changeHolding (data) {
       this.newSignData({holding: data})
     },
-    changePosition (data) {
-      if (data.text != "---") {
-        this.newSignData({position: data.text})
+    changePosition (index) {
+      if (this.positions[index].text != "---") {
+        this.newSignData({position: this.positions[index].text})
       } else {
         this.newSignData({position: false})
       }
@@ -107,10 +107,9 @@ export default {
         this.newSignData({definition: false});
       }
     },
-    changeDefinitionPin (data) {
-      
+    changeDefinitionPin (index) {
       let obj = JSON.parse(JSON.stringify(this.signData.definition)) || {signType: "Low", degree: 0, bgVisible: false};
-      obj.signType = data.text;
+      obj.signType = this.definitions[index].text;
       this.newSignData ({definition: obj});
     },
     changeDefinitionAngle (data) {

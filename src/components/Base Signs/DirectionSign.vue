@@ -10,7 +10,7 @@
       :signID="id"
       :fill="signData.dimension != 'Middle' ? getFill() : 'white'"
     />
-    <circle v-if="signData.dimension == 'Middle' && (!signData.definition || signData.definition.signType != 'Middle')" :cx="signWidth / 2" :cy="height / 2" r="4" fill="black"/>
+    <circle v-if="signData.dimension == 'Middle' && (!signData.definition || signData.definition.signType != 'Middle')" :cx="signWidth / 2" :cy="height / 2" r="4" fill="black" :signID="id"/>
     <Pin v-if="signData.definition" :isSelected="isSelected" :id="id" :signData="signData.definition" :height="height" :inverted="signData.dimension == 'Low'"/>
     <g :transform="'translate(' + getPositionTransform() + ',0)'">
       <Pin v-if="signData.position && signData.position != '---'" :isSelected="isSelected" :id="id" :signData="signData.position == 'Infront' ? {signType: 'Low', degree: 0}:{signType: 'Low', degree: 180}" :height="height"/>

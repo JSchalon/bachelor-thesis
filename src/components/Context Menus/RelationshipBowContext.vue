@@ -51,10 +51,10 @@ export default {
     changeType (data) {
       this.newSignData({signType: data.signType})
     },
-    changeAdressing (data) {
-      if (data.text == "Right") {
+    changeAdressing (index) {
+      if (this.addressingTypes[index].text == "Right") {
         this.newSignData({addressing: "right"})
-      } else if (data.text == "Left") {
+      } else if (this.addressingTypes[index].text == "Left") {
         this.newSignData({addressing: "left"})
       } else {
         this.newSignData({addressing: "both"})
@@ -81,11 +81,11 @@ export default {
     },
     getAddressInitState () {
       if (this.signData.addressing == "right" || this.signData.addressing == undefined) {
-        return "Right";
+        return 0;
       } if (this.signData.addressing == "left") {
-        return "Left";
+        return 1;
       } else {
-        return "Both";
+        return 2;
       }
     }
   },

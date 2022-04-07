@@ -74,6 +74,9 @@ export default {
     document.documentElement.style.setProperty('--contextItemHeight', this.contextItemHeight + "px");
     document.documentElement.style.setProperty('--contextItemMargin', this.contextItemMargin + "px");
     document.documentElement.style.setProperty('--contextItemImageSize', this.contextItemImageSize + "px");
+    setTimeout(function () {
+      this.$store.dispatch("saveStateInHistory");
+    }.bind(this), 50); 
   },
   methods: {
     getSettingsCookie () {
@@ -104,6 +107,7 @@ export default {
     --bg-light-less: #d6d6d6;
     --bg-light-less-2: #c1c1c1;
     --bg-light-least: #a3a3a3;
+    --bg-dark: #434343;
 
     --selected-lighter: #84badb;
     --selected: #5e9fc7;

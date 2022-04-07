@@ -4,7 +4,7 @@
       <OnOffOption :optionText="'Hold'" :initState="signData.holding" :active="true" @switchState="changeHolding"/>
       <RadioOption 
         :options="definitionTypes" 
-        :initState="signData.definition ? signData.definition.baseType : signData.definition"
+        :initState="signData.definition ? definitionTypes.findIndex(obj => obj.text == signData.definition.baseType) : 0"
         :optionText="'Definition'"
         :active="true"
         @switchState="changeDefinition"
@@ -12,7 +12,7 @@
 
         <RadioOption 
           :options="definitions" 
-          :initState="signData.definition ? signData.definition.signType : false"
+          :initState="signData.definition ? definitions.findIndex(obj => obj.text == signData.definition.signType) : 0"
           :optionText="'Angle level'"
           :active="signData.definition && signData.definition.baseType == 'Pin'"
           @switchState="changeDefinitionPin"
@@ -61,7 +61,7 @@ export default {
       definitionTypes: [
         {text: '---', img: false},
         {text: 'Pin', img: "/pin-low-forward.svg"},
-        {text: 'Space Measurement', img: "/space-measurement-sign.svg"}
+        {text: 'SpaceMeasurementSign', img: "/space-measurement-sign.svg"}
       ],
     };
   },
@@ -77,20 +77,20 @@ export default {
     changeHolding (data) {
       this.newSignData({holding: data})
     },
-    changeDefinition (data) {
-      if (data.text != "---") {
-        if (data.text == "Pin") {
-          this.newSignData({definition: {baseType: "Pin", signType: "Low", degree: 0, bgVisible: true}})
+    changeDefinition (index) {
+      if (this.definitionTypes[index].text != "---") {
+        if (this.definitionTypes[index].text == "Pin") {
+          this.newSignData({definition: {baseType: "Pin", signType: "Low", degree: 0, bgVisible: true}});
         } else {
-          this.newSignData({definition: {baseType: "SpaceMeasurementSign", signType: "Narrow", degree: 1}})
+          this.newSignData({definition: {baseType: "SpaceMeasurementSign", signType: "Narrow", degree: 1}});
         }
       } else {
         this.newSignData({definition: false});
       }
     },
-    changeDefinitionPin (data) {
+    changeDefinitionPin (index) {
       let obj = JSON.parse(JSON.stringify(this.signData.definition)) || {baseType: "Pin", signType: "Low", degree: 0, bgVisible: false};
-      obj.signType = data.text;
+      obj.signType = this.definitions[index].text;
       this.newSignData ({definition: obj});
     },
     changeDefinitionPinAngle (data) {

@@ -26,7 +26,7 @@
         C
       </text>
     </g>
-    <path v-if="limbTransform != 0" class="draggable actual-sign" :class="{active: isSelected}" :stroke-width="isSelected ? borderWidth + 1: borderWidth" stroke="black" :d="'M15,'+ (signWidth / 1.5) + 'V40M25,'+ (signWidth / 1.5) + 'V40'"/>
+    <path v-if="limbTransform != 0" class="draggable actual-sign" :class="{active: isSelected}" :stroke-width="isSelected ? borderWidth + 1: borderWidth" stroke="black" :d="'M15,'+ (signWidth / 1.5) + 'V40M25,'+ (signWidth / 1.5) + 'V40'" :signID="id"/>
   </g>
 </template>
 

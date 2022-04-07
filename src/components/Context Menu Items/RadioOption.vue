@@ -26,7 +26,7 @@ export default {
   props: {
     options: Array,
     optionText: String,
-    initState: [String, Boolean],
+    initState: Number,
     active: Boolean,
   },
   emits: ["switchState"],
@@ -37,11 +37,14 @@ export default {
     };
   },
   mounted () {
-    this.selectedID = this.options.findIndex(obj => obj.text.includes(this.initState));
     this.itemHeight = this.$refs.container.getBoundingClientRect().height;
-    if (this.selectedID == -1) {
-      this.selectedID = 0;
-    }
+    this.$nextTick(() => {
+      this.selectedID = this.initState;
+      if (this.selectedID == -1) {
+        this.selectedID = 0;
+      }
+    });
+    
   },
   methods: {
     /**
@@ -49,7 +52,7 @@ export default {
      */
     changeSelect(index) {
       this.selectedID = index;
-      this.$emit("switchState", this.options[index]);
+      this.$emit("switchState", index);
     },
   },
   computed: {
@@ -67,11 +70,11 @@ export default {
 <style scoped>
 
   text{
-    fill: var(--text-options);
+    color: var(--bg-dark);
     margin-right: 10px;
   }
   .radio-option {
-    border: 2px solid var(--text-options);
+    border: 2px solid var(--bg-dark);
     background-color: white;
     border-radius: 2000px;
     margin-left: var(--contextItemMargin);

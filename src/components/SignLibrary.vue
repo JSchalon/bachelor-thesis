@@ -1,7 +1,7 @@
 <template>
   <div id="library" :style="libraryActive ? 'width: 260px;' : 'width: 0;'">
     <div></div>
-    <div id="cur-sign-container"><p class="cur-sign-text">Current Sign: {{curSign}}</p></div>
+    <div id="cur-sign-container"><p class="cur-sign-text">{{curSign}}</p></div>
     <LibraryItemContainer :active="item.active" :selected="item.selected" :category="item.category" :catIndex="index" :key="index" v-for="(item, index) of categories" @expand="selectCategory" @selectSign="updateCurSign" @emitSigns="addSigns"/>
   </div>
 </template>
@@ -29,7 +29,7 @@ export default {
         {active: false, category: "body-part-signs", selected: -1}, 
         {active: false, category: "misc-signs", selected: -1},
       ],
-      curSign: "---",
+      curSign: "",
       signs: {},
     };
   },
@@ -65,7 +65,7 @@ export default {
       this.categories[index].active = !this.categories[index].active;
     },
     updateCurSign (data) {
-      this.curSign = "---";
+      this.curSign = "";
       let unselect = false;
       if (this.categories[data.catIndex].selected == data.index) {
         //if the new selected sign == the old selected sign -> unselect
@@ -77,7 +77,7 @@ export default {
       if (!unselect) {
         //if the new selected sign == the old selected sign -> unselect
         this.categories[data.catIndex].selected = data.index;
-        this.curSign = data.name;
+        this.curSign = "Current Sign: " + data.name;
         //push to current sign
         if (data.updateSign) {
           let sign = {signData: data.signData};
@@ -137,7 +137,7 @@ export default {
     storedSign (sign) {
       //if a sign is placed, the state.curSign is reset -> reset selection in library
       if (!sign) {
-        this.curSign = "---";
+        this.curSign = "";
         for (let elem of this.categories) {
           elem.selected = -1;
         }

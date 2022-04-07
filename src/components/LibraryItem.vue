@@ -1,7 +1,7 @@
 <template>
   <div v-if="active" class="library-item-container" :id="'lib-item' + catIndex">
     <div class="library-item" :key="index" v-for="(elem, index) of signs" @click="selectSign(index)">
-      <svg width="100%" :height="'beatHeight' in elem.signData ? elem.signData.beatHeight * minHeight + 2: height + 2" fill="white" class="library-sign-svg" :cat-index="catIndex" :index="index">
+      <svg width="100%" :height="'beatHeight' in elem.signData ? elem.signData.beatHeight * minHeight + 2: height + 2" fill="white" :class="inLibrary ? 'library-sign-svg': ''" :cat-index="catIndex" :index="index">
         <g :transform="'translate('+ offset + ',1)'">
           <g :transform="elem.signData.baseType == 'RelationshipBow' ? 'translate(-60,0)' : ''">
               <component :is="elem.signData.baseType" :isSelected="index == selected" :height="'beatHeight' in elem.signData ? elem.signData.beatHeight * minHeight : elem.height" :signData="elem.signData"/>
@@ -27,6 +27,10 @@ export default {
     catIndex: Number,
     selected: Number,
     offset: Number,
+    inLibrary: {
+      Boolean,
+      default: true,
+    }
   },
   data() {
     return {
