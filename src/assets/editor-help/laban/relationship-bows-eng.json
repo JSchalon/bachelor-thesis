@@ -1,0 +1,34 @@
+{ 
+  "breakPoints": {"0": 3},
+  "introData": [
+    {
+      "title": "Relationship Bows",
+      "text": "Relationship bows describe the relationship between two body parts or objects. There are four types, three of which are bidirectional.<br><br> They can either be placed on their own, to indicate a general relationship, or be added before another movement, to specify the relationship during it.",
+      "buttonText": "Next",
+      "position": {"elem": "library", "hSide": "right", "vSide": "top"},
+      "stateChange": false,
+      "highlightID": "library-relationship-bows",
+      "highlightElem": "signLibrary"
+    },
+    {
+      "title": "Relationship Bows",
+      "text": "A near bow signifies that two body parts are near each other, but not touching. A contact bow signifies that two body parts are having contact, but are not supporting each other. A supporting sign signifies that one body part is supporting the other. The Addressing bow usually signifies that an active body part is turned to a passive body part, which has a half-circle on its side altough both sides can be active at the same time.",
+      "buttonText": "Next",
+      "position": {"elem": "library", "hSide": "right", "vSide": "top"},
+      "stateChange": false,
+      "image": "addressing.svg",
+      "highlightID": "library-relationship-bows",
+      "highlightElem": "signLibrary"
+    },
+    {
+      "title": "Relationship Bows",
+      "text": "Bows can be further specified. A passing bow (1) signifies a gliding motion of the body parts, while a grasping bow (2) signifies that one body part is grasping the other. Space measurement signs can be used similarly to the grasping sign, in the sense that a “narrow” sign can also be used to indicate a grasping motion.",
+      "buttonText": "Finish",
+      "position": {"elem": "library", "hSide": "right", "vSide": "top"},
+      "stateChange": false,
+      "image": "bow-pass-grasp.svg",
+      "highlightID": "library-relationship-bows",
+      "highlightElem": "signLibrary"
+    }
+  ]
+}

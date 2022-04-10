@@ -3,15 +3,15 @@
   "names": [
     {
       "name": "Left turn",
-      "signType": "Left turn"
+      "signType": "counterClockwise"
     },
     {
       "name": "Right turn",
-      "signType": "Right turn"
+      "signType": "clockwise"
     },
     {
       "name": "Any turn",
-      "signType": "Any turn"
+      "signType": "any"
     }
   ]
 }

@@ -3,19 +3,19 @@
   "names": [
     {
       "name": "Straight path",
-      "signType": "Straight"
+      "signType": "straight"
     },
     {
       "name": "Circular path left",
-      "signType": "Circular left"
+      "signType": "circularLeft"
     },
     {
       "name": "Circular path right",
-      "signType": "Circular right"
+      "signType": "circularRight"
     },
     {
       "name": "Any path",
-      "signType": "Any"
+      "signType": "any"
     }
   ]
 }

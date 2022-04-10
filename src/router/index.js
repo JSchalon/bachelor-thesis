@@ -6,7 +6,7 @@ const routes = [
     path: '/',
     name: 'Interaction Editor',
     component: Main
-  }
+  },
 ]
 
 const router = createRouter({

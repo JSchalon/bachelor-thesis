@@ -1,6 +1,6 @@
 <template>
     <div>
-      <SignCategoryContainer :optionText="'Type'" :category="'space-measurement-signs'" :parentY="y" :active="true" @updateSignData="newSignData"/>
+      <SignCategoryContainer :optionText="'Type'" :category="'space-measurement-signs'" :parentY="y" :active="true" @updateSignData="changeType"/>
       <SignCategoryContainer v-if="signData.signType == 'Unfolding' || signData.signType == 'NeitherOr'" :optionText="'Degree'" :category="'wide-signs'" :parentY="y" :active="false" @updateSignData="newSignData"/>
       <SignCategoryContainer v-if="signData.signType == 'Narrow'" :optionText="'Degree'" :category="'narrow-signs'" :parentY="y" :active="true" @updateSignData="newSignData"/>
       <SignCategoryContainer v-if="signData.signType == 'Wide'" :optionText="'Degree'" :category="'wide-signs'" :parentY="y" :active="true" @updateSignData="newSignData"/>
@@ -43,6 +43,13 @@ export default {
     changeDegree (data) {
       if (this.isActive) {
         this.newSignData ({degree: (data.data + 1)});
+      }
+    },
+    changeType (data) {
+      if (data.signType != "Unfolding" && data.signType != "NeitherOr" ) {
+        this.newSignData ({signType: data.signType});
+      } else {
+        this.newSignData ({signType: data.signType, degree: 1});
       }
     },
     changeHolding (data) {

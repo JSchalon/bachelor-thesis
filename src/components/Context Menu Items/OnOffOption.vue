@@ -4,7 +4,7 @@
         <p class="context-item-text">{{optionText}}</p>
       </div>
       <div class="center-vertically context-item-interact-box">
-        <div class="outer-on-off" @click="changeState">
+        <div class="outer-on-off" :class="initState ? 'on' : 'off'" @click="changeState">
           <div class="inner-on-off" :class="initState ? 'on' : 'off'"/>
         </div>
       </div>
@@ -57,22 +57,30 @@ export default {
   }
 
   .inner-on-off {
-    width: calc(var(--contextItemImageSize) - 5px);
-    height: calc(var(--contextItemImageSize) - 5px);
-    transform: translate(2.5px, 2.5px);
-    background: #828282;
+    width: calc(var(--contextItemImageSize));
+    height: calc(var(--contextItemImageSize));
+    background: var(--bg-lightest);
     border-radius: 2000px;
-    transition: transform 0.2s ease, background-color 0.2s ease;
+    transition: transform 0.2s ease;
+    transform: translate(-2px,-2px);
+    box-sizing: border-box;
+    border: 2px solid var(--bg-dark);
   }
   .outer-on-off {
     width: calc(var(--contextItemImageSize) * 2);
     height: var(--contextItemImageSize);
     border-radius: 2000px;
-    background: #b1b1b1;
+    background: var(--bg-dark);
+    box-sizing: border-box;
+    border: 2px solid var(--bg-dark);
+    transition: background-color 0.2s ease;
+  }
+
+  .outer-on-off.on {
+    background: var(--selected);
   }
 
   .inner-on-off.on {
-    background: #70be7b;
-    transform: translate(calc(var(--contextItemImageSize) * 2 - (var(--contextItemImageSize) - 2.5px)), 2.5px);
+    transform: translate(calc(var(--contextItemImageSize) * 2 - (var(--contextItemImageSize) + 2px)), -2px);
   }
 </style>

@@ -1,16 +1,5 @@
 <template>
-  <div id="app">
-    <router-view/>
-    <div class="alert-container" v-if="isPhone">
-      <div class="alert-box">
-        <p class="alert-text">We recommend using a Tablet or PC to use this editor. Using a phone is possible, but not advised.</p>
-        <div class="divider-bar"></div>
-        <div class="alert-btn-container">
-          <button class="alert-btn" @click="isPhone=false">Got it</button><p>>></p>
-        </div>  
-      </div>
-    </div> 
-  </div>
+  <router-view/>
 </template>
 
 <script>
@@ -29,28 +18,32 @@ export default {
   },
   data() {
     return {
-      isPhone: false,
-      isTablet: false,
       contextMenuWidth: 250,
-      contextItemHeight: 50,
-      contextItemMargin: 10,
+      contextItemHeight: 45,
+      contextItemMargin: 7,
       contextItemImageSize: 25,
-      barHeight: 200,
+      beatHeight: 50,
     };
+  },
+  computed: {
+    barHeight () {
+      let height = this.$store.state["beatsPerBar"] * this.beatHeight;
+      document.documentElement.style.setProperty('--barHeight', height + "px");
+      return height;
+    }
   },
   provide () {
     //set global dimensions used by the score canvas, its subcomponents and the signs
     //change these here
     return {
       signWidth: 40,
-      barHeight: this.barHeight,
+      barHeight: () => this.barHeight,
       startBarOffset: 5,
-      columnWidth: 80,
+      columnWidth: 70,
       beatLineWidth: 25,
       addRemoveHeight: 40,
       addRemoveWidth: 10,
-      innerCanvasMargin: 30,
-      outerCanvasMargin: 50,
+      outerCanvasMargin: 70,
       handleDiam: 7,
       borderWidth: 2,
       contextMenuWidth: this.contextMenuWidth,
@@ -70,24 +63,26 @@ export default {
     }
     if (settingsObj == null) {
       //create settings cookie
-      let testObj = {seenIntro: false, language: "eng", showHelpLines: true};
-      document.cookie = "settings=" + JSON.stringify(testObj) + "; expires=" + d.toUTCString() + "; path=/";
+      let newCookie = {seenIntro: false, language: "eng", showHelpLines: true, showScoreDescription: false};
+      document.cookie = "settings=" + JSON.stringify(newCookie) + "; expires=" + d.toUTCString() + "; path=/";
     } else {
-      //store action set settings
+      this.$store.dispatch("changeSettings", settingsObj);
     }
-    this.isPhone = window.matchMedia("only screen and (max-width: 760px)").matches;
-    this.isTablet = window.matchMedia("only screen and (max-width: 1024px)").matches;
+    this.$store.dispatch("setIsPhone", window.matchMedia("only screen and (max-width: 760px)").matches);
+    this.$store.dispatch("setIsTablet", window.matchMedia("only screen and (max-width: 1024px)").matches);
     document.documentElement.style.setProperty('--contextMenuWidth', this.contextMenuWidth + "px");
     document.documentElement.style.setProperty('--contextItemHeight', this.contextItemHeight + "px");
     document.documentElement.style.setProperty('--contextItemMargin', this.contextItemMargin + "px");
     document.documentElement.style.setProperty('--contextItemImageSize', this.contextItemImageSize + "px");
-    document.documentElement.style.setProperty('--barHeight', this.barHeight + "px");
+    setTimeout(function () {
+      this.$store.dispatch("saveStateInHistory");
+    }.bind(this), 50); 
   },
   methods: {
     getSettingsCookie () {
       const settings =  document.cookie.match('(^|;)\\s*' + "settings" + '\\s*=\\s*([^;]+)')?.pop() || '';
       return settings;
-    }
+    },
   }
 };
 </script>
@@ -98,59 +93,28 @@ export default {
     user-select: none;
     overflow: hidden;
   }
-  .alert-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background-color: rgba(0,0,0,.5);
-    width: 100%;
-    height: 100%;
-    position: fixed;
-    z-index: 10;
-    top: 0;
-  }
-
-    .alert-box {
-      width: 80%;
-      border-radius: 30px;
-      background-color: white;
-      box-shadow: 0 1px 8px 5px rgba(0, 0, 0, 0.15);
-    }
-    .alert-text {
-      width: 100%;
-      padding: 0 1em;
-      margin-bottom: 0.5em;
-      box-sizing: border-box;
-      font-size: 1.5em;
-    }
-
-    .divider-bar {
-      height: 0;
-      width:  calc(100% - 4em);
-      margin: 0 2em;
-      border-bottom: 2px solid;
-
-    }
-
-    .alert-btn-container {
-      width: 100%;
-      margin: 1em 0;
-      display: flex;
-      justify-content: center;
-    }
-
-    .alert-btn-container > * {
-      font-size: 1.5em;
-      color: #21a3fa;
-    }
-
-      .alert-btn {
-        background-color: white;
-        border: 0px;
-        
-      }
-
   text, p {
     font-family: Arial;
+  }
+  :root {
+    --delete: #ff4b4b;
+    --add: #94d481;
+    --add-darker: #51a33c;
+
+    --bg-lightest: #f4f4f4;
+    --bg-lighter: #e9e9e9;
+    --bg-light: #e5e5e5;
+    --bg-light-less: #d6d6d6;
+    --bg-light-less-2: #c1c1c1;
+    --bg-light-least: #a3a3a3;
+    --bg-dark: #434343;
+
+    --selected-lighter: #84badb;
+    --selected: #5e9fc7;
+    --selected-darker: #446f97;
+
+    --text-options: #343434;
+    --text-shortcut: #808080;
+    /* On-off-option */
   }
 </style>

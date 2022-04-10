@@ -1,0 +1,15 @@
+{ 
+  "breakPoints": {"0": 1},
+  "introData": [
+    {
+      "title": "Relationship Pins",
+      "text": "Relationship pins can be used to modify other movements, such as direction signs or turns. Similarly to direction signs, they come in nine horizontal and three vertical directions.<br><br> A black pinhead indicates a downward direction, a flat pinhead a purely horizontal direction and a white pinhead an upward direction.",
+      "buttonText": "Finish",
+      "position": {"elem": "library", "hSide": "right", "vSide": "top"},
+      "stateChange": false,
+      "image": "pin-circle.svg",
+      "highlightID": "none",
+      "highlightElem": "signLibrary"
+    }
+  ]
+}

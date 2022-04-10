@@ -1,7 +1,7 @@
 <template>
   <g>
     <circle 
-      v-if="signData.signType == 'BackToNormal'" 
+      v-if="signData.signType == 'back-normal'" 
       :cx="signWidth / 2"
       :cy="height / 2" 
       :class="{active: isSelected}"
@@ -11,7 +11,7 @@
       class="draggable actual-sign"
       stroke="black"/>
     <circle 
-      v-if="signData.signType == 'BackToNormal'" 
+      v-if="signData.signType == 'back-normal'" 
       :cx="signWidth / 2"
       :cy="height / 2" 
       :class="{active: isSelected}"
@@ -46,7 +46,7 @@ export default {
     signData: Object,
     height: Number,
   },
-  inject: ["signWidth","borderWidth", "barHeight"],
+  inject: ["signWidth","borderWidth"],
   data() {
     return {
     };

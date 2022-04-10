@@ -4,23 +4,23 @@
       <OnOffOption :optionText="'Hold'" :initState="signData.holding" :active="true" @switchState="changeHolding"/>
       <RadioOption 
         :options="dimensions" 
-        :initState="signData.dimension"
-        :optionText="'Dimension'"
+        :initState="dimensions.findIndex(obj => obj.text == signData.dimension)"
+        :optionText="'Vertical Level'"
         :active="true"
-        @switchState="this.changeDimension"
+        @switchState="changeDimension"
       />
       <RadioOption 
         :options="positions" 
-        :initState="signData.position"
+        :initState="positions.findIndex(obj => obj.text == signData.position)"
         :optionText="'Position'"
         :active="true"
-        @switchState="this.changePosition"
+        @switchState="changePosition"
       />
-      <OnOffOption :optionText="'Angle Definition'" :initState="definitionActive" :active="true" @switchState="changeDefinition"/>
+      <OnOffOption :optionText="'Angle definition'" :initState="definitionActive" :active="true" @switchState="changeDefinition"/>
       <RadioOption 
         :options="definitions" 
-        :initState="signData.definition ? signData.definition.signType : false"
-        :optionText="'Pin Dimension'"
+        :initState="signData.definition ? definitions.findIndex(obj => obj.text == signData.definition.signType) : 0"
+        :optionText="'Angle level'"
         :active="signData.definition ? true : false"
         @switchState="changeDefinitionPin"
       />
@@ -28,18 +28,6 @@
       <SignCategoryContainer v-if="signData.definition && signData.definition.signType == 'Low'" :optionText="'Angle'" category="pins-low" :parentY="y" :active="signData.definition ? true : false" @updateSignData="changeDefinitionAngle"/>
       <SignCategoryContainer v-else-if="signData.definition && signData.definition.signType == 'Middle'" :optionText="'Angle'" category="pins-middle" :parentY="y" :active="signData.definition ? true : false" @updateSignData="changeDefinitionAngle"/>
       <SignCategoryContainer v-else-if="signData.definition && signData.definition.signType == 'High'" :optionText="'Angle'" category="pins-high" :parentY="y" :active="signData.definition ? true : false" @updateSignData="changeDefinitionAngle"/>
-      <!--
-        Todo: 
-          - hodl (on/off)
-          - presign (body part): active -> display presign options
-          - - presign (body part) (on/off)
-            - type -> category
-            - limb (if applicable)
-            - if limb: surface (radio)
-          - presign (space measurement sign)
-            - type (category)
-            - if not unfoldnig/neitherOr ->  degree (slider, 0-5)
-      -->
       <DeleteOption @delete="emitDelete"/>
     </div>
 </template>
@@ -69,14 +57,14 @@ export default {
         {text: 'High', img: '/direction-sign-radio/layer-up.svg'}
       ],
       definitions: [
-        {text: 'Low', img: false},
-        {text: 'Middle', img:  false},
-        {text: 'High', img:  false}
+        {text: 'Low', img: "/pin-low-forward.svg"},
+        {text: 'Middle', img:  "/pin-middle.svg"},
+        {text: 'High', img:  "/pin-high.svg"}
       ],
       positions: [
         {text: '---', img: false},
-        {text: 'Infront', img: false},
-        {text: 'Behind', img: false}
+        {text: 'Infront', img: "/pin-low-forward.svg"},
+        {text: 'Behind', img: "/pin-low-backward.svg"}
       ],
       definitionActive: false,
     };
@@ -92,9 +80,9 @@ export default {
      * An example function changing the border color based of an radio Option, as an example for the actual radio funcitionality
      * @arg color the boolean changing the color 
      */
-    changeDimension(data) {
+    changeDimension(index) {
       let newSignData = this.signData;
-      newSignData.dimension = data.text;
+      newSignData.dimension = this.dimensions[index].text;
 
       this.newSignData (newSignData);
     },
@@ -104,8 +92,12 @@ export default {
     changeHolding (data) {
       this.newSignData({holding: data})
     },
-    changePosition (data) {
-      this.newSignData({position: data.text})
+    changePosition (index) {
+      if (this.positions[index].text != "---") {
+        this.newSignData({position: this.positions[index].text})
+      } else {
+        this.newSignData({position: false})
+      }
     },
     changeDefinition (data) {
       this.definitionActive = data;
@@ -115,10 +107,9 @@ export default {
         this.newSignData({definition: false});
       }
     },
-    changeDefinitionPin (data) {
-      
+    changeDefinitionPin (index) {
       let obj = JSON.parse(JSON.stringify(this.signData.definition)) || {signType: "Low", degree: 0, bgVisible: false};
-      obj.signType = data.text;
+      obj.signType = this.definitions[index].text;
       this.newSignData ({definition: obj});
     },
     changeDefinitionAngle (data) {

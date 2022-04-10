@@ -1,10 +1,10 @@
 <template>
-  <div v-show="active" class="library-item-container">
+  <div v-if="active" class="library-item-container" :id="'lib-item' + catIndex">
     <div class="library-item" :key="index" v-for="(elem, index) of signs" @click="selectSign(index)">
-      <svg width="100%" :height="height + 2" fill="white">
+      <svg width="100%" :height="'beatHeight' in elem.signData ? elem.signData.beatHeight * minHeight + 2: height + 2" fill="white" :class="inLibrary ? 'library-sign-svg': ''" :cat-index="catIndex" :index="index">
         <g :transform="'translate('+ offset + ',1)'">
           <g :transform="elem.signData.baseType == 'RelationshipBow' ? 'translate(-60,0)' : ''">
-              <component :is="elem.signData.baseType" :isSelected="index == selected" :height="elem.height" :signData="elem.signData"/>
+              <component :is="elem.signData.baseType" :isSelected="index == selected" :height="'beatHeight' in elem.signData ? elem.signData.beatHeight * minHeight : elem.height" :signData="elem.signData"/>
           </g>
         </g>
       </svg>
@@ -20,13 +20,17 @@
 export default {
   name: 'LibraryItem',
   inject: ["barHeight"],
-  emits: ["expand", "selectSign"],
+  emits: ["expand", "emitSigns", "selectSign"],
   props: {
     active: Boolean,
     category: String,
     catIndex: Number,
     selected: Number,
     offset: Number,
+    inLibrary: {
+      Boolean,
+      default: true,
+    }
   },
   data() {
     return {
@@ -41,6 +45,21 @@ export default {
       let json = require('@/assets/sign-category-loaders/' + this.category + '-' + lang + '.json');
       let obj = JSON.parse(JSON.stringify(json));
       return obj;
+    },
+    minHeight () {
+      return this.barHeight() / this.$store.state["beatsPerBar"];
+    }
+  },
+  watch: {
+    active (value) {
+      if (value) {
+        setTimeout(function () {
+          for (let elem of document.getElementById("lib-item" + this.catIndex).getElementsByClassName("library-sign-svg")) {
+            ["touchstart", "touchmove", "touchend"].forEach((et) => elem.addEventListener(et, this.ignoreTouch));
+          }
+        }.bind(this), 10);
+        
+      }
     }
   },
   mounted () {
@@ -61,14 +80,27 @@ export default {
         newSign.signData[key] = value;
       }
       this.signs.push(newSign);
+
     }
+    this.$emit("emitSigns", {catIndex: this.catIndex, signs: this.signs});
   },
   methods: {
     selectSign (index) {
       let nameElem = this.langStrings.names.find(elem => this.signs[index].signData.signType == elem.signType);
-      this.$emit("selectSign", {catIndex: this.catIndex, name: nameElem.name, index: index, height: this.baseHeight, signData: this.signs[index].signData});
+      this.$emit("selectSign", {catIndex: this.catIndex, name: nameElem.name, index: index, height: this.baseHeight, signData: this.signs[index].signData, updateSign: false});
     },
-    
+    /**
+     * InteractJS workaround: touch events immediately end resize and drag events -> cancel them before that happens and implement scrolling elsewhere
+     * @arg event the drag-move event
+     */
+    ignoreTouch (event) {
+      if (event.cancelable) {
+        event.preventDefault();
+      } else {
+        console.warn(`The following event couldn't be canceled:`);
+        console.dir(event);
+      }
+    },
   },
 }
 </script>

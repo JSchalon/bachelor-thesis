@@ -2,7 +2,7 @@
     <div >
       <RadioOption 
         :options="types" 
-        :initState="signData.signType"
+        :initState="types.findIndex(obj => obj.text == signData.signType)"
         :optionText="'Type'"
         :active="true"
         @switchState="this.changeType"
@@ -30,8 +30,8 @@ export default {
   data() {
     return {
       types: [
-        {text: 'BackToNormal', img: false},
-        {text: 'ReleaseContact', img: false},
+        {text: 'back-normal', img: "/cancel/cancel-back.svg"},
+        {text: 'release-contact', img: "/cancel/cancel-release.svg"},
       ],
     };
   },
@@ -42,8 +42,12 @@ export default {
     
   },
   methods: {
-    changeType(data) {
-      this.newSignData ({signType: data.text});
+    changeType(index) {
+      if (index == 1) {
+        this.newSignData ({signType: "release-contact"});
+      } else {
+        this.newSignData ({signType: "back-normal"});
+      }
     },
     /**
      * The function that sends the updated sign data back to the score

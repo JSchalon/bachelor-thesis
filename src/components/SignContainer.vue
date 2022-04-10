@@ -5,24 +5,26 @@
         signData.baseType == 'RoomDirectionSign' ? 'room-direction' : '',
         signData.baseType == 'PathSign' ? 'path' : '',
         signData.baseType == 'BodyPartSign' ? 'body-part' : '',
-        signData.baseType != 'PathSign' && signData.baseType != 'RoomDirectionSign' && signData.baseType != 'BodyPartSign' ? 'bound-inner' : ''
+        signData.baseType == 'PropSign' ? 'body-part' : '',
+        signData.baseType != 'PathSign' && signData.baseType != 'RoomDirectionSign' && !(signData.baseType == 'BodyPartSign' || signData.baseType == 'PropSign') ? 'bound-inner' : ''
       ]" 
       :x="x" :y="y" 
-      :data-y="y" 
+      :data-y="y"
+      :data-x="x"
       :transform="'translate(' + x + ',' + y +')'" 
       ref="sign" 
       :signID="id"
     >
-      <component :is="signData.baseType" :id="id" :isSelected="isSelected" :height="height" :width="width" :signData="signData"/>
+      <component :is="signData.baseType" :id="id" :isSelected="signData.isSelected" :height="height" :width="width" :signData="signData"/>
       <ResizeHandle 
         :pos="signData.baseType == 'RelationshipBow' ? 'left' : 'top'" 
-        :isActive="isSelected && canResize && signData.resizable" 
+        :isActive="signData.isSelected && canResize && signData.resizable" 
         :signHeight="height" 
         :width="signData.baseType == 'RelationshipBow' ? width : signWidth"
         :signID="id"/>
       <ResizeHandle 
         :pos="signData.baseType == 'RelationshipBow' ? 'right' : 'bottom'" 
-        :isActive="isSelected && canResize && signData.resizable"
+        :isActive="signData.isSelected && canResize && signData.resizable"
         :signHeight="height"
         :width="signData.baseType == 'RelationshipBow' ? width : signWidth"
         :signID="id"/>
@@ -42,18 +44,12 @@ export default {
   emits: ["requestListeners"],
   props: {
     id: Number,
-    isSelected: Boolean,
-    height: Number,
-    width: Number,
-    x: Number,
-    y: Number,
-    canResize: Boolean,
-    signData: Object
+    signData: Object,
+    localData: Object,
   },
-  inject: ["borderWidth", "signWidth"],
+  inject: ["borderWidth", "signWidth", "barHeight"],
   data() {
     return {
-      name: ""
     };
   },
   mounted () {
@@ -67,7 +63,45 @@ export default {
     
   },
   computed: {
-  }
+    beats () {
+      return this.$store.state["beatsPerBar"];
+    },
+    height () {
+      let height = this.barHeight() / this.beats;
+      if (this.localData != undefined) {
+        height = this.localData.height;
+      }
+      return height;
+    },
+    width () {
+      let width = this.signWidth;
+      if (this.localData != undefined) {
+        width = this.localData.width;
+      }
+      return width;
+    },
+    x () {
+      let x = 0;
+      if (this.localData != undefined) {
+        x = this.localData.x;
+      }
+      return x;
+    },
+    y () {
+      let y = 0;
+      if (this.localData != undefined) {
+        y = this.localData.y;
+      }
+      return y;
+    },
+    canResize () {
+      let canResize = false;
+      if (this.localData != undefined) {
+        canResize = this.localData.canResize;
+      }
+      return canResize;
+    },
+  },
 };
 </script>
 
@@ -81,8 +115,7 @@ export default {
 }
 
   .dragging .draggable {
-    opacity: 0.5;
-    stroke:#5e9fc7;
+    stroke:var(--selected);
     z-index: 100;
   }
 
@@ -92,6 +125,6 @@ export default {
 }
 
   .draggable.active {
-    stroke:#5e9fc7;
+    stroke: var(--selected);
   }
 </style>

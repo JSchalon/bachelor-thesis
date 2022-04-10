@@ -4,7 +4,7 @@
         x="0"
         y="0"
         class="draggable actual-sign"
-        :width="signWidth"
+        :width="width > 50 ? width : signWidth"
         :height="height"
         :stroke="signData.borderColor"
         :fill="signData.color"
@@ -29,7 +29,10 @@ export default {
     id: Number,
     isSelected: Boolean,
     height: Number,
-    signData: Object
+    signData: Object,
+    width: {
+      default: 0
+    }
   },
   inject: ["signWidth","borderWidth"],
   data() {
@@ -51,4 +54,11 @@ export default {
 </script>
 
 <style scoped>
+
+.draggable {
+  fill: var(--selected-lighter);
+  stroke-width: 2;
+  stroke: black;
+  opacity: 0.7;
+}
 </style>

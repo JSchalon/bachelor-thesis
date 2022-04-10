@@ -1,7 +1,7 @@
 {
   "catName": "Direction Signs",
   "catHeight": 80,
-  "baseHeight": 100,
+  "baseHeight": 80,
   "general": [
     {
       "isSelected": false,
@@ -14,59 +14,68 @@
   "signData": [
     {
       "baseType": "DirectionSign",
-      "signType": "Left forward direction",
+      "signType": "left-forward",
       "dimension": "Middle",
-      "resizable": true
+      "resizable": true,
+      "beatHeight": 2
     },
     {
       "baseType": "DirectionSign",
-      "signType": "Forward direction",
+      "signType": "forward",
       "dimension": "Middle",
       "side": "left",
-      "resizable": true
+      "resizable": true,
+      "beatHeight": 2
     },
     {
       "baseType": "DirectionSign",
-      "signType": "Right forward direction",
+      "signType": "right-forward",
       "dimension": "Middle",
-      "resizable": true
+      "resizable": true,
+      "beatHeight": 2
     },
     {
       "baseType": "DirectionSign",
-      "signType": "Left direction",
+      "signType": "left",
       "dimension": "Middle",
-      "resizable": true
+      "resizable": true,
+      "beatHeight": 2
     },
     {
       "baseType": "DirectionSign",
-      "signType": "In place",
+      "signType": "place",
       "dimension": "Middle",
-      "resizable": true
+      "resizable": true,
+      "beatHeight": 2
     },
     {
       "baseType": "DirectionSign",
-      "signType": "Right direction",
+      "signType": "right",
       "dimension": "Middle",
-      "resizable": true
+      "resizable": true,
+      "beatHeight": 2
     },
     {
       "baseType": "DirectionSign",
-      "signType": "Left backward direction",
+      "signType": "left-backward",
       "dimension": "Middle",
-      "resizable": true
+      "resizable": true,
+      "beatHeight": 2
     },
     {
       "baseType": "DirectionSign",
-      "signType": "Backward direction",
+      "signType": "backward",
       "dimension": "Middle",
       "side": "left",
-      "resizable": true
+      "resizable": true,
+      "beatHeight": 2
     },
     {
       "baseType": "DirectionSign",
-      "signType": "Right backward direction",
+      "signType": "right-backward",
       "dimension": "Middle",
-      "resizable": true
+      "resizable": true,
+      "beatHeight": 2
     }
   ]
 }

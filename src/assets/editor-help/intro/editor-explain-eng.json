@@ -1,0 +1,16 @@
+{
+  "introData": [
+    {
+      "title": "Welcome to the Interaction Editor",
+      "text": "The Interaction Editor is used to create standardized, machine readable documentation of movements and gestures using Labanotation.<br><br><strong>What is Labanotation?</strong><br> Labanotation is a universal movement description notation, meaning that it can be used to note almost any movement. Because of this it could, with a suitable interface, be used to create end-user documentation, as well as to calibrate gesture recognition software."
+    },
+    {
+      "title": "Introductions are available",
+      "text": "There is a general introduction to Labanotation available. We recommend doing it if you have no, or little, prior experience using Labanotation.<br><br> Additionally, there is also an introduction to the editor and its controls, which we recommend if you are not very familiar with the controls of graphics editors."
+    },
+    {
+      "title": "Welcome to the Interaction Editor",
+      "text": "The introductions are also available at the <strong>“Help”</strong> section of the <strong>options menu</strong>, if you want to do them at a future time."
+    }
+  ]
+}

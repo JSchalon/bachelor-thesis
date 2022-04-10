@@ -1,0 +1,33 @@
+{ 
+  "breakPoints": {"0": 3},
+  "introData": [
+    {
+      "title": "Space Measurement signs",
+      "text": "Space measurement signs, when placed alone, can define flexion (1), extension (2), bending (3), joining (4) or spreading (5) of body parts. They come in six degrees, where a higher degree means more strength is applied. They can be placed in combination with other signs to signify different qualities of movements. To resolve them the neither-stretched-nor-bent sign (6) or the unfolding sign (7) are used.",
+      "buttonText": "Next",
+      "position": {"elem": "library", "hSide": "right", "vSide": "top"},
+      "stateChange": false,
+      "image": "space-measure-degrees.svg",
+      "highlightID": "library-space-measurement-signs",
+      "highlightElem": "signLibrary"
+    },
+    {
+      "title": "Space Measurement signs",
+      "text": "Narrow or flexion signs and folding signs behave similarly, but are different. A narrow sign on the lower arm means that the joint is contracted, but all other joints in the arm stay neutral. A folding sign on the other hand means that all joints in the lower arm are bent. A wide or extension sign means the opposite of the narrow sign, so the specific body part is extended.",
+      "buttonText": "Next",
+      "position": {"elem": "library", "hSide": "right", "vSide": "top"},
+      "stateChange": false,
+      "highlightID": "library-space-measurement-signs",
+      "highlightElem": "signLibrary"
+    },
+    {
+      "title": "Space Measurement signs",
+      "text": "Joining and spreading signs have a similar relationship to narrow and wide signs, but their specific meaning is different. They specify horizontal movements, such as the spreading of the fingers, while wide and narrow signs would specify a vertical movement.",
+      "buttonText": "Finish",
+      "position": {"elem": "library", "hSide": "right", "vSide": "top"},
+      "stateChange": false,
+      "highlightID": "library-space-measurement-signs",
+      "highlightElem": "signLibrary"
+    }
+  ]
+}

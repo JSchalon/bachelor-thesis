@@ -16,24 +16,34 @@
       "baseType": "RoomDirectionSign",
       "signType": "RoomDirectionSign",
       "degree": 0,
-      "resizable": false
+      "resizable": false,
+      "beatHeight": 1
     },
     {
       "baseType": "Cancel",
-      "signType": "BackToNormal",
-      "resizable": false
+      "signType": "back-normal",
+      "resizable": false,
+      "beatHeight": 1
     },
     {
       "baseType": "Cancel",
-      "signType": "ReleaseContact",
-      "resizable": false
+      "signType": "release-contact",
+      "resizable": false,
+      "beatHeight": 1
     },
     {
       "baseType": "VibrationSign",
       "signType": "VibrationSign",
       "resizable": true,
-      "firstPin": false,
-      "secondPin": false
+      "upperPin": {"signType": "Low", "degree": -1},
+      "lowerPin": {"signType": "Low", "degree": -1},
+      "beatHeight": 2
+    },
+    {
+      "baseType": "PropSign",
+      "signType": "SmartPhone",
+      "resizable": false,
+      "beatHeight": 0.8
     }
   ]
 }

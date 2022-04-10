@@ -70,6 +70,6 @@ export default {
 <style scoped>
 .resize-handle {
   fill: white;
-  stroke: #5e9fc7; 
+  stroke: var(--selected); 
 }
 </style>

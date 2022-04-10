@@ -1,12 +1,13 @@
 <template>
-  <div id="library" :style="libraryActive ? 'width: 250px;' : 'width: 0;'">
+  <div id="library" :style="libraryActive ? 'width: 260px;' : 'width: 0;'">
     <div></div>
-    <div id="cur-sign-container"><p class="cur-sign-text">Current Sign: {{curSign}}</p></div>
-    <LibraryItemContainer :active="item.active" :selected="item.selected" :category="item.category" :catIndex="index" :key="index" v-for="(item, index) of categories" @expand="selectCategory" @selectSign="updateCurSign"/>
+    <div id="cur-sign-container"><p class="cur-sign-text">{{curSign}}</p></div>
+    <LibraryItemContainer :active="item.active" :selected="item.selected" :category="item.category" :catIndex="index" :key="index" v-for="(item, index) of categories" @expand="selectCategory" @selectSign="updateCurSign" @emitSigns="addSigns"/>
   </div>
 </template>
 
 <script>
+import interact from "interactjs";
 
 /**
  * The sign library component
@@ -14,6 +15,7 @@
  */
 export default {
   name: 'SignLibrary',
+  emits: ["selectSignDrag"],
   props: {
   },
   data() {
@@ -27,7 +29,8 @@ export default {
         {active: false, category: "body-part-signs", selected: -1}, 
         {active: false, category: "misc-signs", selected: -1},
       ],
-      curSign: "---"
+      curSign: "",
+      signs: {},
     };
   },
   computed: {
@@ -39,9 +42,20 @@ export default {
     }
   },
   mounted () {
-    
+    interact(".library-sign-svg").draggable({
+      inertia: false,
+      autoScroll: false,
+
+      // functions to call on event
+      onstart: this.selectSignStart,
+      onmove: this.selectSignMove,
+      onend: this.selectSignEnd,
+    }).styleCursor(false);
   },
   methods: {
+    addSigns (data) {
+      this.signs[data.catIndex] = data.signs;
+    },
     selectCategory (index) {
       for (let ind = 0; ind < this.categories.length; ind++) {
         if (ind != index) {
@@ -51,7 +65,7 @@ export default {
       this.categories[index].active = !this.categories[index].active;
     },
     updateCurSign (data) {
-      this.curSign = "---";
+      this.curSign = "";
       let unselect = false;
       if (this.categories[data.catIndex].selected == data.index) {
         //if the new selected sign == the old selected sign -> unselect
@@ -63,20 +77,69 @@ export default {
       if (!unselect) {
         //if the new selected sign == the old selected sign -> unselect
         this.categories[data.catIndex].selected = data.index;
-        this.curSign = data.name;
+        this.curSign = "Current Sign: " + data.name;
         //push to current sign
-        let sign = {height: data.height, signData: data.signData};
-        this.$store.dispatch('changeCurSign',sign);
-      } else {
+        if (data.updateSign) {
+          let sign = {signData: data.signData};
+          this.$store.dispatch('changeCurSign',sign);
+        }
+      } else if (!data.updateSign) {
         this.$store.dispatch('changeCurSign',false);
+      } else {
+        let sign = {signData: data.signData};
+        this.$store.dispatch('changeCurSign',sign);
+        this.categories[data.catIndex].selected = data.index;
+        this.curSign = data.name;
       }
-    }
+    },
+
+
+
+    selectSignStart (event) {
+      
+      const catIndex = parseInt(event.target.getAttribute("cat-index"));
+      const index = parseInt(event.target.getAttribute("index"));
+      const lang = this.$store.state["language"];
+      const json = require('@/assets/sign-category-loaders/' + this.categories[catIndex].category + '-' + lang + '.json');
+      const obj = JSON.parse(JSON.stringify(json));
+      const nameElem = obj.names.find(elem => this.signs[catIndex][index].signData.signType == elem.signType);
+      this.updateCurSign({catIndex: catIndex, index: index, name: nameElem.name, signData: this.signs[catIndex][index].signData, updateSign: true});
+      this.$emit("selectSignDrag", {type: "start", pos: {x: event.target.firstChild.getBoundingClientRect().x, y: event.target.firstChild.getBoundingClientRect().y}});
+      if (this.signs[catIndex][index].signData.baseType == "RoomDirectionSign") {
+        this.$store.dispatch("addToGridSelect", {});
+        this.$store.dispatch("addToGridSelect", {col: -this.$store.state["columnsLeft"] - 1});
+      } else if (this.signs[catIndex][index].signData.baseType == "PathSign") {
+        
+        this.$store.dispatch("addToGridSelect", {col: this.$store.state["columnsRight"]});
+      } else if (this.signs[catIndex][index].signData.baseType == "BodyPartSign" || this.signs[catIndex][index].signData.baseType == "PropSign") {
+        for (let col = -this.$store.state["columnsLeft"]; col < this.$store.state["columnsRight"]; col++) {
+          this.$store.dispatch("addToGridSelect", {col: col, bar: -1, beat: 0});
+        }
+      } else {
+        for (let col = -this.$store.state["columnsLeft"]; col < this.$store.state["columnsRight"]; col++) {
+          this.$store.dispatch("addToGridSelect", {col: col, bar: -2});
+          this.$store.dispatch("addToGridSelect", {col: col, bar: -1, beat: 0});
+        }
+      }
+    },
+
+    selectSignMove (event) {
+      this.$emit("selectSignDrag", {type: "move", delta: {x: event.dx, y: event.dy}});
+    },
+    
+    selectSignEnd (event) {
+      const catIndex = parseInt(event.target.getAttribute("cat-index"));
+      const index = parseInt(event.target.getAttribute("index"));
+      this.updateCurSign({catIndex: catIndex, index: index, name: this.categories[catIndex].category, signData: this.signs[catIndex][index].signData});
+      this.$emit("selectSignDrag", {type: "end"});
+      this.$store.dispatch("clearGridSelect");
+    },
   },
   watch: {
     storedSign (sign) {
       //if a sign is placed, the state.curSign is reset -> reset selection in library
       if (!sign) {
-        this.curSign = "---";
+        this.curSign = "";
         for (let elem of this.categories) {
           elem.selected = -1;
         }
@@ -95,11 +158,17 @@ export default {
   float: left;
   position: relative;
   z-index: 5;
+  box-sizing: border-box;
+  border-right: 1px solid var(--bg-light-less-2);
+  background: var(--bg-lightest);
+  color: var(--text-options);
 }
 #cur-sign-container {
-  border-bottom: 1px solid #a1a1a1;
-  background-color: #c1c1c1;
-  min-height: 5vh;
+  background-color: var(--bg-lightest);
+  border-bottom: 1px solid var(--bg-light-less-2);
+  height: 5vh;
+  min-height: 38px;
+  max-height: 50px;
   box-sizing: border-box;
   display: flex;
   align-items: center;
@@ -122,7 +191,6 @@ export default {
   width: 100%;
   display: flex;
   flex-wrap: wrap;
-  border-top: 1px solid #c1c1c1;
   box-sizing: border-box;
 }
 .library-item {

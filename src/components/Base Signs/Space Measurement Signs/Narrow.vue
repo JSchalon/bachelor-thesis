@@ -21,7 +21,7 @@ export default {
     id: Number,
     degree: Number,
   },
-  inject: ["signWidth","borderWidth", "barHeight"],
+  inject: ["signWidth","borderWidth"],
   data() {
     return {
     };

@@ -4,8 +4,8 @@
       <RadioOption 
         :options="addressingTypes" 
         :initState="getAddressInitState()"
-        :optionText="'Definition'"
-        :active="signData.signType == 'Address'"
+        :optionText="'Addressing'"
+        :active="signData.signType == 'address'"
         @switchState="changeAdressing"
       />
       <OnOffOption :optionText="'Hold'" :initState="signData.holding" :active="true" @switchState="changeHolding"/>
@@ -35,9 +35,9 @@ export default {
   data() {
     return {
       addressingTypes: [
-        {text: 'Right', img: false},
-        {text: 'Left', img:  false},
-        {text: 'Both', img:  false}
+        {text: 'Right', img: "/bows/addressing-right.svg"},
+        {text: 'Left', img:  "/bows/addressing-left.svg"},
+        {text: 'Both', img:  "/bows/addressing-both.svg"}
       ]
     };
   },
@@ -51,10 +51,10 @@ export default {
     changeType (data) {
       this.newSignData({signType: data.signType})
     },
-    changeAdressing (data) {
-      if (data.text == "Right") {
+    changeAdressing (index) {
+      if (this.addressingTypes[index].text == "Right") {
         this.newSignData({addressing: "right"})
-      } else if (data.text == "Left") {
+      } else if (this.addressingTypes[index].text == "Left") {
         this.newSignData({addressing: "left"})
       } else {
         this.newSignData({addressing: "both"})
@@ -80,12 +80,12 @@ export default {
       this.$emit("delete", parseInt(this.signIndex))
     },
     getAddressInitState () {
-      if (this.signData.addressing == "right") {
-        return "Right";
+      if (this.signData.addressing == "right" || this.signData.addressing == undefined) {
+        return 0;
       } if (this.signData.addressing == "left") {
-        return "Left";
+        return 1;
       } else {
-        return "Both";
+        return 2;
       }
     }
   },

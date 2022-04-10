@@ -10,7 +10,7 @@
       :signID="id"
       :fill="signData.dimension != 'Middle' ? getFill() : 'white'"
     />
-    <circle v-if="signData.dimension == 'Middle' && (!signData.definition || signData.definition.signType != 'Middle')" :cx="signWidth / 2" :cy="height / 2" r="4" fill="black"/>
+    <circle v-if="signData.dimension == 'Middle' && (!signData.definition || signData.definition.signType != 'Middle')" :cx="signWidth / 2" :cy="height / 2" r="4" fill="black" :signID="id"/>
     <Pin v-if="signData.definition" :isSelected="isSelected" :id="id" :signData="signData.definition" :height="height" :inverted="signData.dimension == 'Low'"/>
     <g :transform="'translate(' + getPositionTransform() + ',0)'">
       <Pin v-if="signData.position && signData.position != '---'" :isSelected="isSelected" :id="id" :signData="signData.position == 'Infront' ? {signType: 'Low', degree: 0}:{signType: 'Low', degree: 180}" :height="height"/>
@@ -38,19 +38,19 @@ export default {
   data() {
     return {
       variations: [
-        {name: "Left forward direction", base: 1, transform: []},
-        {name: "Forward direction left", base: 0, transform: []},
-        {name: "Forward direction right", base: 0, transform: ["mirror-y"]},
-        {name: "Right forward direction", base: 1, transform: ["mirror-y"]},
+        {name: "left-forward", base: 1, transform: []},
+        {name: "forward left", base: 0, transform: []},
+        {name: "forward right", base: 0, transform: ["mirror-y"]},
+        {name: "right-forward", base: 1, transform: ["mirror-y"]},
 
-        {name: "Left direction", base: 2, transform: []},
-        {name: "In place", base: 3, transform: []},
-        {name: "Right direction", base: 2, transform: ["mirror-y"]},
+        {name: "left", base: 2, transform: []},
+        {name: "place", base: 3, transform: []},
+        {name: "right", base: 2, transform: ["mirror-y"]},
 
-        {name: "Left backward direction", base: 1, transform: ["mirror-x"]},
-        {name: "Backward direction left", base: 0, transform: ["mirror-x"]},
-        {name: "Backward direction right", base: 0, transform: ["mirror-x", "mirror-y"]},
-        {name: "Right backward direction", base: 1, transform: ["mirror-x", "mirror-y"]},
+        {name: "left-backward", base: 1, transform: ["mirror-x"]},
+        {name: "backward left", base: 0, transform: ["mirror-x"]},
+        {name: "backward right", base: 0, transform: ["mirror-x", "mirror-y"]},
+        {name: "right-backward", base: 1, transform: ["mirror-x", "mirror-y"]},
       ],
     };
   },
@@ -78,7 +78,7 @@ export default {
       return baseSigns;
     },
     beatHeight () {
-      return this.barHeight / this.$store.state["beatsPerBar"];
+      return this.barHeight() / this.$store.state["beatsPerBar"];
     },
     transform() {
       let transformString = "";
@@ -102,7 +102,7 @@ export default {
     },
     variation () {
       let variation = {};
-      if (this.signData.signType == "Backward direction" || this.signData.signType == "Forward direction") {
+      if (this.signData.signType == "backward" || this.signData.signType == "forward") {
         variation = this.variations.find(o => o.name === this.signData.signType + " " + this.signData.side);
       } else {
         variation = this.variations.find(o => o.name === this.signData.signType);
@@ -118,9 +118,13 @@ export default {
       if (this.signData.dimension == "Low") {
         return "black";
       } else if (this.signData.dimension == "High") {
-        if (this.signData.signType == "Backward direction" || this.signData.signType == "Forward direction") {
+        if (this.signData.signType == "backward" || this.signData.signType == "forward") {
           return "url(#direction-high-" + this.signData.side + ")";
-        }
+        } else if (this.signData.signType.includes("right")) {
+          return "url(#direction-high-left)";
+        } else if (this.signData.signType.includes("left")) {
+          return "url(#direction-high-right)";
+        } 
         return "url(#direction-high-left)";
       } else {
         return "white";

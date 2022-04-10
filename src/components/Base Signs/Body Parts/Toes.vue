@@ -13,12 +13,13 @@
     :cy="20" r="3" 
     stroke="black"
     stroke-width="2"
-    :fill="signData.surface.includes('outer') ? 'black' : 'white' "/>
+    :fill="signData.surface.includes('outer') ? 'black' : 'white'"
+    :signID="id"/>
   <g v-if="signData.digit >= 1 && signData.digit <=5" :transform="signData.limb ? '' : 'translate(7.5,0)'">
     <g v-if="signData.joint >= 1 && signData.joint < 4">
-      <circle fill="black" :cx="18.5 - (index * 4)" :cy="10 + (signData.digit - 1) * 5" r="2" :key="index" v-for="index of (signData.joint)"/>
+      <circle fill="black" :cx="18.5 - (index * 4)" :cy="10 + (signData.digit - 1) * 5" r="2" :key="index" v-for="index of (signData.joint)" :signID="id"/>
     </g>
-    <circle v-if="signData.joint && signData.joint == 4" fill="black" :cx="18.5 - 3 * 4" :cy="10 + (signData.digit - 1) * 5" r="2" />
+    <circle v-if="signData.joint === 0" fill="black" :cx="18.5 - 3 * 4" :cy="10 + (signData.digit - 1) * 5" r="2" />
   </g>
 </template>
 
@@ -35,7 +36,7 @@ export default {
     signData: Object,
     height: Number,
   },
-  inject: ["signWidth","borderWidth", "barHeight"],
+  inject: ["signWidth","borderWidth"],
   data() {
     return {
       

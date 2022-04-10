@@ -55,14 +55,16 @@ export default {
   }
 
   .context-item-interact-img.active {
-    border: 2px solid blue;
+    border: 2px solid var(--selected);
   }
 
   .context-menu {
     width: auto;
     position: absolute;
-    border: 2px solid black;
+    border: none;
+    border-radius: 10px;
     box-sizing: border-box;
+    box-shadow: 0 0px 5px 2px rgb(0 0 0 / 15%);
   }
 
 
@@ -82,6 +84,7 @@ export default {
     }
     .center-vertically.small {
       height: auto;
+      float: right;
     }
 
     .context-item-interact-box {
@@ -103,12 +106,13 @@ export default {
     }
 
     .context-item-interact-img.smaller {
-      width: calc(var(--contextItemImageSize) / 1.5);
-      height: calc(var(--contextItemImageSize) / 1.5);
+      width: calc(var(--contextItemImageSize) / 1.65);
+      height: calc(var(--contextItemImageSize) / 1.65);
     }
 
   .unusable {
     opacity: 0.3;
+    cursor: not-allowed;
   }
 
   .blocker {

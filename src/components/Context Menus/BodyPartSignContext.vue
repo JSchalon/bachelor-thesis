@@ -2,9 +2,9 @@
     <div>
       <SignCategoryContainer :optionText="'Type'" :category="'body-part-signs'" :parentY="y" :active="true" @updateSignData="newSignData"/>
       <OnOffOption :optionText="'Limb'" :initState="signData.limb" :active="signData.canBeLimb" @switchState="changeLimb"/>
-      <RadioOption :optionText="'Top Surface'" :options="surfaceInnerOuter" :initState="signData.surface" :active="signData.limb && signData.canBeLimb" @switchState="this.changeTopSurface"/>
-      <RadioOption :optionText="'Side Surface'" :options="surfaceSides" :initState="signData.surface" :active="signData.limb && signData.canBeLimb" @switchState="this.changeSideSurface"/>
-      <OnOffOption :optionText="'Finger/Toe Definition'" :initState="signData.digit && signData.digit >= 1" :active="signData.signType == 'Fingers' || signData.signType == 'Toes'" @switchState="changeJointDefined"/>
+      <RadioOption :optionText="'Vertical Surface'" :options="surfaceInnerOuter" :initState="surfaceInnerOuter.findIndex(obj => obj.text == surfaceTop)" :active="signData.limb && signData.canBeLimb" @switchState="this.changeTopSurface"/>
+      <RadioOption :optionText="'Horizontal Surface'" :options="surfaceSides" :initState="surfaceSides.findIndex(obj => obj.text == surfaceSide)" :active="signData.limb && signData.canBeLimb" @switchState="this.changeSideSurface"/>
+      <OnOffOption :optionText="'Digit definition'" :initState="'digit' in signData && signData.digit >= 0 && signData.digit !== false" :active="signData.signType == 'Fingers' || signData.signType == 'Toes'" @switchState="changeJointDefined"/>
       <SignCategoryContainer v-if="signData.signType != 'Toes'" :optionText="'Digit'" :category="'finger-digits'" :parentY="y" :active="(signData.signType == 'Fingers' || signData.signType == 'Toes') && jointDefined" @updateSignData="changeDigit"/>
       <SignCategoryContainer v-else :optionText="'Digit'" :category="'toe-digits'" :parentY="y" :active="(signData.signType == 'Fingers' || signData.signType == 'Toes') && jointDefined" @updateSignData="changeDigit"/>
       <SignCategoryContainer v-if="signData.signType != 'Toes'" :optionText="'Joint'" :category="'finger-joints'" :parentY="y" :active="(signData.signType == 'Fingers' || signData.signType == 'Toes') && jointDefined" @updateSignData="changeJoint"/>
@@ -34,13 +34,13 @@ export default {
     return {
       surfaceInnerOuter: [
         {text: "---", img: false},
-        {text: 'inner', img: false},
-        {text: 'outer', img: false}
+        {text: 'inner', img: "/body-parts/vertical-surface-inner.svg"},
+        {text: 'outer', img: "/body-parts/vertical-surface-outer.svg"}
       ],
       surfaceSides: [
         {text: "---", img: false},
-        {text: 'littleFinger', img: false},
-        {text: 'thumb', img: false}
+        {text: 'littleFinger', img: "/body-parts/horizontal-surface-little.svg"},
+        {text: 'thumb', img: "/body-parts/horizontal-surface-thumb.svg"}
       ],
       surfaceTop: "",
       surfaceSide: "",
@@ -51,7 +51,22 @@ export default {
     
   },
   mounted () {
-    
+    if (this.signData.joint !== false) {
+      this.changeJointDefined(true);
+    }
+    if (this.signData.surface !== false) {
+      if (this.signData.surface.includes("inner")) {
+        this.surfaceTop = "inner";
+      } else if (this.signData.surface.includes("outer")) {
+        this.surfaceTop = "outer";
+      }
+      if (this.signData.surface.includes("littleFinger")) {
+        this.surfaceSide = "littleFinger";
+      } else if (this.signData.surface.includes("thumb")) {
+        this.surfaceSide = "thumb";
+      }
+      this.changeSurface();
+    }
   },
   methods: {
     /**
@@ -59,25 +74,34 @@ export default {
      * @arg data the boolean changing the limb 
      */
     changeLimb(data) {
-      this.newSignData ({limb: data});
+      if (!data) {
+        this.newSignData ({limb: data, surface: false});
+      } else {
+        this.newSignData ({limb: data});
+      }
     },
-    changeTopSurface(data) {
-      this.surfaceTop = data.text;
+    changeTopSurface(index) {
+      this.surfaceTop = this.surfaceInnerOuter[index].text;
       this.changeSurface();
     },
-    changeSideSurface(data) {
-      this.surfaceSide = data.text;
+    changeSideSurface(index) {
+      this.surfaceSide = this.surfaceSides[index].text;
       this.changeSurface();
     },
     changeSurface() {
-      this.newSignData ({surface: this.surfaceTop + " " + this.surfaceSide});
+      if ((this.surfaceTop != "" && this.surfaceTop != "---") && (this.surfaceSide != "" && this.surfaceSide != "---")) {
+        this.newSignData ({surface: this.surfaceTop + "-" + this.surfaceSide});
+      } else if (this.surfaceTop != "" && this.surfaceTop != "---") {
+        this.newSignData ({surface: this.surfaceTop});
+      } else if (this.surfaceSide != "" && this.surfaceSide != "---") {
+        this.newSignData ({surface: this.surfaceSide});
+      } else {
+        this.newSignData ({surface: false});
+      }
     },
     changeJointDefined (data) {
-      let joint = 5;
+      let joint = 0;
       if (data && !this.signData.digit && !this.signData.joint) {
-        if (this.signData.signType == "Toes") {
-          joint = 4;
-        }
         this.newSignData ({digit: 1, joint: joint});
       } else if (!data) {
         this.newSignData ({digit: false, joint: false});

@@ -13,7 +13,8 @@
     :cy="20" r="3" 
     stroke="black"
     stroke-width="2"
-    :fill="signData.surface.includes('outer') ? 'black' : 'white' "/>
+    :fill="signData.surface.includes('outer') ? 'black' : 'white'"
+    :signID="id"/>
 </template>
 
 <script>
@@ -29,7 +30,7 @@ export default {
     signData: Object,
     height: Number,
   },
-  inject: ["signWidth","borderWidth", "barHeight"],
+  inject: ["signWidth","borderWidth"],
   data() {
     return {
       
