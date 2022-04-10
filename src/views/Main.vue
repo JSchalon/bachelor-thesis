@@ -207,7 +207,10 @@ export default {
       if (document.getElementById("edit-form").elements["beatsPerBar"]) {
         document.getElementById("edit-form").elements["beatsPerBar"].value = this.$store.state["beatsPerBar"];
       }
-      this.beatsPerBarDisabled = document.getElementById("template-select").value != "Blank Score";
+      setTimeout(function () {
+        this.beatsPerBarDisabled = document.getElementById("template-select").value != "Blank Score";
+      }.bind(this), 10);
+      
     },
     uploadScore (file) {
       if (file == "error") {

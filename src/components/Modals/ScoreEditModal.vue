@@ -110,18 +110,20 @@ export default {
     },
     updateScore (event) {
       event.preventDefault();
-      let index = 0;
       let data = {author: event.srcElement[1].value};
       if (this.newScore) {
-        index = 1;
         data.beatsPerBar = parseInt(event.srcElement[5].value);
+        data.title = event.srcElement[2].value;
+        data.template = event.srcElement[3].value;
+        data.description = event.srcElement[4].value;
+        data.timeUnit = event.srcElement[6].value;
+        data.beatDuration = event.srcElement[7].value;
+      } else {
+        data.title = event.srcElement[2].value;
+        data.description = event.srcElement[3].value;
+        data.timeUnit = event.srcElement[4].value;
+        data.beatDuration = event.srcElement[5].value;
       }
-      
-      data.title = event.srcElement[2].value;
-      data.template = event.srcElement[3].value;
-      data.description = event.srcElement[4].value;
-      data.timeUnit = event.srcElement[5+index].value;
-      data.beatDuration = event.srcElement[6+index].value;
       this.$emit("formSubmit", data);
       
     },

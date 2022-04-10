@@ -11,8 +11,5 @@ Git Repo zur Bachelorarbeit zur Entwicklung eines webbasierten Interaktionsedito
 
 ## Versions
 
-### Version 0.9.1
-- Release Candidate for the summative evlaution
-- Added base Score for the evaluation
-- loading evaluation score at start
-- Fixed some bugs
+### Version 0.9.2
+- quick fix
