@@ -1,0 +1,14 @@
+{ 
+  "breakPoints": {"0": 1},
+  "introData": [
+    {
+      "title": "Path Signs",
+      "text": "Path signs are used to indicate a general movement in a direction. There is a straight path, a left and a right circular path, as well as an undefined path.<br><br>Path signs are placed on the right side of the score, beyond the right-most column.",
+      "buttonText": "Finish",
+      "position": {"elem": "library", "hSide": "right", "vSide": "top"},
+      "stateChange": false,
+      "highlightID": "library-path-signs",
+      "highlightElem": "signLibrary"
+    }
+  ]
+}

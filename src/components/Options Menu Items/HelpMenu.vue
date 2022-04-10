@@ -4,13 +4,13 @@
       <p>Help</p>
     </li>
     <div class="option-box">
-      <li class="option-item" @click="startIntroduction('editor')">
+      <li class="option-item" @click="startIntroduction('intro/editor-intro')">
         <div class="menu-option-container">
           <img src="@/assets/images/interaction-menu/blank.svg" class="option-img">
           <p>Editor Introduction</p>
         </div>
       </li>
-      <li class="option-item" @click="startIntroduction('labanBasic')">
+      <li class="option-item" @click="startIntroduction('laban/laban-basic')">
         <div class="menu-option-container">
           <img src="@/assets/images/interaction-menu/blank.svg" class="option-img">
           <p>Labanotation Introduction</p>
@@ -23,49 +23,49 @@
           <img src="@/assets/images/interaction-menu/triangle-left.svg" class="option-img dropdown">
           <ul class="option-nested sub-menu" tabIndex="0" role="button">
             <div class="option-box sub-menu">
-              <li class="option-item" @click="startIntroduction('directions')">
+              <li class="option-item" @click="startIntroduction('laban/direction-signs')">
                 <div class="menu-option-container">
                   <img src="@/assets/images/common/direction-signs.svg" class="option-img">
                   <p>Direction Signs</p>
                 </div>
               </li>
-              <li class="option-item" @click="startIntroduction('turns')">
+              <li class="option-item" @click="startIntroduction('laban/turn-signs')">
                 <div class="menu-option-container">
                   <img src="@/assets/images/common/turn-signs.svg" class="option-img">
                   <p>Turn Signs</p>
                 </div>
               </li>
-              <li class="option-item" @click="startIntroduction('bows')">
+              <li class="option-item" @click="startIntroduction('laban/relationship-bows')">
                 <div class="menu-option-container">
                   <img src="@/assets/images/common/relationship-bows.svg" class="option-img">
                   <p>Relationship Bows</p>
                 </div>
               </li>
-              <li class="option-item" @click="startIntroduction('spaceMeasurements')">
+              <li class="option-item" @click="startIntroduction('laban/space-measurements')">
                 <div class="menu-option-container">
                   <img src="@/assets/images/common/space-measurement-signs.svg" class="option-img">
                   <p>Space Measurement Signs</p>
                 </div>
               </li>
-              <li class="option-item" @click="startIntroduction('paths')">
+              <li class="option-item" @click="startIntroduction('laban/path-signs')">
                 <div class="menu-option-container">
                   <img src="@/assets/images/common/path-signs.svg" class="option-img">
                   <p>Path Signs</p>
                 </div>
               </li>
-              <li class="option-item" @click="startIntroduction('bodyParts')">
+              <li class="option-item" @click="startIntroduction('laban/body-parts')">
                 <div class="menu-option-container">
                   <img src="@/assets/images/common/body-part-signs.svg" class="option-img">
                   <p>Body Part Signs</p>
                 </div>
               </li>
-              <li class="option-item" @click="startIntroduction('bodyParts')">
+              <li class="option-item" @click="startIntroduction('laban/relationship-pins')">
                 <div class="menu-option-container">
                   <img src="@/assets/images/common/relationship-pins.svg" class="option-img">
                   <p>Relationship Pins</p>
                 </div>
               </li>
-              <li class="option-item" @click="startIntroduction('misc')">
+              <li class="option-item" @click="startIntroduction('laban/misc-signs')">
                 <div class="menu-option-container">
                   <img src="@/assets/images/common/misc-signs.svg" class="option-img">
                   <p>Misc. Signs</p>

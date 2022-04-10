@@ -19,16 +19,16 @@
       <!-- beat lines-->
       <line class="grid-line lasso-able" :x1="columnWidth * columnsLeft - beatLineWidth" :y1="(barH / beats) * (line - 1)" :x2="columnWidth * columnsLeft + beatLineWidth" :y2="(barH / beats) * (line - 1)" :key="line" v-for="line in ((bars) * beats)" stroke-width="2" stroke="black"/>
       <!-- bar lines-->
-      <line class="grid-line lasso-able" :x1="columnWidth * (columnsLeft - 2)" :y1="barH * (line - 1)" :x2="columnWidth * (columnsLeft + 2)" :y2="barH * (line - 1)" :key="line" v-for="line in (bars + 1)" stroke-width="2" stroke="black"/>
+      <line :id="line == bars + 1 ? 'startbar':''" class="grid-line lasso-able" :x1="columnWidth * (columnsLeft - 2)" :y1="barH * (line - 1)" :x2="columnWidth * (columnsLeft + 2)" :y2="barH * (line - 1)" :key="line" v-for="line in (bars + 1)" stroke-width="2" stroke="black"/>
       <!-- start bar lines -->
-      <line class="grid-line lasso-able" :x1="columnWidth * (columnsLeft - 2)" :y1="barH * bars + startBarOffset" :x2="columnWidth * (columnsLeft + 2)" :y2="barH * bars + startBarOffset" stroke-width="2" stroke="black"/>
+      <line id="startbar-lower" class="grid-line lasso-able" :x1="columnWidth * (columnsLeft - 2)" :y1="barH * bars + startBarOffset" :x2="columnWidth * (columnsLeft + 2)" :y2="barH * bars + startBarOffset" stroke-width="2" stroke="black"/>
       <line class="grid-line lasso-able" :x1="columnWidth * (columnsLeft - 2)" :y1="barH * bars + (barH/beats) * 2 + startBarOffset" :x2="columnWidth * (columnsLeft + 2)" :y2="barH * bars + (barH/beats) * 2 + startBarOffset" stroke-width="2" stroke="black"/>
 
       <!--vertical lines-->
       <!-- left outer line -->
       <line class="grid-line lasso-able" :x1="columnWidth * (columnsLeft - 2)" y1="0" :x2="columnWidth * (columnsLeft - 2)" :y2="barH * bars + (barH/beats) * 2 + startBarOffset" stroke-width="2" stroke="black"/>
       <!-- middle line -->
-      <line class="grid-line lasso-able" :x1="columnWidth * (columnsLeft)" y1="0" :x2="columnWidth * (columnsLeft)" :y2="barH * bars + (barH/beats) * 2 + startBarOffset" stroke-width="3" stroke="black"/>
+      <line id="middle-line" class="grid-line lasso-able" :x1="columnWidth * (columnsLeft)" y1="0" :x2="columnWidth * (columnsLeft)" :y2="barH * bars + (barH/beats) * 2 + startBarOffset" stroke-width="3" stroke="black"/>
       <!-- right outer line -->
       <line class="grid-line lasso-able" :x1="columnWidth * (columnsLeft + 2)" y1="0" :x2="columnWidth * (columnsLeft + 2)" :y2="barH * bars + (barH/beats) * 2 + startBarOffset" stroke-width="2" stroke="black"/>
       <g v-if="showHelpLines">
@@ -163,6 +163,10 @@ export default {
               let col = false;
               let bar = -2;
               let beat = -1;
+              let green = true;
+              if ("green" in elem) {
+                green = elem.green;
+              }
               if ("col" in elem) {
                 col = elem.col;
               }
@@ -172,7 +176,7 @@ export default {
               if ("beat" in elem) {
                 beat = elem.beeat;
               }
-              this.highlight(col, bar, beat, true, true);
+              this.highlight(col, bar, beat, true, green);
             }
           }
         }
@@ -445,5 +449,9 @@ export default {
 
   .highlighted.green {
     fill: var(--add);
+  }
+  .grid-line.tut-highlight {
+    stroke: var(--selected-lighter);
+    stroke-width: 4;
   }
 </style>

@@ -1,11 +1,12 @@
 { 
-  "breakPoints": {"0": 1, "1": 1, "2": 5, "6": 5},
+  "breakPoints": {"0": 1, "1": 1, "2": 5, "7": 5},
   "introData": [
     {
       "title": "The Options Menu",
       "text": "The options menu is used to create, import and export scores, edit signs as well as adjust score and editor settings.",
       "buttonText": "Next Interface Element",
       "position": {"elem": "options-menu", "hSide": "left", "vSide": "bottom"},
+      "stateChange": false,
       "highlightID": "options-menu",
       "highlightElem": "optionsMenu"
     },
@@ -15,6 +16,7 @@
       "textTablet": "The sign library is used to place signs on the score. You can tap on a category to open it and then tap on a desired sign to display its name in the “Current Selected Sign” box. <br><br>To place a sign, tap on it and drag it over the score. To abort placing the sign, drag it back into the sign library.",
       "buttonText": "Next Interface Element",
       "position": {"elem": "library", "hSide": "right", "vSide": "top"},
+      "stateChange": false,
       "highlightID": "library",
       "highlightElem": "signLibrary"
     },
@@ -24,15 +26,18 @@
       "textTablet": "After placing a sign it can be moved by tapping on it and then dragging it around. Signs will automatically snap to a column and beat after letting go.<br><br>To resize a sign, tap on it to select it. If it is resizable, two resize handles will appear which can be used to change its size.",
       "buttonText": "Next",
       "position": {"elem": "library", "hSide": "left", "vSide": "top"},
+      "stateChange": {"addToSelectedSigns": 2},
       "highlightID": "canvas",
       "highlightElem": "score"
     },
     {
       "title": "The Score - Duplicating and <br> multi-Selection",
-      "text": "To duplicate a sign, select it, press shift and then drag it around. This also works when multiple signs are selected. In that case the entire selection will be duplicated.<br><br> Multiple signs can also be moved and resized at the same time, although there are some restrictions on resizing differing sign types.",
-      "textTablet": "To duplicate a sign, tap and hold it until the “double box” icon in the interaction menu above the score is selected and then drag it around. This also works when multiple signs are selected. In that case the entire selection will be duplicated.<br><br> Multiple signs can also be moved and resized at the same time, although there are some restrictions on resizing different sign types.",
+      "text": "To duplicate a sign, select it, press shift and then drag it around. This also works when multiple signs are selected. In that case the entire selection will be duplicated.<br><br> Multiple signs can also be moved and resized at the same time, although there are some restrictions on resizing differing sign types (see below).",
+      "textTablet": "To duplicate a sign, tap and hold it until the “double box” icon in the interaction menu above the score is selected and then drag it around. This also works when multiple signs are selected. In that case the entire selection will be duplicated.<br><br> Multiple signs can also be moved and resized at the same time, although there are some restrictions on resizing differing sign types (see below).",
       "buttonText": "Next",
       "position": {"elem": "library", "hSide": "left", "vSide": "top"},
+      "image": "different-resize-types.svg",
+      "stateChange": {"addToSelectedSigns": [1,2,3,4,5]},
       "highlightID": "canvas",
       "highlightElem": "score"
     },
@@ -42,6 +47,8 @@
       "textTablet": "To select multiple signs at once, tap and hold on an empty place on the score until the multi-select icon in the interaction menu is selected and then drag. This will create a selection box. Stop dragging to confirm the selection. All signs within the box at that time will be selected.",
       "buttonText": "Next",
       "position": {"elem": "library", "hSide": "left", "vSide": "top"},
+      "stateChange": {"addToSelectedSigns": [1,2,3,4,5]},
+      "image": "select-box.svg",
       "highlightID": "canvas",
       "highlightElem": "score"
     },
@@ -51,6 +58,7 @@
       "textTablet": "To edit a signs properties after its placement, double-tap on it. A context menu with sign-specific settings will appear. To close the menu, tap anywhere else on the score.",
       "buttonText": "Next",
       "position": {"elem": "library", "hSide": "left", "vSide": "top"},
+      "stateChange": {"addToSelectedSigns": 2, "changeContextMenu": true},
       "highlightID": "canvas",
       "highlightElem": "score"
     },
@@ -60,6 +68,7 @@
       "textTablet": "To add or remove a bar, tap on it. This will highlight it and cause three buttons to appear. The “+” buttons will add a new bar either below or above the selected bar. The “-” button will remove the selected bar and its signs.<br><br> To select a column instead, tap on the same spot again. To unselect a bar or column, tap on any other place on the score",
       "buttonText": "Next Interface Element",
       "position": {"elem": "library", "hSide": "left", "vSide": "top"},
+      "stateChange": {"addToGridSelect": {"col": -1, "bar": 1, "selectBar": true}},
       "highlightID": "canvas",
       "highlightElem": "score"
     },
@@ -69,6 +78,7 @@
       "textTablet": "The interaction menu is used to execute certain operations on the score and its signs.<br><br> The arrows are used to undo and redo actions.",
       "buttonText": "Next",
       "position": {"elem": "interaction-menu", "hSide": "left", "vSide": "bottom"},
+      "stateChange": false,
       "highlightID": "interaction-menu",
       "highlightElem": "interactionMenu"
     },
@@ -78,6 +88,7 @@
       "textTablet": "The icons in the middle are selection options. By tapping the “dashed line” icon with the three boxes the editor enters the multi-select mode. This enables the selection of multiple signs at once. Alternatively, this can also be achieved by using the selection box on the score.",
       "buttonText": "Next",
       "position": {"elem": "interaction-menu", "hSide": "left", "vSide": "bottom"},
+      "stateChange": false,
       "highlightID": "interaction-menu",
       "highlightElem": "interactionMenu"
     },
@@ -87,6 +98,7 @@
       "textTablet": "Tapping on the empty dashed icon opens a dropdown, from which certain selection options can be executed.",
       "buttonText": "Next",
       "position": {"elem": "interaction-menu", "hSide": "left", "vSide": "bottom"},
+      "stateChange": false,
       "highlightID": "interaction-menu",
       "highlightElem": "interactionMenu"
     },
@@ -96,6 +108,7 @@
       "textTablet": "Tapping the “double box” icon enters the sign duplication mode. While in this mode, drag a sign to duplicate it. Alternatively. Holding a sign a short whil also enters this mode.",
       "buttonText": "Next",
       "position": {"elem": "interaction-menu", "hSide": "left", "vSide": "bottom"},
+      "stateChange": false,
       "highlightID": "interaction-menu",
       "highlightElem": "interactionMenu"
     },
@@ -105,6 +118,7 @@
       "textTablet": "The last item on the menu is used to delete all currently selected signs.",
       "buttonText": "Finish",
       "position": {"elem": "interaction-menu", "hSide": "left", "vSide": "bottom"},
+      "stateChange": false,
       "highlightID": "interaction-menu",
       "highlightElem": "interactionMenu"
     }

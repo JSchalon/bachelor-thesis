@@ -1,7 +1,9 @@
 <template>
   <g :transform="'translate(0,' + (height - 40) + ')'">
     <rect x="0" y="0" width="40" height="40" opacity="0" :signID="id" />
-    <component :is="signData.signType" :id="id" :isSelected="isSelected" :height="height" :signData="signData" />
+    <g :transform="transform">
+      <component :is="signData.signType" :id="id" :isSelected="isSelected" :height="height" :signData="signData" />
+    </g>
   </g>
 </template>
 
@@ -26,12 +28,17 @@ export default {
     };
   },
   computed: {
+    transform () {
+      if (this.signData.side == "right") {
+        return 'translate(' + this.signWidth + ',0) scale(-1,1)';
+      } else {
+        return "";
+      }
+    }
   },
   mounted () {
-    
   },
   methods: {
-    
   },
 }
 </script>

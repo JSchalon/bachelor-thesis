@@ -989,7 +989,9 @@ export default createStore({
           context.commit("loadScoreFromTemplate", "blank-score");
         }
       }
-      context.commit("saveScoreToLocalStorage");
+      if (template != "intro-score") {
+        context.commit("saveScoreToLocalStorage");
+      }
     },
     openScore (context, xml) {
       context.commit("loadScoreFromTemplate", {file: xml});

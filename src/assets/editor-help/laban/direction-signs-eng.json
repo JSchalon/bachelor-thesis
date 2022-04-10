@@ -1,0 +1,44 @@
+{ 
+  "breakPoints": {"0": 4},
+  "introData": [
+    {
+      "title": "Direction Signs",
+      "text": "To describe a movement in a specific direction, direction signs are used. They come in 9 variations which define the horizontal direction.<br><br>The vertical direction is defined by the inner pattern. To indicate a downwards direction, the sign is filled black. To indicate a purely horizontal direction, a dot is placed in the middle. An upwards direction is defined by diagonal lines.",
+      "buttonText": "Next",
+      "position": {"elem": "library", "hSide": "right", "vSide": "top"},
+      "stateChange": false,
+      "image": "direction-sign-variations.svg",
+      "highlightID": "library-direction-signs",
+      "highlightElem": "signLibrary"
+    },
+    {
+      "title": "Direction Signs",
+      "text": "To further specify the direction, a relationship pin can be placed in the middle of the sign. These pins shift the direction 30° into the direction of their pinhead.",
+      "buttonText": "Next",
+      "position": {"elem": "library", "hSide": "right", "vSide": "top"},
+      "stateChange": false,
+      "image": "direction-inner-pin.svg",
+      "highlightID": "library-direction-signs",
+      "highlightElem": "signLibrary"
+    },
+    {
+      "title": "Direction Signs",
+      "text": "To specify the relative position of the acting body part after the movement, another relationship pin can be placed left or right of the sign. <br><br>An upwards pin signifies that the body part ends up in front of the other sign, while a downwards pin signifies that it ends up behind.<br><br>An example would be a side-step, where this is used to note which foot is placed in front of the other.",
+      "buttonText": "Next",
+      "position": {"elem": "library", "hSide": "right", "vSide": "top"},
+      "stateChange": false,
+      "image": "direction-outer-pin.svg",
+      "highlightID": "library-direction-signs",
+      "highlightElem": "signLibrary"
+    },
+    {
+      "title": "Direction Signs",
+      "text": "Space measurement signs can be placed below direction signs. This changes the amount of flexion or extension of the body part during the movement. For example a “wide” sign below an upwards movement of the arm would mean that the arm is fully extended.",
+      "buttonText": "Finish",
+      "position": {"elem": "library", "hSide": "right", "vSide": "top"},
+      "stateChange": false,
+      "highlightID": "library-direction-signs",
+      "highlightElem": "signLibrary"
+    }
+  ]
+}

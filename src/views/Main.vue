@@ -14,6 +14,12 @@
     <div class="desc-box" :class="{highlighted: tutHighlight == 'score'}">
       <div class="box" v-if="storeDescActive">
         <h2 class="title is-5">{{$store.state["title"]}} <button class="delete is-large custom-close" aria-label="close" @click="this.$store.dispatch('changeSettings', {showScoreDescription: !storeDescActive});"><img src="@/assets/images/interaction-menu/x.svg" class="option-img"></button> </h2>
+        <p><strong>Author: </strong> {{$store.state["author"]}}</p>
+        <p><strong>Columns: </strong> {{$store.state["columnsLeft"] + $store.state["columnsRight"]}}</p>
+        <p><strong>Bars: </strong> {{$store.state["bars"]}}</p>
+        <p><strong>Beats: </strong> {{$store.state["beatsPerBar"]}}</p>
+        <p><strong>Beat duration: </strong> {{$store.state["beatDuration"] + " " + $store.state["timeUnit"].slice(0,3)}}</p>
+        <p><strong>Description: </strong></p>
         <p>{{$store.state["description"]}}</p>
       </div>
       <button v-else class="button has-background-white is-size-5 desc-btn" @click="this.$store.dispatch('changeSettings', {showScoreDescription: !storeDescActive});">!</button>
@@ -30,19 +36,38 @@
       <template v-slot:text>Importing a score will delete the current score, including any unsaved changes. This action is currently not reversible.</template>
     </ConfirmationModal>
     
-    
     <ConfirmationModal :modalActive="$store.state['isPhone']" :cancel="false" @confirm="phoneDone()">
       <template v-slot:title>Small screen detected</template>
-      <template v-slot:text>We recommend using a Tablet or PC to use this editor. Using a smaller screen, like a smartphone is possible, but not advised.</template>
+      <template v-slot:text>We recommend using a Tablet or PC to use this editor. Using a smaller screen like a smartphone is possible, but not advised.</template>
     </ConfirmationModal>
+
+    <ConfirmationModal :modalActive="introDoneNext && firstIntroChoice == 'laban'" @disableModal="introDoneNext=false;firstIntroChoice=false" @confirm="introDoneNext=false;firstIntroChoice=false; openIntroduction('intro/editor-intro')">
+      <template v-slot:title>Editor Introduction available</template>
+      <template v-slot:text>There is also an introduction into the editor and how to operate it available. Would you like to do it as well? Alternatively, the introductions, as well as further Labanotation sign introductions, are available in the "Help" Menu.</template>
+      <template v-slot:confirm>Do introduction</template>
+      <template v-slot:deny>No thanks</template>
+    </ConfirmationModal>
+    <ConfirmationModal :modalActive="introDoneNext && firstIntroChoice == 'editor'" @disableModal="introDoneNext=false;firstIntroChoice=false" @confirm="introDoneNext=false;firstIntroChoice=false; openIntroduction('laban/laban-basic')">
+      <template v-slot:title>Labanotation Introduction available</template>
+      <template v-slot:text>There is also an introduction into the editor and how to operate it available. Would you like to do it as well? Alternatively, the introductions, as well as further Labanotation sign introductions, are available in the "Help" Menu.</template>
+      <template v-slot:confirm>Do introduction</template>
+      <template v-slot:deny>No thanks</template>
+    </ConfirmationModal>
+
     <div class="is-justify-content-center is-flex alert-box-container" v-if="showCloudAlert != ''">
       <div class="box has-background-primary-light has-text-primary-dark" v-if="showCloudAlert == 'import-success'">Successfully imported score from cloud service.</div>
       <div class="box has-background-danger-light has-text-danger-dark" v-if="showCloudAlert == 'import-failure'">Could not import score from cloud service, please try again.</div>
       <div class="box has-background-primary-light has-text-primary-dark" v-if="showCloudAlert == 'export-success'">Successfully exported file to cloud service.</div>
       <div class="box has-background-danger-light has-text-danger-dark" v-if="showCloudAlert == 'export-failure'">Could not export file to cloud service, please try again.</div>
     </div>
-    <EditorExplainModal :modalActive="showFirstIntro" @disableModal="firstIntroDone(false)" @startLabanIntro="firstIntroDone(true); openIntroduction('labanBasic')" @startEditorIntro="firstIntroDone(true); openIntroduction('editor')"/>
-    <IntroductionModal :modalActive="tutActive" :intro="intro" @disableModal="tutHighlight='';intro='';tutActive=false" @switchHighlight="changeTutHighlight"/>
+
+    <EditorExplainModal 
+      :modalActive="showFirstIntro" 
+      @disableModal="firstIntroDone(false)" 
+      @startLabanIntro="firstIntroDone(true); firstIntroChoice='laban'; openIntroduction('laban/laban-basic')" 
+      @startEditorIntro="firstIntroDone(true); firstIntroChoice='editor'; openIntroduction('intro/editor-intro')"
+    />
+    <IntroductionModal :modalActive="tutActive" :intro="intro" @disableModal="endIntroduction()" @switchHighlight="changeTutHighlight"/>
   </div>
 </template>
 
@@ -71,6 +96,9 @@ export default {
       tutHighlight: "",
       showFirstIntro: false,
       intro: 'intro/editor-intro-',
+      savedScore: false,
+      firstIntroChoice: false,
+      introDoneNext: false,
     };
   },
   computed: {
@@ -135,6 +163,11 @@ export default {
         this.tutActive = false;
         this.tutHighlight='';
         this.intro='';
+        if (this.savedScore) {
+          const serial = new XMLSerializer()
+          this.$store.dispatch("newScore", {file: serial.serializeToString(this.savedScore)});
+          this.savedScore = false;
+        }
       }
     }.bind(this));
   },
@@ -205,16 +238,32 @@ export default {
       this.modalActive = true;
     },
     openIntroduction (which) {
-      if (which == "editor") {
+      if (which == "intro/editor-intro") {
         this.tutHighlight = "optionsMenu";
-        this.intro = 'intro/editor-intro-';
-      } else if (which == "labanBasic") {
+        this.savedScore = this.$store.state["signsXML"];
+        this.$store.dispatch("newScore", "intro-score");
+      } else if (which == "laban/laban-basic") {
         this.tutHighlight = "score";
-        this.intro = 'laban/laban-basic-';
+        this.savedScore = this.$store.state["signsXML"];
+        this.$store.dispatch("newScore", "intro-score");
       } else {
-        console.log(which);
+        this.tutHighlight = "signLibrary";
       }
+      this.intro = which + "-";
       this.tutActive = true;
+    },
+    endIntroduction () {
+      this.tutHighlight='';
+      this.intro='';
+      this.tutActive=false;
+      if (this.savedScore) {
+        const serial = new XMLSerializer()
+        this.$store.dispatch("newScore", {file: serial.serializeToString(this.savedScore)});
+        this.savedScore = false;
+      }
+      if (!this.introDoneNext && this.firstIntroChoice) {
+        this.introDoneNext = true;
+      }
     },
     phoneDone () {
       this.$store.dispatch('setIsPhone', false); 
@@ -509,7 +558,7 @@ html {
 
 .highlighted {
   z-index: 1001!important;
-  position: relative;
+  position: fixed;
 }
 .desc-box.highlighted {
   position: absolute;
@@ -547,6 +596,7 @@ html {
 
 .tut-highlight {
   border: 3px solid var(--selected)!important;
+  position: relative;
 }
 
 div.select:after {
@@ -554,11 +604,11 @@ div.select:after {
 }
 
 .help.is-info {
-  color: var(--selected)!important;
+  color: var(--delete)!important;
 }
 
-.button.is-info {
-  background-color: var(--selected)!important;
+.button.is-success {
+  background-color: var(--add)!important;
 }
 
 </style>

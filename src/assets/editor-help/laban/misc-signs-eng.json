@@ -1,0 +1,41 @@
+{ 
+  "breakPoints": {"0": 4},
+  "introData": [
+    {
+      "title": "Room Direction Signs",
+      "text": "Room direction signs specify the alignment of the body in relation to the room. This is mainly used in dance notation, to signify whether or not a performer is facing the crowd. They are placed beyond the left-most column.",
+      "buttonText": "Next",
+      "position": {"elem": "library", "hSide": "right", "vSide": "top"},
+      "stateChange": false,
+      "highlightID": "library-misc-signs",
+      "highlightElem": "signLibrary"
+    },
+    {
+      "title": "Cancel Signs",
+      "text": "“Release contact” and “back to normal” are cancel signs. They primarily cancel holding signs, which specify that the position of the previous movement is held after it is done, or relationship bows.",
+      "buttonText": "Next",
+      "position": {"elem": "library", "hSide": "right", "vSide": "top"},
+      "stateChange": false,
+      "highlightID": "library-misc-signs",
+      "highlightElem": "signLibrary"
+    },
+    {
+      "title": "Vibration Signs",
+      "text": "Vibration signs define a vibrating movement. The two pins are used to define the two points the movement is oscillating between.",
+      "buttonText": "Finish",
+      "position": {"elem": "library", "hSide": "right", "vSide": "top"},
+      "stateChange": false,
+      "highlightID": "library-misc-signs",
+      "highlightElem": "signLibrary"
+    },
+    {
+      "title": "Prop Signs",
+      "text": "Prop signs are similar to body part signs, in that they can be placed below a column. One use is to place an input device prop next to a body part sign with a relationship bow connecting them to indicate how and where that input device is held.",
+      "buttonText": "Next",
+      "position": {"elem": "library", "hSide": "right", "vSide": "top"},
+      "stateChange": false,
+      "highlightID": "library-misc-signs",
+      "highlightElem": "signLibrary"
+    }
+  ]
+}

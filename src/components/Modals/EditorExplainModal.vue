@@ -10,19 +10,19 @@
         <p class="mb-4" v-html="introData[curIndex]['text']"></p>
       <div class="columns is-multiline mb-0">
         <div class="column is-flex is-justify-content-center is-full p-0">
-          <button v-if="curIndex == 1" class="button has-text-info is-white" @click="$emit('startLabanIntro')">Labanotation Introduction</button>
+          <button v-if="curIndex == 1" class="button nav-btn  mb-2 has-text-white" @click="$emit('startLabanIntro')">Labanotation Introduction</button>
         </div>
         <div class="column is-flex is-justify-content-center is-full p-0">
-          <button v-if="curIndex == 1" class="button has-text-info is-white" @click="$emit('startEditorIntro')">Editor Introduction</button>
+          <button v-if="curIndex == 1" class="button nav-btn  mb-2 has-text-white" @click="$emit('startEditorIntro')">Editor Introduction</button>
         </div>
       </div>
       <div class="is-flex is-justify-content-center mb-4">
-        <button v-if="curIndex == 0" class="button has-text-info is-white" @click="curIndex = curIndex + 1">Next</button>
-        <button v-if="curIndex == 1" class="button has-text-info is-white" @click="curIndex = curIndex + 1">No thanks</button>
-        <button v-if="curIndex == 2" class="button has-text-info is-white" @click="$emit('disableModal')">Understood</button>
+        <button v-if="curIndex == 0" class="button nav-btn has-text-white" @click="curIndex = curIndex + 1">Next</button>
+        <button v-if="curIndex == 1" class="button nav-btn has-text-white" @click="curIndex = curIndex + 1">No thanks</button>
+        <button v-if="curIndex == 2" class="button nav-btn has-text-white" @click="$emit('disableModal')">Understood</button>
       </div>
         <div class="is-flex is-justify-content-center">
-          <button class="button nav-dot mx-2" :class="curIndex == index ? 'is-info':''" @click="curIndex = index" :key="index" v-for="(elem, index) in introData.length"></button>
+          <button class="button nav-dot mx-2" :class="curIndex == index ? 'active':''" @click="curIndex = index" :key="index" v-for="(elem, index) in introData.length"></button>
         </div>
       </div>
     </div>
@@ -65,3 +65,30 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+.nav-btn {
+  color: white;
+  background-color: var(--selected);
+}
+
+.nav-btn:focus {
+  box-shadow: 0 0 0 0.125em rgb(68 111 151 / 25%);
+  outline-color: var(--selected-darker)!important;
+  border-color: var(--selected)!important;
+}
+
+.nav-dot {
+  background-color: white;
+}
+
+.active {
+  background-color: var(--selected);
+}
+
+.nav-dot:focus {
+  box-shadow: 0 0 0 0.125em rgb(68 111 151 / 25%);
+  outline-color: var(--selected-darker)!important;
+  border-color: var(--selected)!important;
+}
+</style>

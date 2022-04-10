@@ -1,0 +1,34 @@
+{ 
+  "breakPoints": {"0": 3},
+  "introData": [
+    {
+      "title": "Turn Signs",
+      "text": "There are two ways of defining the angle of a turn in Labanotation. One way is to use space measurement signs as a qualitative descriptor. A “narrow” sign would signify a small rotation, while a “wide” sign would signify a big one.",
+      "buttonText": "Next",
+      "position": {"elem": "library", "hSide": "right", "vSide": "top"},
+      "stateChange": false,
+      "image": "turn-pin-and-space.svg",
+      "highlightID": "library-turn-signs",
+      "highlightElem": "signLibrary"
+    },
+    {
+      "title": "Turn Signs",
+      "text": "Alternatively, relationship pins can be used to quantitatively describe the rotation. For a right turn, a purely upwards pin indicates a 360° turn, a upwards-left pin a 315° turn, a upwards-right turn 45° etc. For a left turn, this is reversed, so an upwards-left pin means 45° instead.",
+      "buttonText": "Next",
+      "position": {"elem": "library", "hSide": "right", "vSide": "top"},
+      "stateChange": false,
+      "image": "turn-pins.svg",
+      "highlightID": "library-turn-signs",
+      "highlightElem": "signLibrary"
+    },
+    {
+      "title": "Turn Signs",
+      "text": "All three pinhead types have a different meaning in terms of rotations. White pins describe the rotation in relation to the starting position of the body part, black pins describe the rotation in relation to the current position of the body part and flat pins describe the direction in the room the body part is turned to after the rotation.",
+      "buttonText": "Finish",
+      "position": {"elem": "library", "hSide": "right", "vSide": "top"},
+      "stateChange": false,
+      "highlightID": "library-turn-signs",
+      "highlightElem": "signLibrary"
+    }
+  ]
+}

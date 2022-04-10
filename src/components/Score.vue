@@ -1,6 +1,5 @@
 <template>
-    <div id="canvasContainer" @scroll="getScroll">
-      <div class="normal" style="visibility: hidden"/>
+    <div id="canvasContainer" @scroll="getScroll" ref="container" @mousedown.self="selectSign(-1)">
       <div class="margin-box" @mousedown.self="selectSign(-1)">
         <svg preserveAspectRatio="xMinYMax meet" ref="canvas" id="canvas" :width="canvasDimensions.x" :height="canvasDimensions.y" fill="white" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg">
           <defs>
@@ -201,6 +200,12 @@ export default {
         }
       }
     },
+    contextActive (value) {
+      if (value && this.selectedSigns.length >= 1) {
+        const elem = this.$refs.bounding.querySelector(".sign-container[signID='"+ this.selectedSigns[0] + "']");
+        elem.dispatchEvent(new Event("contextmenu"));
+      }
+    },
     ghostOverCanvas (bool) {
       if (bool) {
         let pos = this.getGhostScorePos();
@@ -256,11 +261,22 @@ export default {
       if (!this.interacting) {
         this.initInteractListeners();
       }
+      const offsetBox = this.$refs.container.getBoundingClientRect();
       if (this.canvasScroll.x != event.target.scrollLeft && this.columnHandlesActive) {
-        this.placeGridHandles({type: "col", x: this.selectedColumnTranslate.x + (this.canvasScroll.x - event.target.scrollLeft), y: this.selectedColumnTranslate.y - document.getElementById("canvasContainer").scrollTop - (this.barH / 2 - 15)})
+        if (this.$refs.container.classList.contains("highlighted")) {
+          this.placeGridHandles({type: "col", x: this.selectedColumnTranslate.x + (this.canvasScroll.x - event.target.scrollLeft) + offsetBox.x, y: this.selectedColumnTranslate.y - document.getElementById("canvasContainer").scrollTop - (this.barH / 2 - 15) + offsetBox.y});
+        } else {
+          this.placeGridHandles({type: "col", x: this.selectedColumnTranslate.x + (this.canvasScroll.x - event.target.scrollLeft), y: this.selectedColumnTranslate.y - document.getElementById("canvasContainer").scrollTop - (this.barH / 2 - 15)});
+        }
+        
       }
       if (this.canvasScroll.y != event.target.scrollTop && this.barHandlesActive) {
-        this.placeGridHandles({type: "bar", x: this.selectedBarTranslate.x - (this.columnWidth - this.signWidth - 15), y: this.selectedBarTranslate.y + (this.canvasScroll.y - event.target.scrollTop)})
+        if (this.$refs.container.classList.contains("highlighted")) {
+          
+          this.placeGridHandles({type: "bar", x: this.selectedBarTranslate.x - (this.columnWidth - this.signWidth - 15) + offsetBox.x, y: this.selectedBarTranslate.y + (this.canvasScroll.y - event.target.scrollTop) + offsetBox.y});
+        } else {
+          this.placeGridHandles({type: "bar", x: this.selectedBarTranslate.x - (this.columnWidth - this.signWidth - 15), y: this.selectedBarTranslate.y + (this.canvasScroll.y - event.target.scrollTop)});
+        }
       }
       if (this.interacting) {
         for (let index of this.interactingSigns) {
@@ -365,13 +381,23 @@ export default {
     },
     placeGridHandles(data) {
       this.$store.dispatch("changeContextMenu", false);
+      const offset = this.$refs.container.getBoundingClientRect();
       if (data.type == "col") {
         this.columnHandlesActive = true;
-        this.selectedColumnTranslate = {x: data.x, y: (data.y + document.getElementById("canvasContainer").scrollTop) + this.barH / 2 - 15};
+        if (this.$refs.container.classList.contains("highlighted")) {
+          this.selectedColumnTranslate = {x: data.x - offset.x, y: (data.y + document.getElementById("canvasContainer").scrollTop) + this.barH / 2 - 15 - offset.y};
+        } else {
+          this.selectedColumnTranslate = {x: data.x, y: (data.y + document.getElementById("canvasContainer").scrollTop) + this.barH / 2 - 15};
+        }
       } else {
         //special case for bar 0 -> only add, topside
         this.barHandlesActive = true;
-        this.selectedBarTranslate = {x: data.x + this.columnWidth - this.signWidth - 15, y: data.y};
+        if (this.$refs.container.classList.contains("highlighted")) {
+          this.selectedBarTranslate = {x: data.x - offset.x + this.columnWidth - this.signWidth - 15, y: data.y - offset.y};
+        } else {
+          this.selectedBarTranslate = {x: data.x + this.columnWidth - this.signWidth - 15, y: data.y};
+        }
+        
       }
     },
     updateSelectedColumn (data) {
@@ -963,7 +989,10 @@ export default {
       } else {
         this.contextPos.y = boundingRect.top;
       }
-      
+      if (this.$refs.container.classList.contains("highlighted")) {
+        this.contextPos.x = this.contextPos.x - this.$refs.container.getBoundingClientRect().left;
+        this.contextPos.y = this.contextPos.y - this.$refs.container.getBoundingClientRect().top;
+      }
       
       this.selectSign(targetID);
       this.$store.dispatch("changeContextMenu", true);
@@ -972,8 +1001,8 @@ export default {
     },
 
     moveContextIntoView () {
-      if (this.contextPos.y + document.getElementById("context-menu").offsetHeight >= window.innerHeight) {
-        this.contextPos.y = this.contextPos.y - (this.contextPos.y + document.getElementById("context-menu").offsetHeight - window.innerHeight);
+      if (this.contextPos.y + document.getElementById("context-menu").offsetHeight + this.$refs.container.getBoundingClientRect().top >= window.innerHeight) {
+        this.contextPos.y = this.contextPos.y - (this.contextPos.y + document.getElementById("context-menu").offsetHeight + this.$refs.container.getBoundingClientRect().top - window.innerHeight);
       }
     },
 

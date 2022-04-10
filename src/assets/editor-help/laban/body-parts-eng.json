@@ -1,0 +1,44 @@
+{ 
+  "breakPoints": {"0": 4},
+  "introData": [
+    {
+      "title": "Body Part Signs",
+      "text": "Labanotation has body part signs for different joints (1), limbs (2), surfaces (3), digits (4) and areas (5). Limb signs are usually defined by adding a vertical line to a respective joint sign. Digits (fingers and toes) can be defined with the finger and toe signs respectively.",
+      "buttonText": "Next",
+      "position": {"elem": "library", "hSide": "right", "vSide": "top"},
+      "stateChange": false,
+      "image": "body-part-types.svg",
+      "highlightID": "library-body-part-signs",
+      "highlightElem": "signLibrary"
+    },
+    {
+      "title": "Body Part Signs",
+      "text": "Finger and toe signs can further be defined with dots, where one dot at the base of the digit means the first joint, two dots mean the second joint, etc. When all joints are represented the sign is referring to the whole finger. When only the last dot is visible, the sign is representing the finger tip.",
+      "buttonText": "Next",
+      "position": {"elem": "library", "hSide": "right", "vSide": "top"},
+      "stateChange": false,
+      "image": "digit-types.svg",
+      "highlightID": "library-body-part-signs",
+      "highlightElem": "signLibrary"
+    },
+    {
+      "title": "Body Part Signs",
+      "text": "Surfaces can be defined by adding certain parts to limb signs. A white dot between the vertical lines defines the vertical inner surface, a black dot to the outer surface. A small horizontal line at the side refers to that side of the bodys little finger side, while a longer horizontal line refers to the thumb side. Surfaces can also be combined.",
+      "buttonText": "Next",
+      "position": {"elem": "library", "hSide": "right", "vSide": "top"},
+      "stateChange": false,
+      "image": "surface-types.svg",
+      "highlightID": "library-body-part-signs",
+      "highlightElem": "signLibrary"
+    },
+    {
+      "title": "Body Part Signs",
+      "text": "Body parts can be used in two ways. When they are placed below the score, they specify that all movements in that column apply to that body part. Alternatively a body part sign can be placed before another sign to specify that only that movement applies to it.",
+      "buttonText": "Finish",
+      "position": {"elem": "library", "hSide": "right", "vSide": "top"},
+      "stateChange": false,
+      "highlightID": "library-body-part-signs",
+      "highlightElem": "signLibrary"
+    }
+  ]
+}

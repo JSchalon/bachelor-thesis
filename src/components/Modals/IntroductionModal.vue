@@ -8,6 +8,7 @@
       </div>
       <p v-if="!$store.state['isTablet'] || !('textTablet' in introData[curIndex])" class="mb-4" v-html="introData[curIndex]['text']"></p>
       <p v-else class="mb-4" v-html="introData[curIndex]['textTablet']"></p>
+      <p v-if="'image' in introData[curIndex]" class="mb-4 is-flex is-justify-content-center"><img width="300" :src="imgSrc" /></p>
       <div class="is-flex is-justify-content-center mb-4">
         <button v-if="curIndex > 0" class="button nav-btn has-text-white mr-2" @click="back()">Back</button>
         <button v-if="curIndex < introData.length - 1" class="button nav-btn has-text-white" @click="next()">{{introData[curIndex]["buttonText"]}}</button>
@@ -58,10 +59,22 @@ export default {
   },
   watch: {
     modalActive (value) {
+      this.resetState();
       if (value) {
-        document.getElementById(this.introData[this.curIndex].highlightID).classList.add("tut-highlight");
+        if (this.introData[this.curIndex].highlightID != "none") {
+          document.getElementById(this.introData[this.curIndex].highlightID).classList.add("tut-highlight");
+        }
+        this.switchState();
       } else {
-        document.getElementById(this.introData[this.curIndex].highlightID).classList.remove("tut-highlight");
+        if (this.introData[this.curIndex].highlightID != "none") {
+          if (this.introData[this.curIndex].highlightID.constructor === Array) {
+            for (let index in this.introData[this.curIndex].highlightID) {
+              document.getElementById(this.introData[this.curIndex].highlightID[index]).classList.remove("tut-highlight");
+            }
+          } else {
+            document.getElementById(this.introData[this.curIndex].highlightID).classList.remove("tut-highlight");
+          }
+        }
       }
     },
     intro () {
@@ -88,6 +101,14 @@ export default {
         let elemRect = document.getElementById(pos.elem).getBoundingClientRect();
         return "transform: translate(" + elemRect[pos.hSide] + "px, " + elemRect[pos.vSide] + "px);";
       }
+    },
+    imgSrc () {
+      if ("image" in this.introData[this.curIndex] && this.modalActive) {
+        let introCat = this.intro;
+        return require("@/assets/images/introduction-images/" + introCat.slice(0,-1) + "/" + this.introData[this.curIndex].image);
+      } else {
+        return "";
+      }
     }
   },
   mounted () {
@@ -103,30 +124,102 @@ export default {
   },
   methods: {
     switchIndex (index) {
-      document.getElementById(this.introData[this.curIndex].highlightID).classList.remove("tut-highlight");
+      this.resetState();
+      if (this.introData[this.curIndex].highlightID != "none") {
+        if (this.introData[this.curIndex].highlightID.constructor === Array) {
+          for (let index in this.introData[this.curIndex].highlightID) {
+            document.getElementById(this.introData[this.curIndex].highlightID[index]).classList.remove("tut-highlight");
+          }
+        } else {
+          document.getElementById(this.introData[this.curIndex].highlightID).classList.remove("tut-highlight");
+        }
+      }
       this.curIndex = index;
-      document.getElementById(this.introData[this.curIndex].highlightID).classList.add("tut-highlight");
+      if (this.introData[this.curIndex].highlightID != "none") {
+        if (this.introData[this.curIndex].highlightID.constructor === Array) {
+          for (let index in this.introData[this.curIndex].highlightID) {
+            document.getElementById(this.introData[this.curIndex].highlightID[index]).classList.add("tut-highlight");
+          }
+        } else {
+          document.getElementById(this.introData[this.curIndex].highlightID).classList.add("tut-highlight");
+        }
+      }
+      this.switchState();
     },
     next () {
+      this.resetState();
       this.curIndex = this.curIndex + 1;
       this.$emit('switchHighlight', this.introData[this.curIndex].highlightElem);
       setTimeout(() => {
         if (this.introData[this.curIndex].highlightID != this.introData[this.curIndex - 1].highlightID) {
-          document.getElementById(this.introData[this.curIndex - 1].highlightID).classList.remove("tut-highlight");
-          document.getElementById(this.introData[this.curIndex].highlightID).classList.add("tut-highlight");
+          if (this.introData[this.curIndex - 1].highlightID != "none") {
+            if (this.introData[this.curIndex - 1].highlightID.constructor === Array) {
+              for (let index in this.introData[this.curIndex - 1].highlightID) {
+                document.getElementById(this.introData[this.curIndex - 1].highlightID[index]).classList.remove("tut-highlight");
+              }
+            } else {
+              document.getElementById(this.introData[this.curIndex - 1].highlightID).classList.remove("tut-highlight");
+            }
+          }
+          if (this.introData[this.curIndex].highlightID != "none") {
+            if (this.introData[this.curIndex].highlightID.constructor === Array) {
+              for (let index in this.introData[this.curIndex].highlightID) {
+                document.getElementById(this.introData[this.curIndex].highlightID[index]).classList.add("tut-highlight");
+              }
+            } else {
+              document.getElementById(this.introData[this.curIndex].highlightID).classList.add("tut-highlight");
+            }
+          } 
         }
       }, 1);
+      this.switchState();
     },
     back () {
+      this.resetState();
       this.curIndex = this.curIndex - 1;
       this.$emit('switchHighlight', this.introData[this.curIndex].highlightElem);
       setTimeout(() => {
         if (this.introData[this.curIndex].highlightID != this.introData[this.curIndex + 1].highlightID) {
-          document.getElementById(this.introData[this.curIndex + 1].highlightID).classList.remove("tut-highlight");
-          document.getElementById(this.introData[this.curIndex].highlightID).classList.add("tut-highlight");
+          if (this.introData[this.curIndex + 1].highlightID != "none") {
+            if (this.introData[this.curIndex + 1].highlightID.constructor === Array) {
+              for (let index in this.introData[this.curIndex + 1].highlightID) {
+                document.getElementById(this.introData[this.curIndex + 1].highlightID[index]).classList.remove("tut-highlight");
+              }
+            } else {
+              document.getElementById(this.introData[this.curIndex + 1].highlightID).classList.remove("tut-highlight");
+            }
+          }
+          if (this.introData[this.curIndex].highlightID != "none") {
+            if (this.introData[this.curIndex].highlightID.constructor === Array) {
+              for (let index in this.introData[this.curIndex].highlightID) {
+                document.getElementById(this.introData[this.curIndex].highlightID[index]).classList.add("tut-highlight");
+              }
+            } else {
+              document.getElementById(this.introData[this.curIndex].highlightID).classList.add("tut-highlight");
+            }
+          } 
         }
       }, 1);
-
+      this.switchState();
+    },
+    switchState() {
+      if (this.introData[this.curIndex].stateChange) {
+       
+        for (let [key, value] of Object.entries(this.introData[this.curIndex].stateChange)) {
+          if (value.constructor === Array) {
+            for (let index of value) {
+              this.$store.dispatch(key, index);
+            }
+          } else {
+            this.$store.dispatch(key, value);
+          }
+        }
+      }
+    },
+    resetState () {
+      this.$store.dispatch("clearSelectedSigns");
+      this.$store.dispatch("clearGridSelect");
+      this.$store.dispatch("changeContextMenu", false);
     }
   }
 }
