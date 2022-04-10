@@ -38,18 +38,18 @@
       <li class="option-item">
         <div class="menu-option-container has-sub-menu">
           <img src="@/assets/images/interaction-menu/blank.svg" class="option-img">
-          <p>Export SVG</p>
+          <p>Save XML</p>
           <img src="@/assets/images/interaction-menu/triangle-left.svg" class="option-img dropdown">
           <ul class="option-nested sub-menu" tabIndex="0" role="button">
             <div class="option-box sub-menu">
-              <li class="option-item" @click="exportSVGLocal()">
+              <li class="option-item" @click="exportXMLLocal()">
                 <div class="menu-option-container">
                   <img src="@/assets/images/common/download-local.svg" class="option-img">
                   <p>To local Files</p>
-                  <p class="shortcut" v-if="showShortCuts">Ctrl+P</p>
+                  <p class="shortcut" v-if="showShortCuts">Ctrl+S</p>
                 </div>
               </li>
-              <li class="option-item" @click="exportSVGDropBox()">
+              <li class="option-item" @click="exportXMLDropBox()">
                 <div class="menu-option-container">
                   <img src="@/assets/images/common/upload-cloud.svg" class="option-img">
                   <p>To Dropbox</p>
@@ -62,18 +62,18 @@
       <li class="option-item">
         <div class="menu-option-container has-sub-menu">
           <img src="@/assets/images/interaction-menu/blank.svg" class="option-img">
-          <p>Export XML</p>
+          <p>Save SVG</p>
           <img src="@/assets/images/interaction-menu/triangle-left.svg" class="option-img dropdown">
           <ul class="option-nested sub-menu" tabIndex="0" role="button">
             <div class="option-box sub-menu">
-              <li class="option-item" @click="exportXMLLocal()">
+              <li class="option-item" @click="exportSVGLocal()">
                 <div class="menu-option-container">
                   <img src="@/assets/images/common/download-local.svg" class="option-img">
                   <p>To local Files</p>
-                  <p class="shortcut" v-if="showShortCuts">Ctrl+S</p>
+                  <p class="shortcut" v-if="showShortCuts">Ctrl+P</p>
                 </div>
               </li>
-              <li class="option-item" @click="exportXMLDropBox()">
+              <li class="option-item" @click="exportSVGDropBox()">
                 <div class="menu-option-container">
                   <img src="@/assets/images/common/upload-cloud.svg" class="option-img">
                   <p>To Dropbox</p>

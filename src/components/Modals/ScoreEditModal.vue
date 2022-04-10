@@ -18,7 +18,7 @@
             <input class="input" type="text" placeholder="Title" name="title" required>
           </div>
         </div>
-        <div class="field">
+        <div class="field" v-if="newScore">
           <label class="label">Template</label>
           <div class="control">
             <div class="select">

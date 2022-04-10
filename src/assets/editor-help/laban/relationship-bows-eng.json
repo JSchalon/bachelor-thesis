@@ -16,6 +16,7 @@
       "buttonText": "Next",
       "position": {"elem": "library", "hSide": "right", "vSide": "top"},
       "stateChange": false,
+      "image": "addressing.svg",
       "highlightID": "library-relationship-bows",
       "highlightElem": "signLibrary"
     },

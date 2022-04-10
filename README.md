@@ -11,9 +11,8 @@ Git Repo zur Bachelorarbeit zur Entwicklung eines webbasierten Interaktionsedito
 
 ## Versions
 
-### Version 0.9.0
-- Added all sign introductions
-- Added images to introductions where neccessary
-- Added a information modal where sign intros are located
-- Fixed texts
+### Version 0.9.1
+- Release Candidate for the summative evlaution
+- Added base Score for the evaluation
+- loading evaluation score at start
 - Fixed some bugs

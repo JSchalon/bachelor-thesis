@@ -106,8 +106,10 @@ export default {
       this.updateCurSign({catIndex: catIndex, index: index, name: nameElem.name, signData: this.signs[catIndex][index].signData, updateSign: true});
       this.$emit("selectSignDrag", {type: "start", pos: {x: event.target.firstChild.getBoundingClientRect().x, y: event.target.firstChild.getBoundingClientRect().y}});
       if (this.signs[catIndex][index].signData.baseType == "RoomDirectionSign") {
+        this.$store.dispatch("addToGridSelect", {});
         this.$store.dispatch("addToGridSelect", {col: -this.$store.state["columnsLeft"] - 1});
       } else if (this.signs[catIndex][index].signData.baseType == "PathSign") {
+        
         this.$store.dispatch("addToGridSelect", {col: this.$store.state["columnsRight"]});
       } else if (this.signs[catIndex][index].signData.baseType == "BodyPartSign" || this.signs[catIndex][index].signData.baseType == "PropSign") {
         for (let col = -this.$store.state["columnsLeft"]; col < this.$store.state["columnsRight"]; col++) {

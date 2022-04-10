@@ -43,14 +43,14 @@
 
     <ConfirmationModal :modalActive="introDoneNext && firstIntroChoice == 'laban'" @disableModal="introDoneNext=false;firstIntroChoice=false" @confirm="introDoneNext=false;firstIntroChoice=false; openIntroduction('intro/editor-intro')">
       <template v-slot:title>Editor Introduction available</template>
-      <template v-slot:text>There is also an introduction into the editor and how to operate it available. Would you like to do it as well? Alternatively, the introductions, as well as further Labanotation sign introductions, are available in the "Help" Menu.</template>
-      <template v-slot:confirm>Do introduction</template>
+      <template v-slot:text>There is also an introduction to the editor and how to operate it available. Would you like to visit it? Alternatively, both introductions, as well as further Labanotation sign introductions, are also available in the "Help" menu.</template>
+      <template v-slot:confirm>Visit introduction</template>
       <template v-slot:deny>No thanks</template>
     </ConfirmationModal>
     <ConfirmationModal :modalActive="introDoneNext && firstIntroChoice == 'editor'" @disableModal="introDoneNext=false;firstIntroChoice=false" @confirm="introDoneNext=false;firstIntroChoice=false; openIntroduction('laban/laban-basic')">
       <template v-slot:title>Labanotation Introduction available</template>
-      <template v-slot:text>There is also an introduction into the editor and how to operate it available. Would you like to do it as well? Alternatively, the introductions, as well as further Labanotation sign introductions, are available in the "Help" Menu.</template>
-      <template v-slot:confirm>Do introduction</template>
+      <template v-slot:text>There is also an introduction to Labanotation available. Would you like to visit it? Alternatively, both introductions, as well as further Labanotation sign introductions, are also available in the "Help" menu.</template>
+      <template v-slot:confirm>Visit introduction</template>
       <template v-slot:deny>No thanks</template>
     </ConfirmationModal>
 
@@ -139,17 +139,8 @@ export default {
   },
   mounted () {
     this.signsLength = this.signs.length;
-    if (localStorage.getItem("score")) {
-      this.$store.dispatch("newScore", "local-storage");
-      this.$store.dispatch("clearHistory");
-    } else {
-      this.$store.dispatch("newScore", "blank-score");
-      this.$store.dispatch("clearHistory");
-      if (!this.$store.state['isPhone'] && this.$store.state['seenIntro']) {
-        this.newScore = true;
-        this.modalActive = true;
-      } 
-    }
+    this.$store.dispatch("newScore", "eval-score");
+    this.$store.dispatch("clearHistory");
     if (!this.$store.state['isPhone'] && !this.$store.state['seenIntro']) {
       this.showFirstIntro = true;
     }

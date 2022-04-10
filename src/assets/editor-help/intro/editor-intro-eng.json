@@ -64,8 +64,8 @@
     },
     {
       "title": "The Score - Selecting Bars and Columns",
-      "text": "To add or remove a bar, click on it. This will highlight it and cause three buttons to appear. The “+” buttons will add a new bar either below or above the selected bar. The “-” button will remove the selected bar and its signs.<br><br> To select a column instead, click on the same spot again. To unselect a bar or column, click any other place on the score",
-      "textTablet": "To add or remove a bar, tap on it. This will highlight it and cause three buttons to appear. The “+” buttons will add a new bar either below or above the selected bar. The “-” button will remove the selected bar and its signs.<br><br> To select a column instead, tap on the same spot again. To unselect a bar or column, tap on any other place on the score",
+      "text": "To add or remove a bar, click on it. This will highlight it and cause three buttons to appear. The “+” buttons will add a new bar either below or above the selected bar. The “x” button will remove the selected bar and its signs.<br><br> To select a column instead, click on the same spot again. To unselect a bar or column, click any other place on the score",
+      "textTablet": "To add or remove a bar, tap on it. This will highlight it and cause three buttons to appear. The “+” buttons will add a new bar either below or above the selected bar. The “x” button will remove the selected bar and its signs.<br><br> To select a column instead, tap on the same spot again. To unselect a bar or column, tap on any other place on the score",
       "buttonText": "Next Interface Element",
       "position": {"elem": "library", "hSide": "left", "vSide": "top"},
       "stateChange": {"addToGridSelect": {"col": -1, "bar": 1, "selectBar": true}},
