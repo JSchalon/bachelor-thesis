@@ -12,7 +12,7 @@
     },
     {
       "title": "The Score - Important Lines",
-      "text": "The double line at the bottom defines the start of the movement. Below that the starting position is noted.<br><br> The vertical middle line on the inner score separates the movements of the left and right sides of the body.",
+      "text": "The double line at the bottom defines the start of the movement. Below that the starting position is noted.<br><br> The vertical middle line in the inner score (black outline) separates the movements of the left and right sides of the body.",
       "buttonText": "Next",
       "position": {"elem": "library", "hSide": "left", "vSide": "top"},
       "stateChange": false,
@@ -21,7 +21,7 @@
     },
     {
       "title": "The Score - The support Columns",
-      "text": "The first columns on either side of the center line are called the support columns. They indicate where the weight is placed on that respective side of the body. <br><br> If no sign is placed in this column at a given time, that side is not currently supported, with both columns being empty indicating a jump or fall.",
+      "text": "The first columns on either side of the center line are called the support columns. They are used to note where the weight is placed on that respective side of the body. <br><br> If no sign is placed in this column at a given time, that side is not currently supported, with both columns being empty indicating a jump or fall.",
       "buttonText": "Next",
       "position": {"elem": "library", "hSide": "left", "vSide": "top"},
       "stateChange": {"addToGridSelect": [{"col": -1, "selectCol": true, "green": false}, {"col": 0, "selectCol": true, "green": false}]},
@@ -30,7 +30,7 @@
     },
     {
       "title": "The Score - Further Columns",
-      "text": "Beyond the inner score, defined by the black outline, further columns can be placed, indicated by dotted lines in this editor. <br><br>Traditionally, the second column on either side is used for leg movements, the third for body movements and the fourth for the arms, with the fifth right-sided column being the “head” column. However, columns can be redefined and further columns can be added by placing a body part sign below them.",
+      "text": "Beyond the inner score, further columns can be placed, indicated by dotted lines in this editor. <br><br>Traditionally, the second column on either side is used for leg movements, the third for body movements and the fourth for the arms, with the fifth right-sided column being the “head” column. However, columns can be redefined and further columns can be added by placing a body part sign below them.",
       "buttonText": "To the library",
       "position": {"elem": "library", "hSide": "left", "vSide": "top"},
       "stateChange": {"addToGridSelect": [{},{"col": false, "bar": -1, "green": false}]},
@@ -40,7 +40,7 @@
     },
     {
       "title": "Direction Signs",
-      "text": "Direction signs are the most basic sign and note a movement in a specific direction. They come in 9 variations which define the horizontal direction.<br><br>The vertical direction is defined by the inner pattern. It can be downward (1), middle (2) and upward (3).",
+      "text": "Direction signs are the most basic signs and can be used to note a movement in a specific direction. They come in 9 variations which define the horizontal direction.<br><br>The vertical direction is defined by the inner pattern. It can be downward (1), middle (2) and upward (3).",
       "buttonText": "Next",
       "position": {"elem": "library", "hSide": "right", "vSide": "top"},
       "stateChange": false,
@@ -79,7 +79,7 @@
     },
     {
       "title": "Path Signs",
-      "text": "Path signs are used to indicate a general movement in a direction. There is a straight path, a left and a right circular path, as well as an undefined path.<br><br>Path signs are placed on the right side of the score, beyond the right-most column.",
+      "text": "Path signs are used to indicate a general movement in a direction. There are a straight path, a left and a right circular path, as well as an undefined path.<br><br>Path signs are placed on the right side of the score, beyond the right-most column.",
       "buttonText": "Next",
       "position": {"elem": "library", "hSide": "right", "vSide": "top"},
       "stateChange": false,
@@ -88,7 +88,7 @@
     },
     {
       "title": "Body Part Signs",
-      "text": "Body part signs define a specific joint (1), limb (2), surface (3), digit (4), or area (5). They are either placed below a column, to indicate that all movements in that column apply to it, or placed below another movement to indicate that only that movement applies to it.",
+      "text": "Body part signs define a specific joint (1), limb (2), surface (3), digit (4), or area (5). They are either placed below a column, to note that all movements in that column apply to it, or placed below another movement to note that only that movement applies to it.",
       "buttonText": "Next",
       "position": {"elem": "library", "hSide": "right", "vSide": "top"},
       "stateChange": false,

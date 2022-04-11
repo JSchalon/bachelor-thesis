@@ -11,5 +11,7 @@ Git Repo zur Bachelorarbeit zur Entwicklung eines webbasierten Interaktionsedito
 
 ## Versions
 
-### Version 0.9.2
-- quick fix
+### Version 0.9.3
+- fixed a small bug
+- fixed some css
+- fixed some introduction text

@@ -158,7 +158,6 @@ export default {
               }
             }
           } else {
-            console.log("here")
             this.highlight();
             for (const elem of value) {
               let col = false;

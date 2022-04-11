@@ -61,8 +61,8 @@
             <input class="input" type="number" placeholder="1-1000" min="1" max="1000" value="1" name="beatDuration" required>
           </div>
         </div>
-        <button v-if="newScore" class="button is-success">Create Score</button>
-        <button v-else class="button is-success">Update Score Parameters</button>
+        <button v-if="newScore" class="button nav-btn">Create Score</button>
+        <button v-else class="button nav-btn">Update Score Parameters</button>
         <button class="button ml-3" type="reset" @click="disableModal">Cancel</button>
       </form>
     </div>
@@ -141,3 +141,16 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+.nav-btn {
+  color: white;
+  background-color: var(--selected);
+}
+
+.nav-btn:focus {
+  box-shadow: 0 0 0 0.125em rgb(68 111 151 / 25%);
+  outline-color: var(--selected-darker)!important;
+  border-color: var(--selected)!important;
+}
+</style>
