@@ -31,17 +31,6 @@
       "highlightElem": "score"
     },
     {
-      "title": "The Score - Duplicating and <br> multi-Selection",
-      "text": "To duplicate a sign, select it, press shift and then drag it around. This also works when multiple signs are selected. In that case the entire selection will be duplicated.<br><br> Multiple signs can also be moved and resized at the same time, although there are some restrictions on resizing differing sign types (see below).",
-      "textTablet": "To duplicate a sign, tap and hold it until the “double box” icon in the interaction menu above the score is selected and then drag it around. This also works when multiple signs are selected. In that case the entire selection will be duplicated.<br><br> Multiple signs can also be moved and resized at the same time, although there are some restrictions on resizing differing sign types (see below).",
-      "buttonText": "Next",
-      "position": {"elem": "library", "hSide": "left", "vSide": "top"},
-      "image": "different-resize-types.svg",
-      "stateChange": {"addToSelectedSigns": [1,2,3,4,5]},
-      "highlightID": "canvas",
-      "highlightElem": "score"
-    },
-    {
       "title": "The Score - Selection Box",
       "text": "To select multiple signs at once, click and drag on an empty place on the score. This will create a selection box. Stop dragging to confirm the selection. All signs within the box at that time will be selected.",
       "textTablet": "To select multiple signs at once, tap and hold on an empty place on the score until the multi-select icon in the interaction menu is selected and then drag. This will create a selection box. Stop dragging to confirm the selection. All signs within the box at that time will be selected.",
@@ -49,6 +38,17 @@
       "position": {"elem": "library", "hSide": "left", "vSide": "top"},
       "stateChange": {"addToSelectedSigns": [1,2,3,4,5]},
       "image": "select-box.svg",
+      "highlightID": "canvas",
+      "highlightElem": "score"
+    },
+    {
+      "title": "The Score - Duplicating and <br> multi-Selection",
+      "text": "To duplicate a sign, select it, press shift and then drag it around. This also works when multiple signs are selected. In that case the entire selection will be duplicated.<br><br> Multiple signs can also be moved and resized at the same time, although there are some restrictions on resizing differing sign types (see below).",
+      "textTablet": "To duplicate a sign, tap and hold it until the “double box” icon in the interaction menu above the score is selected and then drag it around. This also works when multiple signs are selected. In that case the entire selection will be duplicated.<br><br> Multiple signs can also be moved and resized at the same time, although there are some restrictions on resizing differing sign types (see below).",
+      "buttonText": "Next",
+      "position": {"elem": "library", "hSide": "left", "vSide": "top"},
+      "image": "different-resize-types.svg",
+      "stateChange": {"addToSelectedSigns": [1,2,3,4,5]},
       "highlightID": "canvas",
       "highlightElem": "score"
     },
