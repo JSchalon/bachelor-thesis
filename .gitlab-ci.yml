@@ -78,7 +78,7 @@ deploy_docker:
     - mkdir -p $HOME/.docker
     - "echo -e '{\n  \"experimental\": \"enabled\",\n    \"storage-driver\": \"overlay2\"\n}' | tee $HOME/.docker/config.json"
     # install docker buildx
-    - docker build --platform=local -o . https://github.com/docker/buildx
+    - docker build --platform=local -o . git@github.com/docker/buildx
     - mkdir -p ~/.docker/cli-plugins/
     - mv buildx ~/.docker/cli-plugins/docker-buildx
     # login to itm docker repository
