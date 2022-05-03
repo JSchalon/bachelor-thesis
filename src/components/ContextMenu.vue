@@ -6,14 +6,13 @@
 
 <script>
 /**
- * The context menu container
+ * The context menu container. loads a sign specific context menu
  * @emits updateSignData updates the sign data given by the score
  * @emits delete deletes the sign
  * @displayName Context Menu
  */
 export default {
   name: "ContextMenu",
-  inject: [],
   props: {
     signData: Object,
     isActive: Boolean,
@@ -22,21 +21,17 @@ export default {
     signIndex: [Number, String]
   },
   emits: ["updateSignData", "delete"],
-  data() {
-    return {
-
-    };
-  },
-  computed: {
-    
-  },
-  mounted () {
-    
-  },
   methods: {
+    /**
+     * requests updating the selected signs data
+     * @param data the new data
+     */
     updateSignData (data) {
       this.$emit("updateSignData", data);
     },
+    /**
+     * requests the deletion of the sign
+     */
     emitDelete() {
       this.$emit("delete", parseInt(this.signIndex))
     }
@@ -44,7 +39,6 @@ export default {
 };
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style>
   .context-menu.inactive {
     display: none;

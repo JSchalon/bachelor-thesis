@@ -15,6 +15,9 @@
 <script>
 /**
  * The Library Item Container component
+ * @emits expand requests category being expanded
+ * @emits emitSigns emit loaded signs to the library
+ * @emits selectSign request sign beeing selected
  * @displayName Library Item Container
  */
 export default {
@@ -33,6 +36,9 @@ export default {
     };
   },
   computed: {
+    /**
+     * loads the translation of the category signs
+     */
     langStrings () {
       let lang = this.$store.state["language"];
       let json = require('@/assets/sign-category-loaders/' + this.category + '-' + lang + '.json');
@@ -41,7 +47,9 @@ export default {
     },
   },
   mounted () {
-    this.itemOffset = this.getWidth();
+    // set the inner offset of the item
+    this.itemOffset = this.getOffset();
+    // setting an observer that opens the category when an introduction highlights it
      this.observer = new MutationObserver(mutations => {
       for (const m of mutations) {
         const newValue = m.target.getAttribute(m.attributeName);
@@ -51,6 +59,7 @@ export default {
       }
     });
 
+    //the observer checks the class list of the container of the category
     this.observer.observe(this.$refs.container, {
       attributes: true,
       attributeOldValue : true,
@@ -58,21 +67,37 @@ export default {
     });
   },
   beforeUnmount () {
+    // disconnecting the observer on unmount
     this.observer.disconnect();
   },
   methods: {
+    /**
+     * expands the category
+     */
     expand () {
       this.$emit("expand", this.catIndex);
     },
-    getWidth() {
+    /**
+     * @returns the offset for the inner category
+     */
+    getOffset() {
         return this.$refs.container.offsetWidth / 6 - 20;
     },
+    /**
+     * emits the signs in the category to the library
+     */
     emitSigns (data) {
       this.$emit("emitSigns", data);
     },
+    /**
+     * requests the selection of a sign
+     */
     selectSign (data) {
       this.$emit("selectSign", data);
     },
+    /**
+     * when an introduction highlights 
+     */
     onClassChange(classAttrValue) {
       const classList = classAttrValue.split(' ');
       if (classList.includes('tut-highlight')) {
@@ -84,7 +109,6 @@ export default {
   },
 }
 </script>
-
 
 <style scoped>
   .turned {

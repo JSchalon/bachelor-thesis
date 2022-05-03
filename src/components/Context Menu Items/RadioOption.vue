@@ -22,7 +22,6 @@
  */
 export default {
   name: "RadioOption",
-  inject: ["contextItemHeight"],
   props: {
     options: Array,
     optionText: String,
@@ -37,14 +36,15 @@ export default {
     };
   },
   mounted () {
+    // sets the height of the blocker depending on the container (the blocker is used when the option is not on)
     this.itemHeight = this.$refs.container.getBoundingClientRect().height;
+    // sets the current active option after load
     this.$nextTick(() => {
       this.selectedID = this.initState;
       if (this.selectedID == -1) {
         this.selectedID = 0;
       }
     });
-    
   },
   methods: {
     /**
@@ -58,6 +58,7 @@ export default {
   computed: {
     /**
      * calculates the text of the current selected option
+     * @returns the current text
      */
     selectedText() {
       return this.options[this.selectedID];
@@ -66,9 +67,7 @@ export default {
 };
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-
   text{
     color: var(--bg-dark);
     margin-right: 10px;
@@ -83,5 +82,4 @@ export default {
   .radio-option.active {
     border-radius: 2000px;
   }
-  
 </style>

@@ -32,13 +32,10 @@
       :stroke-width="isSelected ? borderWidth + 1: borderWidth"
       :signID="id">
     </circle>
-    <!--todo: add a flat pin with the rotation given by the signData.angle-->
   </g>
 </template>
 
 <script>
-
-
 /**
  * The Torso sign component
  * @displayName Torso Sign
@@ -52,23 +49,5 @@ export default {
     height: Number,
   },
   inject: ["signWidth", "borderWidth"],
-  data() {
-    return {
-      textWidth: 0,
-      textHeight: 0,
-    };
-  },
-  computed: {
-  },
-
-  mounted () {
-  },
-  methods: {
-    
-  },
 }
 </script>
-
-
-<style scoped>
-</style>

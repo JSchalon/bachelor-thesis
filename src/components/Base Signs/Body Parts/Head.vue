@@ -26,13 +26,18 @@
         C
       </text>
     </g>
-    <path v-if="limbTransform != 0" class="draggable actual-sign" :class="{active: isSelected}" :stroke-width="isSelected ? borderWidth + 1: borderWidth" stroke="black" :d="'M15,'+ (signWidth / 1.5) + 'V40M25,'+ (signWidth / 1.5) + 'V40'" :signID="id"/>
+    <path 
+      v-if="limbTransform != 0" 
+      class="draggable actual-sign" :class="{active: isSelected}" 
+      :stroke-width="isSelected ? borderWidth + 1: borderWidth" 
+      stroke="black" 
+      :d="'M15,'+ (signWidth / 1.5) + 'V40M25,'+ (signWidth / 1.5) + 'V40'" 
+      :signID="id"
+    />
   </g>
 </template>
 
 <script>
-
-
 /**
  * The head sign component
  * @displayName Head Sign
@@ -53,6 +58,10 @@ export default {
     };
   },
   computed: {
+    /**
+     * if the head sign is a limb it becomes the neck sign and is moved up
+     * @returns the y transform of the head sign
+     */
     limbTransform () {
       if ("limb" in this.signData && this.signData.limb) {
         return -this.signWidth / 6;
@@ -62,15 +71,9 @@ export default {
     }
   },
   mounted () {
+    //calculating the dimensions of the "C" in the head so it can be centered correctly
     this.textWidth = this.$refs.headText.getBoundingClientRect().width;
     this.textHeight = this.$refs.headText.getBoundingClientRect().height;
   },
-  methods: {
-    
-  },
 }
 </script>
-
-
-<style scoped>
-</style>

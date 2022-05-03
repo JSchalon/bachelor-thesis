@@ -6,10 +6,8 @@
 </template>
 
 <script>
-
-
 /**
- * The general prop Sign component
+ * The general prop Sign component. Loads a specific prop by its signData.signType.
  * @displayName Prop Sign
  */
 export default {
@@ -20,23 +18,5 @@ export default {
     signData: Object,
     height: Number,
   },
-  inject: ["signWidth","borderWidth"],
-  data() {
-    return {
-    };
-  },
-  computed: {
-  },
-  mounted () {
-    
-  },
-  methods: {
-    
-  },
 }
 </script>
-
-
-<style scoped>
-
-</style>

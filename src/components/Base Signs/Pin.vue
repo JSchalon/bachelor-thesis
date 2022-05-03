@@ -35,8 +35,6 @@
 </template>
 
 <script>
-
-
 /**
  * The relationship pin Sign component
  * @displayName Relationship Pin
@@ -54,14 +52,16 @@ export default {
     }
   },
   inject: ["signWidth","borderWidth"],
-  data() {
-    return {
-    };
-  },
   computed: {
+    /**
+     * calculates the height of a beat
+     */
     beatHeight () {
       return this.barHeight() / this.$store.state["beatsPerBar"];
     },
+    /**
+     * returns the position and angle of the pin bar
+     */
     calculateStick () {
       let degree = this.signData.degree;
       let stick = {path: "", transform: ""};
@@ -69,9 +69,10 @@ export default {
       
       stick.transform = "rotate(" + (degree % 360) + "," + (this.signWidth / 2) + "," + (this.height / 2) + ")";
       if (degree < 0) {
-        if (this.signData.signType != "Middle") {
+        if (this.signData.signType != "Middle") { 
            path = "M " + (this.signWidth / 2 - 10) + "," + (this.height / 2) + " H " + (this.signWidth / 2 + 10);
-        } else {
+        } else { 
+          //middle pin -> change the position of the center bar with the rotation
           path = "M " + (this.signWidth / 2) + "," + (this.height / 2 - 5) + " V " + (this.height / 2 + 5) + 
           "M " + (this.signWidth / 2 - 10) + "," + (this.height / 2) + " H " + (this.signWidth / 2 + 10);
         }
@@ -80,16 +81,20 @@ export default {
       stick.path = path;
       return stick;
     },
+    /**
+     * calculate the horizontal bar
+     * @returns the horizontal bar svg path
+     */
     calculateHorizontal () {
       let path = "M " + (this.signWidth / 2 - 8) + "," + (this.height / 2) + " H " + (this.signWidth / 2 + 8);
-
       return path;
     }
   },
-  mounted () {
-    
-  },
   methods: {
+    /**
+     * calculate the color of the center circle
+     * @returns the fill color
+     */
     getCircleFill () {
       let value = false;
       if (this.inverted) {
@@ -107,8 +112,3 @@ export default {
   },
 }
 </script>
-
-
-<style scoped>
-
-</style>

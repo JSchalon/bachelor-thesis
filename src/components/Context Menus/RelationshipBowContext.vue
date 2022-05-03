@@ -34,6 +34,7 @@ export default {
   emits: ["updateSignData", "delete"],
   data() {
     return {
+      // the different possible addressing types
       addressingTypes: [
         {text: 'Right', img: "/bows/addressing-right.svg"},
         {text: 'Left', img:  "/bows/addressing-left.svg"},
@@ -48,9 +49,17 @@ export default {
     
   },
   methods: {
+    /**
+     * changes the bow type
+     * @param data the data from the sign category container
+     */
     changeType (data) {
       this.newSignData({signType: data.signType})
     },
+    /**
+     * changes the addressing type
+     * @param index the index in the addressingTypes array
+     */
     changeAdressing (index) {
       if (this.addressingTypes[index].text == "Right") {
         this.newSignData({addressing: "right"})
@@ -60,25 +69,9 @@ export default {
         this.newSignData({addressing: "both"})
       }
     },
-    changeHolding (data) {
-      this.newSignData({holding: data})
-    },
-    changePassing(data) {
-      this.newSignData ({passing: data});
-    },
-    changeGrasping(data) {
-      this.newSignData ({grasping: data});
-    },
     /**
-     * The function that sends the updated sign data back to the score
-     * @arg data the updated sign data 
+     * gets the initial type of the addressing bow
      */
-    newSignData (data) {
-      this.$emit("updateSignData", {index: parseInt(this.signIndex), data: data});
-    },
-    emitDelete() {
-      this.$emit("delete", parseInt(this.signIndex))
-    },
     getAddressInitState () {
       if (this.signData.addressing == "right" || this.signData.addressing == undefined) {
         return 0;
@@ -87,12 +80,45 @@ export default {
       } else {
         return 2;
       }
-    }
+    },
+    /**
+     * changes the holding state
+     * @param data the holding boolean
+     */
+    changeHolding (data) {
+      this.newSignData({holding: data})
+    },
+    /**
+     * changes the passing state
+     * @param data the passing boolean
+     */
+    changePassing(data) {
+      this.newSignData ({passing: data});
+    },
+    /**
+     * changes the grasping state
+     * @param data the grasping boolean
+     */
+    changeGrasping(data) {
+      this.newSignData ({grasping: data});
+    },
+    /**
+     * The function that sends the updated sign data back to the score
+     * @param data the updated sign data 
+     */
+    newSignData (data) {
+      this.$emit("updateSignData", {index: parseInt(this.signIndex), data: data});
+    },
+    /**
+     * emits a deletion request
+     */
+    emitDelete() {
+      this.$emit("delete", parseInt(this.signIndex))
+    },
   },
 };
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style>
   .context-menu.inactive {
     display: none;

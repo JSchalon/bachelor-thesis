@@ -21,24 +21,12 @@ export default {
     id: Number,
     degree: Number,
   },
-  inject: ["signWidth","borderWidth"],
+  inject: ["borderWidth"],
   data() {
     return {
+      //path does not change -> placed in data instead of computed
       path: "M 0,0 L 0,40 L 40,0 L 40,40 M 13.333333333333334,13.333333333333336 L 26.666666666666664,26.666666666666664"
     };
   },
-  computed: {
-  },
-  mounted () {
-    
-  },
-  methods: {
-    
-  },
 }
 </script>
-
-
-<style scoped>
-
-</style>

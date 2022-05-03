@@ -21,7 +21,6 @@
  */
 export default {
   name: "SpaceMeasurementSignContext",
-  inject: [],
   props: {
     signData: Object,
     isActive: Boolean,
@@ -29,22 +28,20 @@ export default {
     y: Number,
   },
   emits: ["updateSignData", "delete"],
-  data() {
-    return {
-    };
-  },
-  computed: {
-    
-  },
-  mounted () {
-    
-  },
   methods: {
+    /**
+     * changes the degree of the space measurement sign
+     * @param data the data from the sign category container
+     */
     changeDegree (data) {
       if (this.isActive) {
         this.newSignData ({degree: (data.data + 1)});
       }
     },
+    /**
+     * chanages the sign type 
+     * @param data the data from the sign category container
+     */
     changeType (data) {
       if (data.signType != "Unfolding" && data.signType != "NeitherOr" ) {
         this.newSignData ({signType: data.signType});
@@ -52,16 +49,23 @@ export default {
         this.newSignData ({signType: data.signType, degree: 1});
       }
     },
+    /**
+     * chanages the holding state 
+     * @param data the holding boolean
+     */
     changeHolding (data) {
       this.newSignData({holding: data})
     },
     /**
      * The function that sends the updated sign data back to the score
-     * @arg data the updated sign data 
+     * @param data the updated sign data 
      */
     newSignData (data) {
       this.$emit("updateSignData", {index: parseInt(this.signIndex), data: data});
     },
+    /**
+     * emits a deletion request
+     */
     emitDelete() {
       this.$emit("delete", parseInt(this.signIndex))
     }
@@ -69,7 +73,6 @@ export default {
 };
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style>
   .context-menu.inactive {
     display: none;

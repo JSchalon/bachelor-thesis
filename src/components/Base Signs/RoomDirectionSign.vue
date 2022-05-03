@@ -15,13 +15,10 @@
     <g >
       <Pin :id="id" :height="height" :isSelected="isSelected" :signData="pinData" />
     </g>
-    <!--todo: add a flat pin with the rotation given by the signData.angle-->
   </g>
 </template>
 
 <script>
-
-
 /**
  * The general room direction Sign component
  * @displayName Room Direction Sign
@@ -35,26 +32,14 @@ export default {
     height: Number,
   },
   inject: ["signWidth", "borderWidth"],
-  data() {
-    return {
-      
-    };
-  },
   computed: {
+    /**
+     * calculates the inner pin
+     * @returns the signdata for the pin
+     */
     pinData () {
       return {signType: "Middle", degree: this.signData.degree, bgVisible: false};
     },
   },
-  mounted () {
-    
-  },
-  methods: {
-    
-  },
 }
 </script>
-
-
-<style scoped>
-
-</style>

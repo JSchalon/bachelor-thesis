@@ -19,10 +19,11 @@ import interact from "interactjs";
  * A generic slider option for the context menus
  * @emits switchState the update when the slider is changed
  * @displayName Slider Option
+ * @deprecated no longer used, since it was not intuitive in its current implementation
  */
 export default {
   name: "SliderOption",
-  inject: ["contextItemHeight", "contextItemMargin", "contextMenuWidth"],
+  inject: ["contextItemMargin", "contextMenuWidth"],
   props: {
     optionText: String,
     stops: Number,
@@ -38,8 +39,10 @@ export default {
     };
   },
   mounted () {
+    //calculate slider width and height
     this.sliderWidth = this.getSliderWidth();
     this.itemHeight = this.$refs.container.getBoundingClientRect().height;
+    //set interact listener for dragging
     interact('#' + this.id).draggable({ 
       origin: 'self',
       inertia: false,
@@ -51,35 +54,43 @@ export default {
         }),
       ],
       onmove: this.dragMove,
-    })
-    
-    
+    });
   },
   methods: {
+    /**
+     * calculates the width of the slider
+     * @returns the width
+     */
     getSliderWidth() {
       return this.contextMenuWidth - this.contextItemMargin * 2 - 16;
     },
+    /**
+     * the interact drag move function
+     * @param event the interact drag-move event
+     */
     dragMove(event) {
+      // get the slider position
       let value = event.pageX / this.sliderWidth;
-      if (value > 1) {
+      if (value > 1) { // position out of bounds right -> pull back into bounds
         value = 1;
       }
-      if (value < 0) {
+      if (value < 0) { // position out of bounds left -> pull back into bounds
         value = 0;
       }
+      //calculate value
       event.target.style.paddingLeft = (value * 100) + '%';
       event.target.setAttribute('x', value);
+      //emit value
       this.$emit("switchState",{index: this.id, data: (Math.round(value * this.stops))});
     }
-    
   },
   beforeUnmount () {
-    interact('#' + this.id).unset()
+    //unsetting interact listeners is important, else stuff breaks
+    interact('#' + this.id).unset();
   }
 };
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 /* the slider bar */
 .slider {

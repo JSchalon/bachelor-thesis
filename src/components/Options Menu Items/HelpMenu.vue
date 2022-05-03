@@ -99,22 +99,26 @@
 <script>
 /**
  * The standard Help menu component
+ * @emits startIntroduction requests the opening of the specified introduction
  * @displayName Options Help Menu
  */
 export default {
     name: 'HelpMenu',
-    emits: ["requestNewScore", "startIntroduction"],
+    emits: ["startIntroduction"],
     props: {
       showShortCuts: Boolean
     },
     methods: {
+      /**
+       * requests the opening of an introduction
+       * @param which the string with the path to the introdcution
+       */
       startIntroduction(which) {
         this.$emit("startIntroduction", which);
       },
     }
 }
 </script>
-
 
 <style scoped>
 a {

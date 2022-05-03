@@ -35,7 +35,6 @@
  */
 export default {
   name: "vibrationSignContext",
-  inject: [],
   props: {
     signData: Object,
     isActive: Boolean,
@@ -45,6 +44,7 @@ export default {
   emits: ["updateSignData", "delete"],
   data() {
     return {
+      // the different pin types
       pinType: [
         {text: 'Low', img: "/pin-low-forward.svg"},
         {text: 'Middle', img: "/pin-middle.svg"},
@@ -53,13 +53,15 @@ export default {
       displayPinOptions: false
     };
   },
-  computed: {
-    
-  },
   mounted () {
+    // only displays the pinoptions if both are on (deprecated)
     this.displayPinOptions = (typeof this.signData.upperPin == "object" || typeof this.signData.lowerPin == "object");
   },
   methods: {
+    /**
+     * switches the pins on or off
+     * @param data the boolean
+     */
     changePins (data) {
       this.displayPinOptions = data;
       if (!data) {
@@ -67,13 +69,20 @@ export default {
       } else {
         this.newSignData ({upperPin: {signType: "Low", degree: 0}, lowerPin: {signType: "Low", degree: 0}});
       }
-      
     },
+    /**
+     * changes the upper pin type
+     * @param index the index in the pinType array
+     */
     changeupperPin (index) {
       let obj = JSON.parse(JSON.stringify(this.signData.upperPin)) || {signType: "Low", degree: 0};
       obj.signType = this.pinType[index].text;
       this.newSignData ({upperPin: obj});
     },
+    /**
+     * changes the upper pin angle
+     * @param data the data from the sign category container  
+     */
     changeupperPinAngle (data) {
       if (this.isActive) {
         let degree = data.degree;
@@ -82,11 +91,19 @@ export default {
         this.newSignData ({upperPin: obj});
       }
     },
+    /**
+     * changes the lower pin type
+     * @param index the index in the pinType array
+     */
     changelowerPin (index) {
       let obj = JSON.parse(JSON.stringify(this.signData.lowerPin)) || {signType: "Low", degree: 0};
       obj.signType = this.pinType[index].text;
       this.newSignData ({lowerPin: obj});
     },
+    /**
+     * changes the lower pin angle
+     * @param data the data from the sign category container  
+     */
     changelowerPinAngle (data) {
       if (this.isActive) {
         let degree = data.degree;
@@ -97,11 +114,14 @@ export default {
     },
     /**
      * The function that sends the updated sign data back to the score
-     * @arg data the updated sign data 
+     * @param data the updated sign data 
      */
     newSignData (data) {
       this.$emit("updateSignData", {index: parseInt(this.signIndex), data: data});
     },
+    /**
+     * emits a deletion request
+     */
     emitDelete() {
       this.$emit("delete", parseInt(this.signIndex))
     }
@@ -109,7 +129,6 @@ export default {
 };
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style>
   .context-menu.inactive {
     display: none;

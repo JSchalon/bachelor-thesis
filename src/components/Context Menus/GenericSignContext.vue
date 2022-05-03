@@ -35,21 +35,10 @@ export default {
     signIndex: [Number, String]
   },
   emits: ["updateSignData", "delete"],
-  data() {
-    return {
-
-    };
-  },
-  computed: {
-    
-  },
-  mounted () {
-    
-  },
   methods: {
     /**
      * An example function changing the border color based of an radio Option, as an example for the actual radio funcitionality
-     * @arg color the boolean changing the color 
+     * @param color the boolean changing the color 
      */
     changeBorderColor(color) {
       let newSignData = this.signData;
@@ -59,7 +48,7 @@ export default {
     },
     /**
      * An example function changing the color based of an on/Off Option, as an example for the actual on/off funcitionality
-     * @arg color the boolean changing the color 
+     * @param color the boolean changing the color 
      */
     changeColor(colorState) {
       let newSignData = this.signData;
@@ -72,11 +61,14 @@ export default {
     },
     /**
      * The function that sends the updated sign data back to the score
-     * @arg data the updated sign data 
+     * @param data the updated sign data 
      */
     newSignData (data) {
       this.$emit("updateSignData", {index: parseInt(this.signIndex), data: data});
     },
+    /**
+     * requests sign deletion
+     */
     emitDelete() {
       this.$emit("delete", parseInt(this.signIndex))
     }
@@ -84,7 +76,6 @@ export default {
 };
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style>
   .context-menu.inactive {
     display: none;

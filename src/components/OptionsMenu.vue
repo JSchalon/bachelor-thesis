@@ -23,26 +23,39 @@ export default {
       }
     },
     methods: {
+      /**
+       * blurs the browser focus
+       */
       blurFocus() {
         document.activeElement.blur();
       },
+      /**
+       * requests opening the new score menu
+       */
       requestNewScore () {
         this.$emit("requestNewScore");
       },
+      /**
+       * requests importing a new score
+       */
       requestUpload (file) {
         this.$emit("requestUpload", file);
       },
+      /**
+       * requests opening the score details
+       */
       requestScoreDetails () {
         this.$emit("requestScoreDetails");
       },
+      /**
+       * requests the start of an introduction
+       */
       startIntroduction (which) {
         this.$emit("startIntroduction", which);
       },
-
     }
 }
 </script>
-
 
 <style>
 #options-menu {

@@ -32,8 +32,6 @@
 </template>
 
 <script>
-
-
 /**
  * The cancel sign component
  * @displayName Cancel Sign
@@ -47,11 +45,10 @@ export default {
     height: Number,
   },
   inject: ["signWidth","borderWidth"],
-  data() {
-    return {
-    };
-  },
   computed: {
+    /**
+     * returns the svg path for the sign
+     */
     path () {
       let path = 
         "M 0," + (this.height / 2) + " Q " + (this.signWidth * 3 / 8) + "," + (this.height ) + "," + (this.signWidth * 3 / 4) + "," + (this.height / 2) + 
@@ -59,16 +56,5 @@ export default {
       return path; 
     }
   },
-  mounted () {
-    
-  },
-  methods: {
-    
-  },
 }
 </script>
-
-
-<style scoped>
-
-</style>

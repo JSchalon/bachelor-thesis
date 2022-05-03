@@ -7,12 +7,39 @@
     <link rel="icon" href="<%= BASE_URL %>favicon.ico">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css">
     <title>Interaction Editor</title>
+    <style>
+      .ie-banner {
+        display: none;
+      }
+      .ie-banner.on {
+        display: block;
+      }
+    </style>
   </head>
   <body>
     <noscript>
       <strong>We're sorry but <%= htmlWebpackPlugin.options.title %> doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
     </noscript>
-    <div id="app"></div>
+    <div id="app">
+      
+    </div>
+    <!--Popup warning that internet explorer is not supported (app does not work at all)-->
+    <div id="ie-warn" class="ie-banner modal">
+        <div class="modal-background"></div>
+        <div class="modal-content">
+          <div class="box">
+            <h1 class="title">Internet Explorer Warning</h1>
+            <p class="mb-4">This editor needs certain modern JavaScript functionalities to work properly, which Internet Explorer does not support. A modern browser is required instead.</p>
+          </div>
+        </div>
+    </div>
+    <script>
+      //isIE should only be true on ie 6-11
+      var isIE = /*@cc_on!@*/false || !!document.documentMode;
+      if (isIE) { //isIE -> display warn banner
+        document.getElementById("ie-warn").setAttribute("class", "ie-banner on");
+      }
+    </script>
     <!-- built files will be auto injected -->
   </body>
 </html>

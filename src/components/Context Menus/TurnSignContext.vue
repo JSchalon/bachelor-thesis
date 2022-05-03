@@ -53,11 +53,13 @@ export default {
   emits: ["updateSignData", "delete"],
   data() {
     return {
+      // the pin definition types
       definitions: [
         {text: 'Low', img: "/pin-low-forward.svg"},
         {text: 'Middle', img: "/pin-middle.svg"},
         {text: 'High', img: "/pin-high.svg"}
       ],
+      // the turn definition types
       definitionTypes: [
         {text: '---', img: false},
         {text: 'Pin', img: "/pin-low-forward.svg"},
@@ -65,18 +67,25 @@ export default {
       ],
     };
   },
-  computed: {
-    
-  },
-  mounted () {
-  },
   methods: {
+    /**
+     * chanages the sign type 
+     * @param data the data from the sign category container
+     */
     changeType(data) {
       this.newSignData ({signType: data.text});
     },
+    /**
+     * chanages the holding state 
+     * @param data the holding boolean
+     */
     changeHolding (data) {
       this.newSignData({holding: data})
     },
+    /**
+     * chanages the inner definition type 
+     * @param index the index of the type in the definitionTypes array
+     */
     changeDefinition (index) {
       if (this.definitionTypes[index].text != "---") {
         if (this.definitionTypes[index].text == "Pin") {
@@ -88,11 +97,19 @@ export default {
         this.newSignData({definition: false});
       }
     },
+    /**
+     * chanages the definition pin type 
+     * @param index the index of the pin in the definitions array
+     */
     changeDefinitionPin (index) {
       let obj = JSON.parse(JSON.stringify(this.signData.definition)) || {baseType: "Pin", signType: "Low", degree: 0, bgVisible: false};
       obj.signType = this.definitions[index].text;
       this.newSignData ({definition: obj});
     },
+    /**
+     * chanages the pin definition angle 
+     * @param data the data from the sign category container
+     */
     changeDefinitionPinAngle (data) {
       if (this.isActive) {
         let degree = data.degree;
@@ -101,9 +118,17 @@ export default {
         this.newSignData ({definition: obj});
       }
     },
+    /**
+     * chanages the space measurement type 
+     * @param data the data from the sign category container
+     */
     changeDefinitionSpace(data) {
       this.newSignData ({definition: data});
     },
+    /**
+     * chanages the space measurement degree 
+     * @param data the data from the sign category container
+     */
     changeDefinitionSpaceDegree (data) {
       if (this.isActive) {
         let degree = data.degree;
@@ -114,11 +139,14 @@ export default {
     },
     /**
      * The function that sends the updated sign data back to the score
-     * @arg data the updated sign data 
+     * @param data the updated sign data 
      */
     newSignData (data) {
       this.$emit("updateSignData", {index: parseInt(this.signIndex), data: data});
     },
+    /**
+     * emits a deletion request
+     */
     emitDelete() {
       this.$emit("delete", parseInt(this.signIndex))
     }
@@ -126,7 +154,6 @@ export default {
 };
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style>
   .context-menu.inactive {
     display: none;

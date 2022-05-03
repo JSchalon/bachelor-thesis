@@ -49,12 +49,19 @@
       };
     },
     computed: {
+      /**
+       * @returns whether undoing is possible
+       */
       undoPossible () {
         return this.$store.state["undoStack"].length > 1;
       },
+      /**
+       * @returns whether redoing is possible
+       */
       redoPossible () {
         return this.$store.state["redoStack"].length > 0;
       },
+      // getters for vuex variables
       selectedSigns () {
         return this.$store.state["selectedSigns"];
       },
@@ -68,23 +75,32 @@
         return this.$store.state["signs"];
       }
     },
-    mounted () {
-      
-    },
     methods: {
+      /**
+       * dispatches an undo action
+       */
       undo () {
         this.$store.dispatch("undoChanges");
       },
+      /**
+       * dispatches a redo action
+       */
       redo () {
         this.$store.dispatch("redoChanges");
       },
+      /**
+       * deletes all currently selected signs
+       */
       deleteSelection () {
-        if (this.selectedSigns.length == 0) {
+        if (this.selectedSigns.length == 0) { // no selection -> no effect
           return;
         }
+        // sort selection before
         const sortedSelected = this.selectedSigns.sort();
+        // clear selection and context menu
         this.$store.dispatch("clearSelectedSigns");
         this.$store.dispatch("changeContextMenu", false);
+        //delete signs (decreasing order)
         for (let max = sortedSelected.length - 1; max >= 0; max--) {
           
           if (sortedSelected[max] > 0) {
@@ -93,35 +109,53 @@
         }
         this.$store.dispatch("saveStateInHistory");
       },
+      /**
+       * toggles the multi select mode
+       */
       activateMultiSelect () {
         this.$store.dispatch("toggleMultiSelect");
       },
+      /**
+       * toggles the duplication mode
+       */
       activateDuplicate () {
         this.$store.dispatch("toggleDuplicateSignActive");
       },
+      /**
+       * selects all signs
+       */
       selectAll () {
         this.$store.dispatch("clearSelectedSigns");
         for (let index = 1; index < this.signs.length; index++) {
           this.$store.dispatch("addToSelectedSigns", index);
         }
       },
+      /**
+       * unselects all signs
+       */
       unselectAll () {
         this.$store.dispatch("clearSelectedSigns");
         this.$store.dispatch("setSelectedColumn", false);
         this.$store.dispatch("setSelectedBar", false);
       },
+      /**
+       * inverts the current selection
+       */
       invertSelection () {
-        if (this.selectedSigns.length > 0) {
+        if (this.selectedSigns.length > 0) { // only if a sign is selected
           let unselected = [];
           for (let index = 1; index < this.signs.length; index++) {
             unselected.push(index);
           }
+          // sort selection
           const sortedSelected = this.selectedSigns.sort();
+          //remove selected indices from the unselected array
           for (let index = sortedSelected.length - 1; index >= 0; index--) {
             unselected.splice(sortedSelected[index] - 1, 1);
           }
-          
+          // clear selected signs
           this.$store.dispatch("clearSelectedSigns");
+          // select new signs
           for (let index of unselected) {
             this.$store.dispatch("addToSelectedSigns", index);
           }
@@ -132,7 +166,6 @@
     },
   }
 </script>
-
 
 <style scoped>
 #interaction-menu {
@@ -157,5 +190,4 @@
   padding: 0;
   height: 100%;
 }
-
 </style>

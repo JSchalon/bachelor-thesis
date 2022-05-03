@@ -26,8 +26,6 @@
 </template>
 
 <script>
-
-
 /**
  * The Turn Sign component
  * @displayName Turn Sign
@@ -41,12 +39,11 @@ export default {
     height: Number,
   },
   inject: ["signWidth", "borderWidth", "barHeight"],
-  data() {
-    return {
-
-    };
-  },
   computed: {
+    /**
+     * calculates the points for the sign
+     * @returns the polygon points
+     */
     points () {
       let points = "0,0 " + this.signWidth + "," + (this.beatHeight / 3) + " " + this.signWidth + "," + this.height + " 0," + (this.height - this.beatHeight / 3);
       if (this.signData.holding) {
@@ -55,9 +52,17 @@ export default {
 
       return points;
     },
+    /**
+     * calculates the beat height
+     * @returns the beat height
+     */
     beatHeight () {
       return this.barHeight() / this.$store.state["beatsPerBar"];
     },
+    /**
+     * calculates the transform depending on the sign type
+     * @returns the transform string
+     */
     transform() {
       let transformString = "";
       let scale = [1,1];
@@ -71,16 +76,5 @@ export default {
       return transformString;
     },
   },
-  mounted () {
-    
-  },
-  methods: {
-    
-  },
 }
 </script>
-
-
-<style scoped>
-
-</style>

@@ -18,12 +18,14 @@
 
 <script>
 /**
- * A container for a sign category for the context menu
+ * A container for a sign category for the context menu. When hovered, displays the signs.
+ * @emits updateSignData when a new sign is selected
  * @displayName SignCategoryContainer
  */
 export default {
   name: "SignCategoryContainer",
-  inject: ["contextItemHeight", "contextMenuWidth", "contextItemMargin"],
+  inject: ["contextMenuWidth"],
+  emits: ["updateSignData"],
   props: {
     optionText: String,
     category: String,
@@ -40,34 +42,50 @@ export default {
       itemHeight: 0,
     };
   },
-  computed: {
-  },
   mounted () {
-    this.itemOffset = this.getWidth();
+    //set the offset within the actual sign container based on the width
+    this.itemOffset = this.getOffset();
+    //calculate the y position of the actual sign container
     this.getTop();
+    //calculate the x position of the sign container
     this.xOffset = this.getXPos();
+    // get the item height for the blocker 
     this.itemHeight = this.$refs.container.getBoundingClientRect().height;
   },
   methods: {
-    getWidth() {
+    /**
+     * calculates the offset within the sign container
+     * @returns the offset
+     */
+    getOffset() {
       return this.$refs.container.offsetWidth / 6 - 20;
     },
+    /**
+     * calculates the y position of the sign container relative to the item. 
+     */
     getTop() {
-      
       let elem = this.$refs.container.querySelector(".category");
       this.top =  Math.round(this.$refs.container.getBoundingClientRect().y - this.parentY);
       let altTop = Math.round(elem.getBoundingClientRect().y + elem.getBoundingClientRect().height);
-      if (altTop >= window.innerHeight) {
+      if (altTop >= window.innerHeight) { // y + height out of bounds -> move it up
         this.top = this.top - (altTop - window.innerHeight);
       }
     },
+    /**
+     * selects a sign
+     * @param data the data from the sign container
+     */
     selectSign (data) {
       this.selected = data.index;
       let signData = JSON.parse(JSON.stringify(data.signData))
       this.$emit("updateSignData", signData)
     },
+    /**
+     * calculates the x position of the sign container
+     * @returns the position
+     */
     getXPos() {
-      if (this.$refs.container.getBoundingClientRect().right + this.contextMenuWidth >= window.innerWidth) {
+      if (this.$refs.container.getBoundingClientRect().right + this.contextMenuWidth >= window.innerWidth) { // x + width out of bounds -> display it on the right instead
         return -this.contextMenuWidth;
       } else {
         return this.contextMenuWidth;
@@ -77,7 +95,6 @@ export default {
 };
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
   .hover-target:hover + .category {
     display: block;

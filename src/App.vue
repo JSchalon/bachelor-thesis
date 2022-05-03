@@ -26,6 +26,9 @@ export default {
     };
   },
   computed: {
+    /**
+     * sets the bar height based on the beat height and the beats per bar
+     */
     barHeight () {
       let height = this.$store.state["beatsPerBar"] * this.beatHeight;
       document.documentElement.style.setProperty('--barHeight', height + "px");
@@ -33,7 +36,7 @@ export default {
     }
   },
   provide () {
-    //set global dimensions used by the score canvas, its subcomponents and the signs
+    //set global constants for subcomponents
     //change these here
     return {
       signWidth: 40,
@@ -54,10 +57,12 @@ export default {
     }
   },
   mounted () {
+    // create the settings cookie
     let d = new Date();
     d.setTime(d.getTime() + 60 * 24 * 60 * 60 * 1000);
     let cookie = this.getSettingsCookie();
     let settingsObj = null;
+    // check if there is an existing cookie
     if (cookie) {
       settingsObj = JSON.parse(this.getSettingsCookie());
     }
@@ -68,17 +73,23 @@ export default {
     } else {
       this.$store.dispatch("changeSettings", settingsObj);
     }
+    // check for phone or tablet dimensions
     this.$store.dispatch("setIsPhone", window.matchMedia("only screen and (max-width: 760px)").matches);
     this.$store.dispatch("setIsTablet", window.matchMedia("only screen and (max-width: 1024px)").matches);
+    // set global css variables for context menu dimensions
     document.documentElement.style.setProperty('--contextMenuWidth', this.contextMenuWidth + "px");
     document.documentElement.style.setProperty('--contextItemHeight', this.contextItemHeight + "px");
     document.documentElement.style.setProperty('--contextItemMargin', this.contextItemMargin + "px");
     document.documentElement.style.setProperty('--contextItemImageSize', this.contextItemImageSize + "px");
     setTimeout(function () {
       this.$store.dispatch("saveStateInHistory");
-    }.bind(this), 50); 
+    }.bind(this), 100); 
   },
   methods: {
+    /** 
+     * get the settings cookie as a string
+     * @returns the cookie
+     */
     getSettingsCookie () {
       const settings =  document.cookie.match('(^|;)\\s*' + "settings" + '\\s*=\\s*([^;]+)')?.pop() || '';
       return settings;

@@ -24,10 +24,11 @@ export default {
     width: Number,
   },
   inject: ["handleDiam", "borderWidth"],
-  mounted () {
-    
-  },
   computed: {
+    /**
+     * calculates the position relative to the sign
+     * @returns the x and y position
+     */
     getPos () {
       if (this.pos == "top") {
         return{x: this.width / 2, y: 0}
@@ -39,6 +40,9 @@ export default {
         return{x: this.width, y: this.signHeight / 2}
       }
     },
+    /**
+     * @returns the class of the handle based on if it is top/left or right/bottom
+     */
     getClass () {
       if (this.pos == 'top' || this.pos == 'left') {
         return "handle-first";
@@ -50,7 +54,6 @@ export default {
 };
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 .resize-handle {
   fill: white;
