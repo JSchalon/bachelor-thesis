@@ -72,6 +72,8 @@ export default {
       document.cookie = "settings=" + JSON.stringify(newCookie) + "; expires=" + d.toUTCString() + "; path=/";
     } else {
       this.$store.dispatch("changeSettings", settingsObj);
+      //reset settings cookie saving time to 90 days
+      document.cookie = "settings=" + JSON.stringify(settingsObj) + "; expires=" + d.toUTCString() + "; path=/";
     }
     // check for phone or tablet dimensions
     this.$store.dispatch("setIsPhone", window.matchMedia("only screen and (max-width: 760px)").matches);
