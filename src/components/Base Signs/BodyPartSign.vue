@@ -6,12 +6,11 @@
     </g>
   </g>
 </template>
-
 <script>
 
 
 /**
- * The general body part Sign component
+ * The general body part Sign component. Loads a body part sign based on the signData.signType
  * @displayName Body Part Sign
  */
 export default {
@@ -22,28 +21,18 @@ export default {
     signData: Object,
     height: Number,
   },
-  inject: ["signWidth","borderWidth"],
-  data() {
-    return {
-    };
-  },
+  inject: ["signWidth"],
   computed: {
+    /**
+     * returns the rotation of the sign. If the side is right, the sign is mirrored horizontally 
+     */
     transform () {
-      if (this.signData.side == "right") {
+      if (this.signData.side == "right" && this.signData.signType != "Head") { // rotate if the side is right and the sign is not the head sign
         return 'translate(' + this.signWidth + ',0) scale(-1,1)';
       } else {
         return "";
       }
     }
   },
-  mounted () {
-  },
-  methods: {
-  },
 }
 </script>
-
-
-<style scoped>
-
-</style>

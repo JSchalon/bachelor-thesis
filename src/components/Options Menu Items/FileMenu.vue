@@ -24,12 +24,7 @@
           <img src="@/assets/images/interaction-menu/triangle-left.svg" class="option-img dropdown">
           <ul class="option-nested sub-menu" tabIndex="0" role="button">
             <div class="option-box sub-menu">
-              <li class="option-item" @click="dropboxImport()">
-                <div class="menu-option-container">
-                  <img src="@/assets/images/interaction-menu/blank.svg" class="option-img">
-                  <p>Dropbox</p>
-                </div>
-              </li>
+              <CloudImportButton :btn="'DropBoxImport'" @uploadScore="uploadScore"/>
             </div>
           </ul>
         </div>
@@ -49,12 +44,7 @@
                   <p class="shortcut" v-if="showShortCuts">Ctrl+S</p>
                 </div>
               </li>
-              <li class="option-item" @click="exportXMLDropBox()">
-                <div class="menu-option-container">
-                  <img src="@/assets/images/common/upload-cloud.svg" class="option-img">
-                  <p>To Dropbox</p>
-                </div>
-              </li>
+              <CloudExportButton :btn="'DropboxXMLExport'"/>
             </div>
           </ul>
         </div>
@@ -73,12 +63,7 @@
                   <p class="shortcut" v-if="showShortCuts">Ctrl+P</p>
                 </div>
               </li>
-              <li class="option-item" @click="exportSVGDropBox()">
-                <div class="menu-option-container">
-                  <img src="@/assets/images/common/upload-cloud.svg" class="option-img">
-                  <p>To Dropbox</p>
-                </div>
-              </li>
+              <CloudExportButton :btn="'DropboxSVGExport'"/>
             </div>
           </ul>
         </div>
@@ -97,6 +82,9 @@
 <script>
 /**
  * The standard File menu component
+ * @emits requestNewScore opens the score creation modal
+ * @emits requestUpload sends an imported score to the view to load
+ * @emits requestScoreDetails opens the score details to edit them
  * @displayName Options File Menu
  */
 export default {
@@ -105,26 +93,23 @@ export default {
     props: {
       showShortCuts: Boolean
     },
-    computed: {
-      
-    },
-    mounted () {
-      let dropBox = document.createElement("script");
-      dropBox.setAttribute(
-        "src",
-        "https://www.dropbox.com/static/api/2/dropins.js"
-      );
-      dropBox.setAttribute("id", "dropboxjs");
-      dropBox.setAttribute("data-app-key", "6w1sobho503o9jj");
-      document.head.appendChild(dropBox);
-    },
     methods: {
+      /**
+       * requests the opening of the score creation modal
+       */
       requestNewScore() {
         this.$emit("requestNewScore");
       },
+      /**
+       * opens the local file upload popup
+       */
       openFileUpload () {
         document.getElementById("xml-file").click();
       },
+      /**
+       * loads a selected file from the file explorer
+       * @param string the id of the file upload input
+       */
       uploadScoreFromString (string) {
         const elem = document.getElementById(string);
         if ("files" in elem) {
@@ -132,6 +117,10 @@ export default {
           this.uploadScore (score);
         }
       },
+      /**
+       * requests the parent to load an imported score
+       * @param score either the xml doc string or an error string
+       */
       uploadScore (score) {
         if (score.type.includes("xml")) {
           const reader = new FileReader();
@@ -149,11 +138,18 @@ export default {
           reader.readAsText(score);
         }
       },
+      /**
+       * serializes the canvas to a string
+       * @return the svg string
+       */
       makeSVGFile () {
         const serializer = new XMLSerializer();
         const svg = serializer.serializeToString(document.getElementById("canvas"));
         return svg;
       },
+      /**
+       * export the svg canvas to local files
+       */
       exportSVGLocal () {
         const svg = this.makeSVGFile();
 
@@ -161,153 +157,62 @@ export default {
         if (!filename.includes(".svg")) {
           filename = filename + ".svg";
         }
+        //creates a file download link
         const pom = document.createElement('a');
+        //creates a blob file to download
         const bb = new Blob([svg], {type: 'application/xml'});
         pom.setAttribute('href', window.URL.createObjectURL(bb));
         pom.setAttribute('download', filename);
         pom.dataset.downloadurl = ['application/xml', pom.download, pom.href].join(':');
         pom.draggable = true; 
         pom.classList.add('dragout');
+        // add the download link to the dom and click it
         document.body.appendChild(pom);
         pom.click();
+        // remove the link again
         document.body.removeChild(pom);
       },
-      exportSVGDropBox () {
-        const svg = this.makeSVGFile();
-        let filename = this.$store.state["title"];
-        if (!filename.includes(".svg")) {
-          filename = filename + ".svg";
-        }
-        let options = {
-          files: [{url: "data:text/html,"+encodeURIComponent(svg), filename: filename}],
-          success: function () {
-            this.$store.dispatch("setCloudAlert", "export-success");
-            setTimeout(function () {
-              this.$store.dispatch("setCloudAlert", "");
-            }.bind(this), 5000);
-          }.bind(this),
-          cancel: function () {
-            this.$store.dispatch("setCloudAlert", "export-failure");
-            setTimeout(function () {
-              this.$store.dispatch("setCloudAlert", "");
-            }.bind(this), 5000);
-          }.bind(this)
-        }
-        // disabling eslint temporarily because it identifies "Dropbox" as undefined, 
-        // despite the fact that it is defined in the script defined in the mounted-hook
-        /* eslint-disable */
-        Dropbox.save(options);
-        /* eslint-enable */
-      },
+      /**
+       * serializes the xml doc to a string
+       * @return the xml string
+       */
       makeXMLFile () {
         const serializer = new XMLSerializer();
         const xml = serializer.serializeToString(this.$store.state["signsXML"]);
         return xml;
       },
+      /**
+       * export the xml score to local files
+       */
       exportXMLLocal () {
-        const xml = this.makeXMLFile()
-       
+        const xml = this.makeXMLFile();
+
         let filename = this.$store.state["title"];
         if (!filename.includes(".xml")) {
           filename = filename + ".xml";
         }
+
+        //creates a download link
         const pom = document.createElement('a');
+        // creates a blob file to download
         const bb = new Blob([xml], {type: 'application/xml'});
         pom.setAttribute('href', window.URL.createObjectURL(bb));
         pom.setAttribute('download', filename);
         pom.dataset.downloadurl = ['application/xml', pom.download, pom.href].join(':');
         pom.draggable = true; 
         pom.classList.add('dragout');
+        //add the link, click it
         document.body.appendChild(pom);
         pom.click();
+        //remove the link
         document.body.removeChild(pom);
       }, 
-      exportXMLDropBox () {
-        const xml = this.makeXMLFile()
-       
-        let filename = this.$store.state["title"];
-        if (!filename.includes(".xml")) {
-          filename = filename + ".xml";
-        }
-        //const bb = new Blob([xml], {type: 'text/xml'});
-        let options = {
-          files: [{url: "data:text/html,"+encodeURIComponent(xml), filename: filename}],
-          success: function () {
-            this.$store.dispatch("setCloudAlert", "export-success");
-            setTimeout(function () {
-              this.$store.dispatch("setCloudAlert", "");
-            }.bind(this), 5000);
-          }.bind(this),
-          cancel: function () {
-            this.$store.dispatch("setCloudAlert", "export-failure");
-            setTimeout(function () {
-              this.$store.dispatch("setCloudAlert", "");
-            }.bind(this), 5000);
-          }.bind(this)
-        }
-        // disabling eslint temporarily because it identifies "Dropbox" as undefined, 
-        // despite the fact that it is defined in the script defined in the mounted-hook
-        /* eslint-disable */
-        Dropbox.save(options);
-        /* eslint-enable */
-      },
+      /**
+       * requests opening the score details to edit them
+       */
       requestScoreDetails () {
         this.$emit("requestScoreDetails");
       },
-      dropboxImport() {
-        let options = {
-          success: function (files) {
-            this.$store.dispatch("setCloudAlert", "import-success");
-            setTimeout(function () {
-              this.$store.dispatch("setCloudAlert", "");
-            }.bind(this), 5000);
-            let attachments = [];
-            for (let i = 0; i < files.length; i++) {
-              let attachment = {};
-              attachment._id = files[i].id;
-              attachment.title = files[i].name;
-              attachment.size = files[i].bytes;
-              attachment.iconURL = files[i].icon;
-              attachment.link = files[i].link;
-              attachment.extension = `. ${files[i].name.split(".")[1]}`;
-              attachments.push(attachment);
-            }
-            this.tempAttachments = attachments;
-            fetch(this.tempAttachments[0].link)
-              .then(res => res.blob())
-              .then(blob => {
-                this.uploadScore(blob);
-            });
-          }.bind(this),
-          cancel: function () {
-            this.$store.dispatch("setCloudAlert", "import-failure");
-            setTimeout(function () {
-              this.$store.dispatch("setCloudAlert", "");
-            }.bind(this), 5000);
-          }.bind(this),
-
-          linkType: "direct",
-
-          multiselect: false,
-
-          extensions: [
-          ".xml",
-          ],
-
-          folderselect: false,
-
-          sizeLimit: 102400000
-        };
-        // disabling eslint temporarily because it identifies "Dropbox" as undefined, 
-        // despite the fact that it is defined in the script defined in the mounted-hook
-        /* eslint-disable */
-        Dropbox.choose(options);
-        /* eslint-enable */
-      }
     }
   }
 </script>
-
-
-<style scoped>
-</style>

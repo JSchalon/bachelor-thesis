@@ -33,6 +33,9 @@
 /**
  * The first introduction that appears on first loading of the editor
  * Used to explain the editor, as well as present the editor and labanotation introductions
+ * @emits disableModal closes the modal and resumes the editor
+ * @emits startLabanIntro opens the labanotation intro
+ * @emits startEditorIntro opens the editor intro
  * @displayName Editor Explain Modal
  */
 export default {
@@ -47,10 +50,8 @@ export default {
       curIndex: 0,
     };
   },
-  computed: {
-
-  },
   mounted () {
+    // gets the language and loads the respective texts
     let lang = this.$store.state["language"];
     let json = require('@/assets/editor-help/intro/editor-explain-' + lang + '.json');
     let obj = JSON.parse(JSON.stringify(json));
@@ -60,9 +61,6 @@ export default {
     }
     this.introData = data;
   },
-  methods: {
-    
-  }
 }
 </script>
 

@@ -11,7 +11,5 @@ Git Repo zur Bachelorarbeit zur Entwicklung eines webbasierten Interaktionsedito
 
 ## Versions
 
-### Version 0.9.3
-- fixed a small bug
-- fixed some css
-- fixed some introduction text
+### Version 1.0.1
+- fixed a bug pertaining to the reseting of the settings cookie saving time

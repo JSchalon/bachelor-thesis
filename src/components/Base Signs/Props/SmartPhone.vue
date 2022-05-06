@@ -27,14 +27,12 @@
 </template>
 
 <script>
-
-
 /**
  * The smartphone prop component
  * @displayName SmartPhone Prop
  */
 export default {
-  name: 'SmartPhone',
+  name: 'SmartPhoneProp',
   props: {
     isSelected: Boolean,
     id: Number,
@@ -42,22 +40,5 @@ export default {
     height: Number,
   },
   inject: ["signWidth", "borderWidth"],
-  data() {
-    return {
-
-    };
-  },
-  computed: {
-  },
-
-  mounted () {
-  },
-  methods: {
-    
-  },
 }
 </script>
-
-
-<style scoped>
-</style>

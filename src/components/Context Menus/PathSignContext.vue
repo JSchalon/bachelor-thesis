@@ -33,16 +33,23 @@ export default {
     
   },
   methods: {
+    /**
+     * Changes the path type
+     * @param data the data from the sign category container
+     */
     changeType (data) {
       this.newSignData({signType: data.signType})
     },
     /**
      * The function that sends the updated sign data back to the score
-     * @arg data the updated sign data 
+     * @param data the updated sign data 
      */
     newSignData (data) {
       this.$emit("updateSignData", {index: parseInt(this.signIndex), data: data});
     },
+    /**
+     * emits a deletion request
+     */
     emitDelete() {
       this.$emit("delete", parseInt(this.signIndex))
     }
@@ -50,7 +57,6 @@ export default {
 };
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style>
   .context-menu.inactive {
     display: none;

@@ -51,16 +51,19 @@ export default {
   emits: ["updateSignData", "delete"],
   data() {
     return {
+      //data for the vertical dimension for the radio buttons
       dimensions: [
         {text: 'Low', img: '/direction-sign-radio/layer-down.svg'},
         {text: 'Middle', img: '/direction-sign-radio/layer-middle.svg'},
         {text: 'High', img: '/direction-sign-radio/layer-up.svg'}
       ],
+      //data for the vertical pin dimension for the radio buttons
       definitions: [
         {text: 'Low', img: "/pin-low-forward.svg"},
         {text: 'Middle', img:  "/pin-middle.svg"},
         {text: 'High', img:  "/pin-high.svg"}
       ],
+      //data for the relative position for the radio buttons
       positions: [
         {text: '---', img: false},
         {text: 'Infront', img: "/pin-low-forward.svg"},
@@ -73,12 +76,13 @@ export default {
     
   },
   mounted () {
+    //checks if the pin definition is active at load
     this.definitionActive = (typeof this.signData.definition == "object");
   },
   methods: {
     /**
-     * An example function changing the border color based of an radio Option, as an example for the actual radio funcitionality
-     * @arg color the boolean changing the color 
+     * changes the vertical level of the sign
+     * @param index the index in the dimension array
      */
     changeDimension(index) {
       let newSignData = this.signData;
@@ -86,12 +90,24 @@ export default {
 
       this.newSignData (newSignData);
     },
+    /**
+     * changes the sign type
+     * @param data the data from the sign category container  
+     */
     changeType (data) {
       this.newSignData({signType: data.signType})
     },
+    /**
+     * changes the holding state
+     * @param data the holding bool  
+     */
     changeHolding (data) {
       this.newSignData({holding: data})
     },
+    /**
+     * changes the relative position
+     * @param index the index of the position array  
+     */
     changePosition (index) {
       if (this.positions[index].text != "---") {
         this.newSignData({position: this.positions[index].text})
@@ -99,6 +115,10 @@ export default {
         this.newSignData({position: false})
       }
     },
+    /**
+     * switches the pin definition on or off
+     * @param data the pin boolean  
+     */
     changeDefinition (data) {
       this.definitionActive = data;
       if (data) {
@@ -107,11 +127,19 @@ export default {
         this.newSignData({definition: false});
       }
     },
+    /**
+     * changes the vertical level of the definition pin
+     * @param index the index of the definition  
+     */
     changeDefinitionPin (index) {
       let obj = JSON.parse(JSON.stringify(this.signData.definition)) || {signType: "Low", degree: 0, bgVisible: false};
       obj.signType = this.definitions[index].text;
       this.newSignData ({definition: obj});
     },
+    /**
+     * changes the agnle of the definition pin
+     * @param data the sign category data
+     */
     changeDefinitionAngle (data) {
       if (this.isActive) {
         let degree = data.degree;
@@ -121,25 +149,15 @@ export default {
       }
     },
     /**
-     * An example function changing the color based of an on/Off Option, as an example for the actual on/off funcitionality
-     * @arg color the boolean changing the color 
-     */
-    changeColor(colorState) {
-      let newSignData = this.signData;
-      if (colorState) {
-        newSignData.color = "red";
-      } else {
-        newSignData.color = "white";
-      }
-      this.newSignData (newSignData);
-    },
-    /**
      * The function that sends the updated sign data back to the score
-     * @arg data the updated sign data 
+     * @param data the updated sign data 
      */
     newSignData (data) {
       this.$emit("updateSignData", {index: parseInt(this.signIndex), data: data});
     },
+    /**
+     * emits a deletion request
+     */
     emitDelete() {
       this.$emit("delete", parseInt(this.signIndex))
     }
@@ -147,7 +165,6 @@ export default {
 };
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style>
   .context-menu.inactive {
     display: none;

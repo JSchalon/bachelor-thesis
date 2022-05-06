@@ -34,8 +34,7 @@
 <script>
 
 /**
- * The sign container component.
- * Holds a sign
+ * The sign container component. Loads a sign based on its signdata
  * @emits requestListeners at mount, so that the score can implement dragging, resizing, clicking and double clicking
  * @displayName Sign Container
  */
@@ -47,25 +46,23 @@ export default {
     signData: Object,
     localData: Object,
   },
-  inject: ["borderWidth", "signWidth", "barHeight"],
-  data() {
-    return {
-    };
-  },
+  inject: ["signWidth", "barHeight"],
   mounted () {
     //give it a random number to differentiate between signs
-    this.name= Math.round(Math.random() * 100);
     let sign = this.$refs.sign;
     //request event listeners on the outer group
     this.$emit("requestListeners", sign);
   },
-  methods: {
-    
-  },
   computed: {
+    /**
+     * @returns the beats per bar
+     */
     beats () {
       return this.$store.state["beatsPerBar"];
     },
+    /**
+     * @returns the height of the sign in svg coords
+     */
     height () {
       let height = this.barHeight() / this.beats;
       if (this.localData != undefined) {
@@ -73,6 +70,9 @@ export default {
       }
       return height;
     },
+    /**
+     * @returns the width of the sign in svg coords
+     */
     width () {
       let width = this.signWidth;
       if (this.localData != undefined) {
@@ -80,6 +80,9 @@ export default {
       }
       return width;
     },
+    /**
+     * @returns the x position of the sign in svg coords
+     */
     x () {
       let x = 0;
       if (this.localData != undefined) {
@@ -87,6 +90,9 @@ export default {
       }
       return x;
     },
+    /**
+     * @returns the y position of the sign in svg coords
+     */
     y () {
       let y = 0;
       if (this.localData != undefined) {
@@ -94,6 +100,9 @@ export default {
       }
       return y;
     },
+    /**
+     * @returns whether or not the sign can be resized
+     */
     canResize () {
       let canResize = false;
       if (this.localData != undefined) {
@@ -106,7 +115,6 @@ export default {
 </script>
 
 <style>
-
 .dragging {
   touch-action: none;
   overscroll-behavior: none;

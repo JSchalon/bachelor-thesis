@@ -45,12 +45,18 @@
 import interact from "interactjs";
 /**
  * The visual grid component
+ * @emits unselect requests unselecting all signs
+ * @emits getGridHandles requests the activation of the grid handles
+ * @emits removeGridHandles requests the deactivation of the grid handles
+ * @emits selectColumn request the selection of a column
+ * @emits selectBar request the selection of a bar
+ * @emits lassoSelect emits the position of the lasso box after dragging
  * @displayName Grid
  */
 export default {
   name: "Grid",
   inject: ["barHeight", "columnWidth", "borderWidth", "startBarOffset", "beatLineWidth"],
-  emits: ["unselect", "placeSign", "getGridHandles","removeGridHandles", "selectColumn", "selectBar", "lassoSelect"],
+  emits: ["unselect","getGridHandles","removeGridHandles", "selectColumn", "selectBar", "lassoSelect"],
   props: {
     bars: Number,
     beats: Number,
@@ -69,25 +75,38 @@ export default {
   },
   computed: {
     /**
-     * Calculates the total amount of beats in the score
+     * @returns the height of a bar
      */
     barH() {
       return this.barHeight();
     },
+    /**
+     * @returns the total number of beats
+     */
     totalBeats() {
       return this.beats * this.bars;
     },
-    curSign() {
-      return this.$store.state["curSign"];
+    /**
+     * @returns the width and height of the grid
+     */
+    gridDimensions() {
+      return {w: (this.columnsLeft + this.columnsRight) * this.columnWidth, h: this.fullHeight};
     },
+    /**
+     * @returns the left columns + the room direction sign column
+     */
     columnsLeft () {
       return this.$store.state["columnsLeft"] + 1;
     },
+    /**
+     * @returns the right columns + the path sign column
+     */
     columnsRight () {
       return this.$store.state["columnsRight"] + 1;
     },
-    gridDimensions() {
-      return {w: (this.columnsLeft + this.columnsRight) * this.columnWidth, h: this.fullHeight};
+    // further computed methods load variables from the vuex state
+    curSign() {
+      return this.$store.state["curSign"];
     },
     showHelpLines(){
       return this.$store.state["showHelpLines"];
@@ -100,65 +119,94 @@ export default {
     },
   },
   watch: {
+    /**
+     * observes the changes in left columns
+     */
     columnsLeft () {
       //if a column is added, the highlighted column has to be changed
       //without a timeout, this does not work properly
       setTimeout(function () {this.colHighlightAfterAddRemove()}.bind(this), 1);
     },
+    /**
+     * observes the changes in right columns
+     */
     columnsRight () {
       //if a column is added, the highlighted column has to be changed
       //without a timeout, this does not work properly
       setTimeout(function () {this.colHighlightAfterAddRemove()}.bind(this), 1);
     },
+    /**
+     * observes the changes in selected signs on the score
+     */
     signsSelected (value) {
+      // if a sign is selected -> clear the grid selection
       if (value != []) {
         this.highlight();
       }
     },
+    /**
+     * observes the change in bars
+     */
     bars() {
       //if a column is added/removed, the highlighted column has to be changed
       //without a timeout, this does not work properly
       setTimeout(function () {this.barHighlightAfterAddRemove()}.bind(this), 1);
     },
+    /**
+     * observes changes in the selected column
+     */
     selectedColumn(value) {
-      if (value === false ) {
+      if (value === false ) { // no selected column -> unhighlight and remove grid handles
         this.highlight();
         this.$emit("removeGridHandles");
         this.barSelected = false;
         this.colSelected = false;
       }
     },
+    /**
+     * observes changes in the selected bar
+     */
     selectedBar(value) {
-      if (value === false ) {
+      if (value === false ) { // no selected bar -> unhighlight and remove grid handles
         this.highlight();
         this.$emit("removeGridHandles");
         this.barSelected = false;
         this.colSelected = false;
       }
     },
+    /**
+     * observes the vuex specific grid selection. this is used by the introductions to highlight certain things 
+     * and by the sign library when placing a sign
+     */
     gridSelection: {
       deep: true,
       handler(value) {
-        if (value == []) {
+        if (value == []) { // no selection -> unhighlight
           this.highlight();
-        } else {
+        } else { 
           this.$emit("removeGridHandles");
-          if (value.length == 1) {
-            if ("col" in value[0]) {
+          if (value.length == 1 && ('selectBar' in value[0] || 'selectCol' in value[0])) { // if only one bar/col is selected and the grid handles are supposed to be active
+            if ("col" in value[0]) { // col is needed to place the grid handles 
               let col = value[0].col;
-              if ("selectBar" in value[0] && value[0].selectBar == true && "bar" in value[0]) {
+              if ("selectBar" in value[0] && value[0].selectBar == true && "bar" in value[0]) { // select a bar
                 let bar = value[0].bar;
-                const parent = this.$refs.grid.querySelector("#grid-column" + col);
+                const parent = this.$refs.grid.querySelector("#grid-column" + col); // parent column is needed to get the position of a "block" in the bar
+                // get the position and place the grid handles
                 this.$emit("getGridHandles", {type: "bar", x: parent.querySelector(".beat-rect.ba" + bar).getBoundingClientRect().x, y: parent.querySelector(".beat-rect.ba" + bar).getBoundingClientRect().y});
+                // highlight the bar
                 this.highlight(false, bar);
               } else if ("selectCol" in value[0] && value[0].selectCol == true ) {
                 const parent = this.$refs.grid.querySelector("#grid-column" + col);
+                // calculate the grid handle position
                 this.$emit("getGridHandles", {type: "col", x: parent.getBoundingClientRect().x, y: parent.getBoundingClientRect().y});
+                // select the column
                 this.highlight(col);
               }
             }
-          } else {
+          } else { // multiple blocks
+            //unhighlight
             this.highlight();
+            // check all elements
             for (const elem of value) {
               let col = false;
               let bar = -2;
@@ -176,6 +224,7 @@ export default {
               if ("beat" in elem) {
                 beat = elem.beeat;
               }
+              // highlight the curent element
               this.highlight(col, bar, beat, true, green);
             }
           }
@@ -184,8 +233,10 @@ export default {
     }
   },
   mounted () {
+    // activate click listeners
     interact(".beat-rect").on("tap", this.click);
     interact(".grid-line").on("tap", this.lineClick);
+    //activate lasso interact listeners
     interact(".lasso-able").draggable({
       inertia: false,
       autoScroll: false,
@@ -195,6 +246,7 @@ export default {
       onmove: this.lassoScale,
       onend: this.lassoEnd
     }).styleCursor(false);
+    //activate holding interact listeners
     interact(".lasso-able").on('hold',
       function () {
         if (!this.multiselectActive) {
@@ -202,14 +254,20 @@ export default {
         }
       }.bind(this)
     );
+    //disable touch events, since they break interact events
     for (let elem of document.getElementsByClassName("lasso-able")) {
       ["touchstart", "touchmove", "touchend"].forEach((et) => elem.addEventListener(et, this.ignoreTouch));
     }
   },
   methods: {
+    /**
+     * changes the selection after a column has been added or removed
+     */
     colHighlightAfterAddRemove() {
-      if (!(this.selectedColumn === false)) {
+      if (!(this.selectedColumn === false)) { // selected column
+        //unhighlight
         this.highlight();
+        // check if current selected column is out of bounds -> pull back into bounds and re-place grid handles 
         if (this.selectedColumn < -this.columnsLeft) {
           this.highlight(this.selectedColumn + 1);
           const newHighlight = this.$refs.grid.querySelector("#grid-column" + (this.selectedColumn + 1));
@@ -218,46 +276,53 @@ export default {
           this.highlight(this.selectedColumn - 1);
           const newHighlight = this.$refs.grid.querySelector("#grid-column" + (this.selectedColumn - 1));
           this.$emit("getGridHandles", {type: "col", x: newHighlight.getBoundingClientRect().x, y: newHighlight.getBoundingClientRect().y});
-        } else {
+        } else { // selected column still in bounds -> just re-highlight and place grid handles
           this.highlight(this.selectedColumn);
           const newHighlight = this.$refs.grid.querySelector("#grid-column" + this.selectedColumn);
           this.$emit("getGridHandles", {type: "col", x: newHighlight.getBoundingClientRect().x, y: newHighlight.getBoundingClientRect().y});
         }
-      } else {
-        this.highlight();
-        this.$emit("removeGridHandles");
-      }
-    },
-    barHighlightAfterAddRemove() {
-      if (!(this.selectedBar === false)) {
-        this.highlight(false, this.selectedBar);
-      } else {
+      } else { // no selected column -> unhighlight and remove handles
         this.highlight();
         this.$emit("removeGridHandles");
       }
     },
     /**
-     * When the grid is clicked -> unselect all signs
+     * changes the selection after a bar has been added or removed
+     */
+    barHighlightAfterAddRemove() {
+      if (!(this.selectedBar === false)) { 
+        // highlight new bar
+        this.highlight(false, this.selectedBar);
+      } else { // no selected bar -> unhighlight and remove handles
+        this.highlight();
+        this.$emit("removeGridHandles");
+      }
+    },
+    /**
+     * click event listener for the grid 
+     * @param event the click event
      */
     click (event) {
-      if (event.button == 2 || this.contextActive || this.signsSelected) {
+      if (event.button == 2 || this.contextActive || this.signsSelected) { // rightclick, having signs selected or the context menu open unselects the grid
         this.$emit("unselect");
         this.$emit("removeGridHandles")
         this.highlight();
       } else if (event.button == 0){
+        // if no columns or bars are selected -> select the bar of the event target
         if (this.colSelected === false && this.barSelected === false && parseInt(event.target.getAttribute("bar")) > -1) {
           this.$emit("removeGridHandles");
           this.highlight(false, parseInt(event.target.getAttribute("bar")));
           this.barSelected = parseInt(event.target.getAttribute("bar"));
           this.$emit("selectBar", parseInt(event.target.getAttribute("bar")));
           this.$emit("getGridHandles", {type: "bar", x: event.target.getBoundingClientRect().x, y: event.target.parentElement.querySelector(".beat-rect.ba" + event.target.getAttribute("bar")).getBoundingClientRect().y});
+        // else if the bar of the event target is selected -> select the column of the target
         } else if (this.colSelected === false && this.barSelected == parseInt(event.target.getAttribute("bar")) && this.barSelected !== false) {
            this.highlight(parseInt(event.target.getAttribute("col")));
            this.colSelected = parseInt(event.target.getAttribute("col"));
            this.$emit("removeGridHandles");
            this.$emit("selectColumn", parseInt(event.target.getAttribute("col")));
            this.$emit("getGridHandles", {type: "col", x: event.target.parentElement.getBoundingClientRect().x, y: event.target.parentElement.getBoundingClientRect().y});
-        } else {
+        } else { // unselect all
           this.barSelected = false;
           this.colSelected = false;
           this.highlight();
@@ -265,40 +330,45 @@ export default {
         }
       }
     },
+    /**
+     * grid line click listener
+     */
     lineClick () {
+      // unselect grid
       this.$emit("unselect");
       this.colSelected = false;
       this.barSelected = false;
     },
     /**
      * Calculates the bar of a grid rect based on its' index
-     * @arg nr the index 
+     * @param nr the index 
      */
     getBar(nr) {
       return Math.floor(((this.beats * this.bars - nr) / this.beats) % this.bars);
     },
     /**
-     * Calculates the beat of a grid rect based on its' index
-     * @arg nr the index 
+     * Calculates the beat of a grid rect based on its index
+     * @param nr the index 
      */
     getBeat(nr) {
       return (this.totalBeats - nr) % this.beats;
     },
     /**
-     * Highlights all width the specified beat and or bar
-     * @arg col the column to highlight, optional
-     * @arg bar the bar to highlight, optional
-     * @arg beat the bar to highlight, optional
-     * @arg multi if true, the selection does not get reset before (allows multi-selection)
-     * @arg green if true, changes the selection color to green (used when placing a sign)
+     * Highlights all grid elements width the specified beat and or bar
+     * @param col the column to highlight, optional
+     * @param bar the bar to highlight, optional
+     * @param beat the bar to highlight, optional
+     * @param multi if true, the selection does not get reset before (allows multi-selection)
+     * @param green if true, changes the selection color to green (used when placing a sign)
      */
     highlight (col = false, bar = -2, beat = -1, multi = false, green = false) {
-      if (!multi) {
+      if (!multi) { // normally reset the selection before reselection
         for (let elem of this.$refs.grid.querySelectorAll(".highlighted")) {
           elem.classList.remove("highlighted");
           elem.classList.remove("green");
         }
       }
+      // first checking if a specific bar or beat is selected
       let highl = "";
       if (bar >= -1) {
         highl = highl + ".ba" + bar;
@@ -306,18 +376,20 @@ export default {
       if (beat >= 0 && this.beats > beat) {
         highl = highl + ".be" + beat;
       }
-      if (highl != "") {
+      if (highl != "") { 
+        // highlight based on the bar and beat
         let elems = this.$refs.grid.querySelectorAll(highl);
-        if (col !== false && typeof col == "number") {
+        if (col !== false && typeof col == "number") { // if col is selected -> further restric selection
           elems = this.$refs.grid.querySelector("#grid-column" + col).querySelectorAll(highl);
         }
+        // highlight elements
         for (let el of elems) {
           el.classList.toggle("highlighted");
           if (green) {
             el.classList.toggle("green");
           }
         }
-      } else if (col !== false) {
+      } else if (col !== false) { // only column selected -> highlight all children of the column group
         let elems = this.$refs.grid.querySelector("#grid-column" + col).children;
         for (let el of elems) {
           el.classList.toggle("highlighted");
@@ -325,84 +397,103 @@ export default {
             el.classList.toggle("green");
           }
         }
-      } else {
+      } else { // no selection -> unhighlight
         for (let elem of this.$refs.grid.querySelectorAll(".highlighted")) {
           elem.classList.remove("highlighted");
           elem.classList.remove("green");
         }
       }
     },
+    /**
+     * the start listener for the lasso selection
+     * @param event the interact drag-start event 
+     */
     lassoStart (event) {
+      // get the rectangle
       const outerRect = this.$refs.grid.getBoundingClientRect();
+      // offset the starting position by the grid
       this.lasso.x = Math.round(event.client.x - outerRect.x);
       this.lasso.y = Math.round(event.client.y - outerRect.y);
+      // set the starting pos for the event
       this.lasso.startX = Math.round(event.client.x - outerRect.x);
       this.lasso.startY = Math.round(event.client.y - outerRect.y);
     },
 
     /**
-     * The drag-move event listener, moves the sign and the shadow element
-     * @arg event the drag-move event
+     * the move listener for the lasso selection
+     * @param event the interact drag-move event 
      */
     lassoScale (event) {
-      if (event.dx < 0) {
-        if (this.lasso.x < this.lasso.startX) {
+
+      if (event.dx < 0) { // moving left
+        if (this.lasso.x < this.lasso.startX) { // lasso is left of the starting position
+          //increase lasso size
           this.lasso.x = this.lasso.x + event.dx;
           this.lasso.w = this.lasso.startX - (this.lasso.x);
-        } else {
-          if (this.lasso.w + event.dx < 0) {
+        } else { // lasso is right of the starting position
+          if (this.lasso.w + event.dx < 0) { // new width would be negative
+            // move x left and set width to the starting position 
             this.lasso.x = this.lasso.x + event.dx;
             this.lasso.w = this.lasso.startX - (this.lasso.x);
-          } else {
+          } else { // width still positive
+            // decrease the width and set the x to the starting position
             this.lasso.x = this.lasso.startX;
             this.lasso.w = this.lasso.w + event.dx;
           }
         }
-      } else if (event.dx > 0) {
-        if (this.lasso.x < this.lasso.startX) {
-          if (this.lasso.x + event.dx >= this.lasso.startX) {
+      } else if (event.dx > 0) { // moving right
+        if (this.lasso.x < this.lasso.startX) { // lasso left of the starting position
+          if (this.lasso.x + event.dx >= this.lasso.startX) { // lasso would overtake the starting position
+            // set the x to the starting position and 
             this.lasso.x = this.lasso.startX;
             this.lasso.w = event.dx;
-          } else {
+          } else { // lasso still left of the starting position
+            // move lasso x and adjust width
             this.lasso.x = this.lasso.x + event.dx;
             this.lasso.w = this.lasso.startX - (this.lasso.x);
-            if (this.lasso.w < 0) {
+            if (this.lasso.w < 0) { // width sometimes comes out to < 0 -> readjust
               this.lasso.w = 0;
             }
           }
-        } else {
+        } else { // lasso right of starting position
+          // increase the width
           this.lasso.x = this.lasso.startX;
           this.lasso.w = this.lasso.w + event.dx;
         }
       }
 
-      if (event.dy < 0) {
-        if (this.lasso.y < this.lasso.startY) {
+      if (event.dy < 0) { // lasso moving upward
+        if (this.lasso.y < this.lasso.startY) { // lasso is above the starting position
+          // move y up, adjust height
           this.lasso.y = this.lasso.y + event.dy;
           this.lasso.h = this.lasso.startY - (this.lasso.y);
-        } else {
-          if (this.lasso.h + event.dy < 0) {
+        } else { // lasso below starting position
+          if (this.lasso.h + event.dy < 0) { // lasso height would be negative
+            // move y up and adjust width
             this.lasso.y = this.lasso.y + event.dy;
             this.lasso.h = this.lasso.startY - (this.lasso.y);
-          } else {
+          } else { // lasso height still above 0
+            // keep y at starting position, reduce height
             this.lasso.y = this.lasso.startY;
             this.lasso.h = this.lasso.h + event.dy;
           }
         }
-      } else if (event.dy > 0) {
-        if (this.lasso.y < this.lasso.startY) {
-          if (this.lasso.y + event.dy >= this.lasso.startY) {
+      } else if (event.dy > 0) { // lasso moving down
+        if (this.lasso.y < this.lasso.startY) { // lasso above starting position
+          if (this.lasso.y + event.dy >= this.lasso.startY) { // lasso would be below starting position
+            // set lasso y to starting position, increase height
             this.lasso.y = this.lasso.startY;
             this.lasso.h = event.dy;
-          } else {
+          } else { // lasso still above starting position
+            // increase y and adjust height
             this.lasso.y = this.lasso.y + event.dy;
             this.lasso.h = this.lasso.startY - (this.lasso.y);
-            //console.log((this.lasso.y + event.dx) + " " + this.lasso.startY);
-            if (this.lasso.h < 0) {
+            if (this.lasso.h < 0) { // if lasso height becomes negative -> adjust to 0 
               this.lasso.h = 0;
             }
           }
-        } else {
+        } else { // lasso below starting position
+          // keep lasso at starting pos, adjust height
           this.lasso.y = this.lasso.startY;
             this.lasso.h = this.lasso.h + event.dy;
         }
@@ -410,11 +501,11 @@ export default {
     },
     
     /**
-     * The drag-end event listener, places the sign at the proper position and removes the shadow
-     * @arg event the drag-move event
+     * The drag-end event listener, emits the lasso dimensions to the score
      */
     lassoEnd () {
       this.$emit("lassoSelect", {x: this.lasso.x, y: this.lasso.y, w: this.lasso.w, h: this.lasso.h});
+      // reset lasso
       this.lasso = {x: 0, y: 0, startY: 0, startX: 0, w: 0, h: 0};
       if (this.multiselectActive) {
          this.$store.dispatch("toggleMultiSelect");
@@ -422,7 +513,7 @@ export default {
     },
     /**
      * InteractJS workaround: touch events immediately end resize and drag events -> cancel them before that happens and implement scrolling elsewhere
-     * @arg event the drag-move event
+     * @param event the touch event
      */
     ignoreTouch (event) {
       if (event.cancelable && this.multiselectActive) {
@@ -433,7 +524,6 @@ export default {
 };
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
   .help {
     stroke-dasharray: 5,5;

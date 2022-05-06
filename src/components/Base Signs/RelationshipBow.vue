@@ -57,8 +57,6 @@
 </template>
 
 <script>
-
-
 /**
  * The general relationship bow sign component
  * @displayName Relationship Bow Sign
@@ -75,18 +73,19 @@ export default {
       default: 160
     }
   },
-  inject: ["signWidth","borderWidth"],
-  data() {
-    return {
-    };
-  },
+  inject: ["borderWidth"],
   computed: {
+    /**
+     * Calculate the sign shape based on the sign type
+     * @returns the svg path for the sign
+     */
     path () {
       const type = this.signData.signType;
       let path = "";
       if (type == "touch") {
         path = "M 35,10 Q " + (this.width / 2) + ",40," + (this.width - 35) + ",10";
       } else if (type == "address") {
+        //the addressing bow changes depending on which side is adressing
         path = "M 35,10 H " + (this.width - 70) + " Q " + (this.width - 55) + ",40," + (this.width - 35) + ",10";
         if (this.signData.addressing == "left") {
           path = "M 35,10 Q 55,40,70,10 H " + (this.width - 35) ;
@@ -96,25 +95,18 @@ export default {
       } else if (type == "near") {
         path = "M 35,10 Q " + (this.width / 2) + ",40," + (this.width - 35) + ",10";
       } else if (type == "support") {
-        path = "M 35,10 L 60, 30 H " + (this.width - 60) + " L " + (this.width - 35) + ",10";
+        path = "M 35,10 L 55, 25 H " + (this.width - 55) + " L " + (this.width - 35) + ",10";
       }
       return path; 
     },
+    /**
+     * calculates the "X" path for the grasping modification
+     * @returns the grasping path
+     */
     graspingPath () {
       let path = "M " + (this.width / 2 - 5) + "," + (this.height / 2 - 5) + " l 10,10" + "M " + (this.width / 2 - 5) + "," + (this.height / 2 + 5) + " l 10,-10";  
       return path;
     }
   },
-  mounted () {
-    
-  },
-  methods: {
-    
-  },
 }
 </script>
-
-
-<style scoped>
-
-</style>

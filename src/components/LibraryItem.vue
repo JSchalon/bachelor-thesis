@@ -15,6 +15,9 @@
 <script>
 /**
  * The LibraryItem component
+ * @emits expand requests being expanded
+ * @emits emitSigns emit the loaded signs to the category container
+ * @emits selectSign request sign beeing selected
  * @displayName Library Item
  */
 export default {
@@ -40,51 +43,70 @@ export default {
     };
   },
   computed: {
+    /**
+     * gets the translation strings for the signs in the category
+     * @returns the sign name translations
+     */
     langStrings () {
       let lang = this.$store.state["language"];
       let json = require('@/assets/sign-category-loaders/' + this.category + '-' + lang + '.json');
       let obj = JSON.parse(JSON.stringify(json));
       return obj;
     },
+    /**
+     * @returns the beat height
+     */
     minHeight () {
       return this.barHeight() / this.$store.state["beatsPerBar"];
     }
   },
   watch: {
+    /**
+     * observes if the category is active
+     * @param value the new active value
+     */
     active (value) {
       if (value) {
+        // if active -> reset touch listeners
         setTimeout(function () {
           for (let elem of document.getElementById("lib-item" + this.catIndex).getElementsByClassName("library-sign-svg")) {
             ["touchstart", "touchmove", "touchend"].forEach((et) => elem.addEventListener(et, this.ignoreTouch));
           }
         }.bind(this), 10);
-        
       }
     }
   },
   mounted () {
-    //load signs and add click functionality
+    //load sign data from json
     let json = require('@/assets/sign-category-loaders/' + this.category + '.json');
     let obj = JSON.parse(JSON.stringify(json));
     this.height = obj.catHeight;
     this.baseHeight = obj.baseHeight;
     let general = {};
+    // get general values of the loaded category
     for (let [key,value] of Object.entries(obj.general[0])) {
-        general[key] = value;
-      }
+      general[key] = value;
+    }
+    // make sign data
     for (let index = 0; index < obj.signData.length; index++) {
+      // make new object with general data
       let newSign = {};
       newSign = Object.assign(newSign, general)
       newSign.signData = {};
+      // add sign specific data
       for (let [key,value] of Object.entries(obj.signData[index])) {
         newSign.signData[key] = value;
       }
+      // add to signs
       this.signs.push(newSign);
-
     }
     this.$emit("emitSigns", {catIndex: this.catIndex, signs: this.signs});
   },
   methods: {
+    /**
+     * selects a sign
+     * @param index the index of the sign in the category
+     */
     selectSign (index) {
       let nameElem = this.langStrings.names.find(elem => this.signs[index].signData.signType == elem.signType);
       this.$emit("selectSign", {catIndex: this.catIndex, name: nameElem.name, index: index, height: this.baseHeight, signData: this.signs[index].signData, updateSign: false});
@@ -104,7 +126,6 @@ export default {
   },
 }
 </script>
-
 
 <style scoped>
   .turned {

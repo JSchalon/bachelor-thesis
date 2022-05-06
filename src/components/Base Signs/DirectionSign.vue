@@ -15,13 +15,10 @@
     <g :transform="'translate(' + getPositionTransform() + ',0)'">
       <Pin v-if="signData.position && signData.position != '---'" :isSelected="isSelected" :id="id" :signData="signData.position == 'Infront' ? {signType: 'Low', degree: 0}:{signType: 'Low', degree: 180}" :height="height"/>
     </g>
-    <!-- add aditional stuff to display, like another sign or smth-->
   </g>
 </template>
 
 <script>
-
-
 /**
  * The general Direction Sign component
  * @displayName Direction Sign
@@ -37,6 +34,7 @@ export default {
   inject: ["signWidth","borderWidth", "barHeight"],
   data() {
     return {
+      //stores all variations of signs. There are 4 bases which are then mirrored to produce all other signs
       variations: [
         {name: "left-forward", base: 1, transform: []},
         {name: "forward left", base: 0, transform: []},
@@ -55,6 +53,9 @@ export default {
     };
   },
   computed: {
+    /**
+     * returns the svg paths for all the direction sign basetypes
+     */
     baseSigns () {
       let baseSigns = [
         {name: "straight", points: ""},
@@ -77,9 +78,16 @@ export default {
 
       return baseSigns;
     },
+    /**
+     * returns the beat height for further calculation
+     */
     beatHeight () {
       return this.barHeight() / this.$store.state["beatsPerBar"];
     },
+    /**
+     * returns the transform of the sign based on the sign type variation
+     * to mirror a sign it is scaled by a factor of -1 and moved to the right by its width/height
+     */
     transform() {
       let transformString = "";
       let scale = [1,1];
@@ -97,7 +105,6 @@ export default {
         }
         transformString = "translate(" + translate[0] + ", " +  translate[1] + ") " + "scale(" + scale[0] + ", "+ scale[1] +")";
       }
-      
       return transformString;
     },
     variation () {
@@ -110,10 +117,11 @@ export default {
       return variation;
     }
   },
-  mounted () {
-    
-  },
   methods: {
+    /**
+     * returns the fill of the sign based on its vertical level
+     * the high direction is stored as a pattern in the canvas (Score.vue) and referenced here by an url
+     */
     getFill () {
       if (this.signData.dimension == "Low") {
         return "black";
@@ -130,6 +138,10 @@ export default {
         return "white";
       }
     },
+    /**
+     * returns the position of the "relative position pin" 
+     * (left to the sign on the left side, right on the right side)
+     */
     getPositionTransform() {
       if (this.signData.side == "left") {
         return -this.signWidth + 10;
@@ -140,8 +152,3 @@ export default {
   },
 }
 </script>
-
-
-<style scoped>
-
-</style>

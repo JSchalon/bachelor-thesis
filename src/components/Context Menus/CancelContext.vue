@@ -29,19 +29,18 @@ export default {
   emits: ["updateSignData", "delete"],
   data() {
     return {
+      //the cancel sign types
       types: [
         {text: 'back-normal', img: "/cancel/cancel-back.svg"},
         {text: 'release-contact', img: "/cancel/cancel-release.svg"},
       ],
     };
   },
-  computed: {
-    
-  },
-  mounted () {
-    
-  },
   methods: {
+    /**
+     * changes the type
+     * @param index the index in the types array
+     */
     changeType(index) {
       if (index == 1) {
         this.newSignData ({signType: "release-contact"});
@@ -51,11 +50,14 @@ export default {
     },
     /**
      * The function that sends the updated sign data back to the score
-     * @arg data the updated sign data 
+     * @param data the updated sign data 
      */
     newSignData (data) {
       this.$emit("updateSignData", {index: parseInt(this.signIndex), data: data});
     },
+    /**
+     * Emits the deletion request for the sign
+     */
     emitDelete() {
       this.$emit("delete", parseInt(this.signIndex))
     }

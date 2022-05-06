@@ -22,13 +22,10 @@
       :stroke-width="isSelected ? borderWidth + 1: borderWidth"
       :signID="id">
     </circle>
-    <!--todo: add a flat pin with the rotation given by the signData.angle-->
   </g>
 </template>
 
 <script>
-
-
 /**
  * The Pelvis sign component
  * @displayName Pelvis Sign
@@ -48,17 +45,5 @@ export default {
       textHeight: 0,
     };
   },
-  computed: {
-  },
-
-  mounted () {
-  },
-  methods: {
-    
-  },
 }
 </script>
-
-
-<style scoped>
-</style>

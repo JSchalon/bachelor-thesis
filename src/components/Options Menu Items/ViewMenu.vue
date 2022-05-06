@@ -30,22 +30,35 @@
  */
 export default {
     name: 'ViewMenu',
-    emits: ["requestNewScore"],
     props: {
       showShortCuts: Boolean
     },
     computed: {
+      /**
+       * checks if the dotted line on the canvas is active
+       * @returns the help lines active boolean
+       */
       helpLinesActive(){
         return this.$store.state["showHelpLines"];
       },
+      /**
+       * checks if the score description on the canvas is active
+       * @returns the score description active boolean
+       */
       showScoreDescription(){
         return this.$store.state["showScoreDescription"];
       }
     },
     methods: {
+      /**
+       * toggles the help lines on or off
+       */
       toggleHelpLines() {
         this.$store.dispatch("changeSettings", {showHelpLines: !this.helpLinesActive});
       },
+      /**
+       * toggles the score description on or off
+       */
       toggleScoreDescription() {
         this.$store.dispatch("changeSettings", {showScoreDescription: !this.showScoreDescription});
       }

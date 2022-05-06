@@ -20,8 +20,6 @@
 </template>
 
 <script>
-
-
 /**
  * The Vibration Sign component
  * @displayName Vibration Sign
@@ -35,25 +33,31 @@ export default {
     height: Number,
   },
   inject: ["signWidth", "borderWidth", "barHeight"],
-  data() {
-    return {
-      
-    };
-  },
   computed: {
     beatHeight () {
       return this.barHeight() / this.$store.state["beatsPerBar"];
     },
+    /**
+     * Calculates the frequenzy of the vibration wiggle
+     * @returns the frequenzy
+     */
     squiggleStep () {
       return this.barHeight() / 10;
     },
+    /**
+     * Calculates the amplitude of the vibration wiggle
+     * @returns the amplitude
+     */
     squiggleAmplitude () {
       return this.signWidth / 3;
     },
+    /**
+     * Calculates the sign path
+     * @returns the path
+     */
     makeSquiggle() {
-      // Adjust step so that there are a whole number of steps along the path
       let height = this.height;
-      if (this.signData.upperPin || this.signData.lowerPin) {
+      if (this.signData.upperPin || this.signData.lowerPin) { // pins active -> stop wiggle further up
         height = this.height - 45;
       }
       let numSteps = Math.round(height / this.squiggleStep);
@@ -86,16 +90,5 @@ export default {
       return newPath;
     }
   },
-  mounted () {
-    
-  },
-  methods: {
-    
-  },
 }
 </script>
-
-
-<style scoped>
-
-</style>

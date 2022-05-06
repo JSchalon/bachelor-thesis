@@ -32,26 +32,20 @@ export default {
     height: Number,
   },
   inject: ["signWidth","borderWidth"],
-  data() {
-    return {
-    };
-  },
-  computed: {
-    
-  },
-  mounted () {
-    
-  },
   methods: {
+    /**
+     * calculates the path head/tail based on the signType
+     * @param isTop boolean. used to determine the vertical position
+     */
     pathHead (isTop) {
       let yPos = 5;
-      if (!isTop) {
+      if (!isTop) { // tail -> move position to the bottom of the sign
         yPos = this.height - 5;
       }
-      let path = "M " + (this.signWidth/2 - 15) +"," + yPos + " H " + (this.signWidth/2 + 15);
-      if (this.signData.signType.includes("circular")) {
+      let path = "M " + (this.signWidth/2 - 15) +"," + yPos + " H " + (this.signWidth/2 + 15); // straight path -> flat head
+      if (this.signData.signType.includes("circular")) { // circular path -> slanted head
         path = "M " + (this.signWidth/2 - 15) +"," + (yPos - 5) + " L " + (this.signWidth/2 + 15) + "," + (yPos + 5);
-      } else if (this.signData.signType == "any") {
+      } else if (this.signData.signType == "any") { // any path -> curved head
         path = 
           "M " + (this.signWidth/2 - 15) +"," + yPos + 
           "Q" + (this.signWidth/2 - 7.5) + "," + (yPos - 10) + "," + (this.signWidth/2) + "," + yPos +
@@ -62,8 +56,3 @@ export default {
   },
 }
 </script>
-
-
-<style scoped>
-
-</style>

@@ -21,7 +21,6 @@
       :stroke-width="isSelected ? borderWidth + 1: borderWidth"
       :signID="id">
     </circle>
-    <!--todo: add a flat pin with the rotation given by the signData.angle-->
   </g>
 </template>
 
@@ -47,17 +46,5 @@ export default {
       textHeight: 0,
     };
   },
-  computed: {
-  },
-
-  mounted () {
-  },
-  methods: {
-    
-  },
 }
 </script>
-
-
-<style scoped>
-</style>

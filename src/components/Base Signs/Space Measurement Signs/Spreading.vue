@@ -21,32 +21,18 @@ export default {
     id: Number,
     degree: Number,
   },
-  inject: ["signWidth","borderWidth"],
-  data() {
-    return {
-    };
-  },
+  inject: ["borderWidth"],
   computed: {
+    /**
+     * returns the svg path for the sign
+     */
     path () {
       let path = "M 0,10 L 10,23.333333333333332 L 30,23.333333333333332 L 40,10";
-      if (this.degree > 3) {
+      if (this.degree > 3) { // degree > 3 -> change baseshape
         path = "M 0,10 L 10,23.333333333333332 L 30,23.333333333333332 L 40,10 M 6,18.333333333333332 L 34,18.333333333333332";
       }
-
       return path;
-    },
-    
-  },
-  mounted () {
-    
-  },
-  methods: {
-    
+    },   
   },
 }
 </script>
-
-
-<style scoped>
-
-</style>

@@ -32,11 +32,6 @@ export default {
       itemHeight: 0,
     };
   },
-  computed: {
-  },
-  mounted () {
-    
-  },
   methods: {
     /**
      * Method for changing the state of the property
@@ -46,11 +41,9 @@ export default {
       this.itemHeight = this.$refs.container.getBoundingClientRect().height;
     }
   },
-  
 };
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
   .anim {
     transition: x 0.2s ease;

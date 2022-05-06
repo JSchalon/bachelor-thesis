@@ -14,7 +14,6 @@
  */
 export default {
   name: "RoomDirectionSignContext",
-  inject: [],
   props: {
     signData: Object,
     isActive: Boolean,
@@ -22,17 +21,11 @@ export default {
     y: Number
   },
   emits: ["updateSignData", "delete"],
-  data() {
-    return {
-    };
-  },
-  computed: {
-    
-  },
-  mounted () {
-    
-  },
   methods: {
+    /**
+     * changes the angle of the pin
+     * @param data the data from the sign category container
+     */
     changeAngle (data) {
       if (this.isActive){
         this.newSignData ({degree: data.degree});
@@ -40,11 +33,14 @@ export default {
     },
     /**
      * The function that sends the updated sign data back to the score
-     * @arg data the updated sign data 
+     * @param data the updated sign data 
      */
     newSignData (data) {
       this.$emit("updateSignData", {index: parseInt(this.signIndex), data: data});
     },
+    /**
+     * emits a deletion request
+     */
     emitDelete() {
       this.$emit("delete", parseInt(this.signIndex))
     }
@@ -52,7 +48,6 @@ export default {
 };
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style>
   .context-menu.inactive {
     display: none;

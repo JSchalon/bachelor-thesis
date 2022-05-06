@@ -22,8 +22,10 @@
           <label class="label">Template</label>
           <div class="control">
             <div class="select">
-              <select id="template-select" @change="checkBeatsPerBar">
-                <option>Blank Score</option>
+              <select id="template-select" @change="updateScoreParam">
+                <option template="blank-score">Blank Score</option>
+                <option template="walking-turning">Walking and Turning</option>
+                <option template="device-shake">Device Shake</option>
               </select>
             </div>
           </div>
@@ -37,7 +39,7 @@
         <div class="field" v-if="newScore">
           <!-- don't display if not blank score-->
           <label class="label">Beats per Measure</label>
-          <p class="help is-info">Currently cannot be changed after score creation</p>
+          <p class="help is-info">Currently cannot be changed after score creation or with custom templates.</p>
           <div class="control">
             <input class="input" type="number" min="1" max="8" placeholder="1 - 8" value="4" name="beatsPerBar" :disabled="beatsPerBarDisabled">
           </div>
@@ -71,7 +73,10 @@
 
 <script>
 /**
- * The score parameter and new score modal
+ * The modal used to create scores and edit their parameters
+ * @emits disableModal closes the modal and resumes the editor
+ * @emits checkBeatsPerBar change if the beats per bar option is enabled (only if making a new score with the blank template)
+ * @emits formSubmit submits the form
  * @displayName Score Edit Modal
  */
 export default {
@@ -82,43 +87,65 @@ export default {
     newScore: Boolean,
     beatsPerBarDisabled: Boolean
   },
-  data() {
-    return {
-    };
-  },
-  computed: {
-
-  },
   watch: {
+    /**
+     * observes the active state of the modal
+     * @param value the new observed value
+     */
     modalActive (value) {
-      if (value) {
+      if (value) { // modal active -> load data from vuex
         this.loadFormData();
       }
     }
   },
   mounted () {
+    // add eventlistener for submitting
     document.getElementById("edit-form").addEventListener("submit", this.updateScore);
+    // load the form data from vuex
     this.loadFormData();
   },
   methods: {
+    /**
+     * closes the modal
+     */
     disableModal () {
       this.$emit("disableModal");
     },
-    checkBeatsPerBar() {
+    /**
+     * only allow the beats per bar option when making a new score with the blank score template
+     */
+    updateScoreParam () {
       const value = document.getElementById('template-select').value != 'Blank Score';
       this.$emit("checkBeatsPerBar", value);
+      let data = undefined;
+      for (let elem of document.getElementById('template-select').childNodes) {
+        if (elem.value == document.getElementById('template-select').value) {
+          data = require("@/assets/score-templates/" + elem.getAttribute("template") + ".xml");
+        }
+      }
+      
+      const parser = new DOMParser();
+      let xml = parser.parseFromString(data.default,"text/xml");
+      document.getElementById("edit-form").querySelector("input[name='author']").value = xml.getElementsByTagName("laban:author")[0].innerHTML;
+      document.getElementById("edit-form").querySelector("input[name='title']").value = xml.getElementsByTagName("laban:title")[0].innerHTML;
+      document.getElementById("edit-form").querySelector("textarea[name='description']").value = xml.getElementsByTagName("laban:description")[0].innerHTML;
+      document.getElementById("edit-form").querySelector("input[name='beatsPerBar']").value = xml.getElementsByTagName("laban:beats")[0].innerHTML;
     },
+    /**
+     * requests updating the score
+     * @param event the submit event
+     */
     updateScore (event) {
       event.preventDefault();
       let data = {author: event.srcElement[1].value};
-      if (this.newScore) {
+      if (this.newScore) { // making a new score -> different elements in the form
         data.beatsPerBar = parseInt(event.srcElement[5].value);
         data.title = event.srcElement[2].value;
         data.template = event.srcElement[3].value;
         data.description = event.srcElement[4].value;
         data.timeUnit = event.srcElement[6].value;
         data.beatDuration = event.srcElement[7].value;
-      } else {
+      } else { // editing the score
         data.title = event.srcElement[2].value;
         data.description = event.srcElement[3].value;
         data.timeUnit = event.srcElement[4].value;
@@ -127,6 +154,9 @@ export default {
       this.$emit("formSubmit", data);
       
     },
+    /**
+     * loads the current values of the form inpus from the vuex state
+     */
     loadFormData () {
       let form = document.getElementById("edit-form");
       form.elements["author"].value = this.$store.state["author"];

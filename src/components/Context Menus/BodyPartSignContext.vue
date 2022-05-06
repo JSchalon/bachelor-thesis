@@ -17,7 +17,7 @@
 /**
  * The context menu for the body part signs
  * @emits updateSignData updates the sign data given by the score
- * @emits delete deletes the sign
+ * @emits delete request sign deletion
  * @displayName Body Part Sign Context
  */
 export default {
@@ -32,11 +32,13 @@ export default {
   emits: ["updateSignData", "delete"],
   data() {
     return {
+      //data for the outer surface radio buttons
       surfaceInnerOuter: [
         {text: "---", img: false},
         {text: 'inner', img: "/body-parts/vertical-surface-inner.svg"},
         {text: 'outer', img: "/body-parts/vertical-surface-outer.svg"}
       ],
+      //data for the side surface radio buttons
       surfaceSides: [
         {text: "---", img: false},
         {text: 'littleFinger', img: "/body-parts/horizontal-surface-little.svg"},
@@ -47,13 +49,13 @@ export default {
       jointDefined: false,
     };
   },
-  computed: {
-    
-  },
   mounted () {
+    // set joint if true
     if (this.signData.joint !== false) {
       this.changeJointDefined(true);
     }
+
+    // set surface if true
     if (this.signData.surface !== false) {
       if (this.signData.surface.includes("inner")) {
         this.surfaceTop = "inner";
@@ -70,8 +72,8 @@ export default {
   },
   methods: {
     /**
-     * An example function changing the color based of an on/Off Option, as an example for the actual on/off funcitionality
-     * @arg data the boolean changing the limb 
+     * changes the limb
+     * @param data the boolean changing the limb 
      */
     changeLimb(data) {
       if (!data) {
@@ -80,14 +82,25 @@ export default {
         this.newSignData ({limb: data});
       }
     },
+    /**
+     * changes the outer surface
+     * @param index the index in the surfaceInnerOuter array 
+     */
     changeTopSurface(index) {
       this.surfaceTop = this.surfaceInnerOuter[index].text;
       this.changeSurface();
     },
+    /**
+     * changes the side surface
+     * @param index the index in the surfaceSides array 
+     */
     changeSideSurface(index) {
       this.surfaceSide = this.surfaceSides[index].text;
       this.changeSurface();
     },
+    /**
+     * changes the surface string
+     */
     changeSurface() {
       if ((this.surfaceTop != "" && this.surfaceTop != "---") && (this.surfaceSide != "" && this.surfaceSide != "---")) {
         this.newSignData ({surface: this.surfaceTop + "-" + this.surfaceSide});
@@ -99,6 +112,9 @@ export default {
         this.newSignData ({surface: false});
       }
     },
+    /**
+     * changes wheter or not a specific joint is defined (fingers, toes)
+     */
     changeJointDefined (data) {
       let joint = 0;
       if (data && !this.signData.digit && !this.signData.joint) {
@@ -108,19 +124,28 @@ export default {
       }
       this.jointDefined = data;
     },
+    /**
+     * change the active joint (fingers, toes)
+     */
     changeJoint (data) {
       this.newSignData({joint: data.joint});
     },
+    /**
+     * changes the active digit (fingers, toes)
+     */
     changeDigit (data) {
       this.newSignData({digit: data.digit});
     },
     /**
      * The function that sends the updated sign data back to the score
-     * @arg data the updated sign data 
+     * @param data the updated sign data 
      */
     newSignData (data) {
       this.$emit("updateSignData", {index: parseInt(this.signIndex), data: data});
     },
+    /**
+     * Emits the deletion request for the sign
+     */
     emitDelete() {
       this.$emit("delete", parseInt(this.signIndex))
     }
@@ -128,7 +153,6 @@ export default {
 };
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style>
   .context-menu.inactive {
     display: none;

@@ -19,13 +19,10 @@
       :stroke-width="isSelected ? borderWidth + 1: borderWidth"
       :signID="id">
     </path>
-    <!--todo: add a flat pin with the rotation given by the signData.angle-->
   </g>
 </template>
 
 <script>
-
-
 /**
  * The Waist sign component
  * @displayName Waist Sign
@@ -39,13 +36,11 @@ export default {
     height: Number,
   },
   inject: ["signWidth", "borderWidth"],
-  data() {
-    return {
-      textWidth: 0,
-      textHeight: 0,
-    };
-  },
   computed: {
+    /**
+     * Calculate the sign shape
+     * @returns the svg path for the sign
+     */
     path () {
       let path = 
         "M " + (this.signWidth / 6 + 4) + "," + (this.signWidth / 6 + 4) + " l " + (this.signWidth / 1.5 - 8) + "," + (this.signWidth / 1.5 - 8) +
@@ -53,15 +48,5 @@ export default {
       return path;
     }
   },
-
-  mounted () {
-  },
-  methods: {
-    
-  },
 }
 </script>
-
-
-<style scoped>
-</style>

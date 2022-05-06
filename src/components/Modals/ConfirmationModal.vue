@@ -17,6 +17,8 @@
  * A generic confirmation modal with a title, a text, a confirm and a cancel button
  * Used to make sure a user understands the consequence an action might have
  * Change Text via slots
+ * @emits disableModal closes the modal
+ * @emits confirm confirms
  * @displayName Confirmation Modal
  */
 export default {
@@ -29,19 +31,6 @@ export default {
       Boolean
     }
   },
-  data() {
-    return {
-    };
-  },
-  computed: {
-
-  },
-  mounted () {
-    
-  },
-  methods: {
-    
-  }
 }
 </script>
 

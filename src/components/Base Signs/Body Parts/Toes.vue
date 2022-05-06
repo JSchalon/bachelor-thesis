@@ -36,39 +36,26 @@ export default {
     signData: Object,
     height: Number,
   },
-  inject: ["signWidth","borderWidth"],
-  data() {
-    return {
-      
-    };
-  },
+  inject: ["borderWidth"],
   computed: {
+    /**
+     * Calculate the sign shape
+     * @returns the svg path for the sign
+     */
     path () {
       let path = "M 15,10 L 25,10 M 15,30 L 25,30 M 15,15 L 25,15 M 15,20 L 25,20 M 15,25 L 25,25 M 25,0 V 40";
-      if (this.signData.limb) {
+      if (this.signData.limb) { // limb -> add vertical line
         path = "M 7.5,10 L 17.5,10 M 7.5,10 L 17.5,10 M 7.5,30 L 17.5,30 M 7.5,15 L 17.5,15 M 7.5,20 L 17.5,20 M 7.5,25 L 17.5,25 M 17.5,0 V 40 M 27.5,0 V 40";
       }
-      if (this.signData.surface) {
+      if (this.signData.surface) { // surface -> add surface path
         if (this.signData.surface.includes("littleFinger")) {
           path = path + "M 27.5,20 H 32";
         } else if (this.signData.surface.includes("thumb")) {
           path = path + "M 27.5,20 H 35";
         }
       }
-
       return path;
     },
-    
-  },
-  mounted () {
-  },
-  methods: {
-    
   },
 }
 </script>
-
-
-<style scoped>
-
-</style>

@@ -41,6 +41,8 @@
 /**
  * The general introdcution modal component
  * Loads the requested introduction
+ * @emits disableModal closes the loaded introduction
+ * @emits switchHighlight changes the highlighted element
  * @displayName Introduction Modal
  */
 export default {
@@ -58,14 +60,19 @@ export default {
     };
   },
   watch: {
+    /**
+     * observes if the modal is active
+     * @param value the new observed value 
+     */
     modalActive (value) {
+      // on state change -> reset vuex parameters
       this.resetState();
-      if (value) {
-        if (this.introData[this.curIndex].highlightID != "none") {
+      if (value) { // modal active -> load introduction
+        if (this.introData[this.curIndex].highlightID != "none") { // check if correct element is highlighted
           document.getElementById(this.introData[this.curIndex].highlightID).classList.add("tut-highlight");
         }
         this.switchState();
-      } else {
+      } else { // modal inactive -> remove highlighting
         if (this.introData[this.curIndex].highlightID != "none") {
           if (this.introData[this.curIndex].highlightID.constructor === Array) {
             for (let index in this.introData[this.curIndex].highlightID) {
@@ -77,9 +84,14 @@ export default {
         }
       }
     },
+    /**
+     * observes the intro prop and loads the specific introduction on change
+     */
     intro () {
       if (this.modalActive) {
+        //reset current intro index
         this.curIndex = 0;
+        // load the intro from the json file
         let lang = this.$store.state["language"];
         let json = require('@/assets/editor-help/' + this.intro + lang + '.json');
         let obj = JSON.parse(JSON.stringify(json));
@@ -87,12 +99,18 @@ export default {
         for (const elem of Object.entries(obj.introData)) {
           data.push(elem[1]);
         }
+        //set the breakpoints for the navigation dots
         this.breakPoints = obj.breakPoints;
+        //set the introdcution data
         this.introData = data;
       } 
     }
   },
   computed: {
+    /**
+     * calculates the current position of the modal
+     * @returns the modal translation
+     */
     getPosition () {
       if (!("position" in this.introData[this.curIndex])) {
         return "";
@@ -102,6 +120,10 @@ export default {
         return "transform: translate(" + elemRect[pos.hSide] + "px, " + elemRect[pos.vSide] + "px);";
       }
     },
+    /**
+     * loads the image for the current introduction index, if there is one
+     * @returns the image file
+     */
     imgSrc () {
       if ("image" in this.introData[this.curIndex] && this.modalActive) {
         let introCat = this.intro;
@@ -112,6 +134,7 @@ export default {
     }
   },
   mounted () {
+    // loads the first introduction at mount via the intro prop
     let lang = this.$store.state["language"];
     let json = require('@/assets/editor-help/' + this.intro + lang + '.json');
     let obj = JSON.parse(JSON.stringify(json));
@@ -123,18 +146,24 @@ export default {
     this.introData = data;
   },
   methods: {
+    /**
+     * switches the view to a new index
+     * @param index the new index
+     */
     switchIndex (index) {
       this.resetState();
-      if (this.introData[this.curIndex].highlightID != "none") {
-        if (this.introData[this.curIndex].highlightID.constructor === Array) {
+      if (this.introData[this.curIndex].highlightID != "none") { // currently highlighting elements -> unhighlight
+        if (this.introData[this.curIndex].highlightID.constructor === Array) { // multiple highlighted items
           for (let index in this.introData[this.curIndex].highlightID) {
             document.getElementById(this.introData[this.curIndex].highlightID[index]).classList.remove("tut-highlight");
           }
-        } else {
+        } else { // one element
           document.getElementById(this.introData[this.curIndex].highlightID).classList.remove("tut-highlight");
         }
       }
+      // set new index
       this.curIndex = index;
+      // highlihgt new element(s) if there are some
       if (this.introData[this.curIndex].highlightID != "none") {
         if (this.introData[this.curIndex].highlightID.constructor === Array) {
           for (let index in this.introData[this.curIndex].highlightID) {
@@ -144,13 +173,22 @@ export default {
           document.getElementById(this.introData[this.curIndex].highlightID).classList.add("tut-highlight");
         }
       }
+      //switch the state of the vuex variables
       this.switchState();
     },
+    /**
+     * moves to the next index
+     */
     next () {
+      //reset the vuex variables
       this.resetState();
+
       this.curIndex = this.curIndex + 1;
+
+      //emit the new highlighted part of the user interface
       this.$emit('switchHighlight', this.introData[this.curIndex].highlightElem);
       setTimeout(() => {
+        //old highlighted elements != the new ones -> remove highlihgts and set new ones
         if (this.introData[this.curIndex].highlightID != this.introData[this.curIndex - 1].highlightID) {
           if (this.introData[this.curIndex - 1].highlightID != "none") {
             if (this.introData[this.curIndex - 1].highlightID.constructor === Array) {
@@ -172,13 +210,22 @@ export default {
           } 
         }
       }, 1);
+      //switch vuex variables
       this.switchState();
     },
+    /**
+     * moves back one index
+     */
     back () {
+      //reset the vuex variables
       this.resetState();
+
       this.curIndex = this.curIndex - 1;
+
+      //emit the new highlighted part of the user interface
       this.$emit('switchHighlight', this.introData[this.curIndex].highlightElem);
       setTimeout(() => {
+        //old highlighted elements != the new ones -> remove highlihgts and set new ones
         if (this.introData[this.curIndex].highlightID != this.introData[this.curIndex + 1].highlightID) {
           if (this.introData[this.curIndex + 1].highlightID != "none") {
             if (this.introData[this.curIndex + 1].highlightID.constructor === Array) {
@@ -200,11 +247,16 @@ export default {
           } 
         }
       }, 1);
+      //switch vuex variables
       this.switchState();
     },
+    /**
+     * checks if any vue actions are to be performed during the introduction
+     */
     switchState() {
-      if (this.introData[this.curIndex].stateChange) {
-       
+      if (this.introData[this.curIndex].stateChange) { // stateChange true -> call vue actions 
+
+        //call all vue actions based on the stateChange of the current index
         for (let [key, value] of Object.entries(this.introData[this.curIndex].stateChange)) {
           if (value.constructor === Array) {
             for (let index of value) {
@@ -216,7 +268,11 @@ export default {
         }
       }
     },
+    /**
+     * resets the selected signs, the grid selection and context menu in the vuex state
+     */
     resetState () {
+      //currently these three are being used in the introductions, although further vuex actions could be added
       this.$store.dispatch("clearSelectedSigns");
       this.$store.dispatch("clearGridSelect");
       this.$store.dispatch("changeContextMenu", false);

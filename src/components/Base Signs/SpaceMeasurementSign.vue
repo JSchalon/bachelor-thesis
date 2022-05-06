@@ -24,10 +24,8 @@
 </template>
 
 <script>
-
-
 /**
- * The general space measurement sign component
+ * The general space measurement sign component. Loads the specific sign with the signdata.SignType.
  * @displayName Space Measurement Sign
  */
 export default {
@@ -39,17 +37,11 @@ export default {
     height: Number,
   },
   inject: ["signWidth","borderWidth"],
-  data() {
-    return {
-    };
-  },
-  computed: {
-  
-  },
-  mounted () {
-    
-  },
   methods: {
+    /**
+     * Calculates the x and y translation of the sign
+     * @returns the translation string
+     */
     getTranslate() {
       let xComp = (this.signWidth / 2) * 0.3; 
       let yComp = ((this.height - this.signWidth) + this.signWidth / 2) * 0.3; 
@@ -58,8 +50,3 @@ export default {
   },
 }
 </script>
-
-
-<style scoped>
-
-</style>
